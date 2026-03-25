@@ -8,7 +8,8 @@
     "scheme": "app2",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.a-cube-expo.app-2"
     },
     "android": {
       "adaptiveIcon": {

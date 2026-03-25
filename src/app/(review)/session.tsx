@@ -1,22 +1,20 @@
 import { ScrollView, Text } from "react-native";
+
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
 
-export default function HomeScreen() {
+export default function SessionScreen() {
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 24,
-      }}
+      contentContainerStyle={{ padding: 24, gap: 12 }}
       style={{ backgroundColor: colors.bg }}
     >
-      <Text style={textStyles.word}>WortSchatz</Text>
-      <Text style={[textStyles.mono, { marginTop: 8 }]}>
-        il tuo tedesco, parola per parola
+      <Text selectable style={textStyles.body}>
+        La sessione di ripasso apparira qui.
+      </Text>
+      <Text selectable style={textStyles.bodyLight}>
+        Rispondi alle domande per consolidare il vocabolario.
       </Text>
     </ScrollView>
   );
