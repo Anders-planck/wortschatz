@@ -3,14 +3,14 @@ import { NativeTabs } from "expo-router/unstable-native-tabs";
 export default function AppTabs() {
   return (
     <NativeTabs minimizeBehavior="onScrollDown">
-      <NativeTabs.Trigger name="(search,vocabulary)">
+      <NativeTabs.Trigger name="(search)">
         <NativeTabs.Trigger.Icon
           sf={{ default: "magnifyingglass", selected: "magnifyingglass" }}
         />
         <NativeTabs.Trigger.Label>Cerca</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="(search,vocabulary)">
+      <NativeTabs.Trigger name="(vocabulary)">
         <NativeTabs.Trigger.Icon
           sf={{ default: "list.bullet", selected: "list.bullet" }}
         />
