@@ -1,12 +1,10 @@
 import { useState, useCallback } from "react";
 import type { Word } from "@/features/dictionary/types";
-import { fetchFromWiktionary } from "@/features/dictionary/services/wiktionary-client";
-import { generateWordContext } from "@/features/dictionary/services/ai-context-service";
 import {
-  getWordByTerm,
-  insertWord,
-  updateWordAIContent,
-} from "@/features/shared/db/words-repository";
+  lookupFromCache,
+  lookupFromWiktionary,
+  enrichWithAI,
+} from "@/features/dictionary/services/word-lookup-service";
 
 interface UseWordLookupReturn {
   word: Word | null;
@@ -32,72 +30,29 @@ export function useWordLookup(): UseWordLookupReturn {
     setIsAILoading(false);
 
     try {
-      // Phase 0: Check SQLite cache
-      const cached = await getWordByTerm(normalized);
+      const cached = await lookupFromCache(normalized);
       if (cached) {
         setWord(cached);
         setIsLoading(false);
         return;
       }
 
-      // Phase 1: Fetch from Wiktionary
-      const wiktionaryData = await fetchFromWiktionary(normalized);
-
-      if (!wiktionaryData) {
+      const baseWord = await lookupFromWiktionary(normalized);
+      if (!baseWord) {
         setError(`"${normalized}" nicht gefunden`);
         setIsLoading(false);
         return;
       }
 
-      const now = new Date().toISOString();
-      const baseWord: Omit<Word, "id"> = {
-        term: wiktionaryData.term ?? normalized,
-        type: wiktionaryData.type ?? "noun",
-        gender: wiktionaryData.gender ?? null,
-        plural: wiktionaryData.plural ?? null,
-        translations: wiktionaryData.translations ?? [],
-        forms: wiktionaryData.forms ?? null,
-        examples: null,
-        usageContext: null,
-        audioUrl: null,
-        rawWiktionary: wiktionaryData.rawWiktionary ?? null,
-        searchedAt: now,
-        reviewScore: 0,
-        nextReview: null,
-        category: null,
-        createdAt: now,
-      };
-
-      // Save base word to SQLite
-      const id = await insertWord(baseWord);
-      const savedWord: Word = { ...baseWord, id };
-      setWord(savedWord);
+      setWord(baseWord);
       setIsLoading(false);
-
-      // Phase 2: AI enrichment (background, non-critical)
       setIsAILoading(true);
+
       try {
-        const context = await generateWordContext(wiktionaryData);
-
-        await updateWordAIContent(
-          savedWord.term,
-          context.examples,
-          context.usageContext,
-          context.category,
-        );
-
-        setWord((prev) =>
-          prev
-            ? {
-                ...prev,
-                examples: context.examples,
-                usageContext: context.usageContext,
-                category: context.category,
-              }
-            : prev,
-        );
+        const enriched = await enrichWithAI(baseWord);
+        setWord(enriched);
       } catch {
-        // AI failure is non-critical — word is still usable without context
+        // AI failure is non-critical
       } finally {
         setIsAILoading(false);
       }
