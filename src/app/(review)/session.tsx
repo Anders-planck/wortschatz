@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { Stack, useRouter } from "expo-router";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 
 import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
 import { useReviewSession } from "@/features/review/hooks/use-review-session";
 import { SessionProgress } from "@/features/review/components/session-progress";
 import { ReviewCard } from "@/features/review/components/review-card";
 import { ResponseButtons } from "@/features/review/components/response-buttons";
 import { SessionComplete } from "@/features/review/components/session-complete";
+import { SessionEmpty } from "@/features/review/components/session-empty";
 
 export default function SessionScreen() {
   const router = useRouter();
@@ -32,16 +32,7 @@ export default function SessionScreen() {
   if (words.length === 0) {
     return (
       <>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: colors.bg,
-          }}
-        >
-          <Text style={textStyles.mono}>No words to review</Text>
-        </View>
+        <SessionEmpty />
         <Stack.Screen.Title>Sessione</Stack.Screen.Title>
       </>
     );
@@ -50,13 +41,11 @@ export default function SessionScreen() {
   if (isComplete) {
     return (
       <>
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
-          <SessionComplete
-            total={total}
-            responses={responses}
-            onDone={() => router.back()}
-          />
-        </View>
+        <SessionComplete
+          total={total}
+          responses={responses}
+          onDone={() => router.back()}
+        />
         <Stack.Screen.Title>Completato</Stack.Screen.Title>
       </>
     );
