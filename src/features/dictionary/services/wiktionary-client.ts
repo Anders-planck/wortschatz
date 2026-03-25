@@ -73,7 +73,11 @@ export async function fetchFromWiktionary(
     const encoded = encodeURIComponent(term);
     const response = await fetch(`${BASE_URL}/page/summary/${encoded}`);
 
-    if (!response.ok) return null;
+    if (response.status === 404) return null;
+
+    if (!response.ok) {
+      throw new Error(`Wiktionary API error: ${response.status}`);
+    }
 
     const data = (await response.json()) as WiktionarySummary;
     const extract = data.extract ?? "";
@@ -87,7 +91,11 @@ export async function fetchFromWiktionary(
       translations: [],
       rawWiktionary: data as unknown as Record<string, unknown>,
     };
-  } catch {
-    return null;
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith("Wiktionary API")) {
+      throw err;
+    }
+    // Network error (timeout, DNS, etc.) — differentiate from "not found"
+    throw new Error("Network error: could not reach Wiktionary");
   }
 }

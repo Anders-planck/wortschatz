@@ -1,10 +1,8 @@
 import { useState, useCallback, useRef } from "react";
 import { useFocusEffect } from "expo-router";
 
-import type { Word } from "@/features/dictionary/types";
+import type { Word, WordFilter } from "@/features/dictionary/types";
 import { getAllWords } from "@/features/shared/db/words-repository";
-
-type WordFilter = "noun" | "verb" | "preposition" | undefined;
 
 export function useVocabulary() {
   const [words, setWords] = useState<Word[]>([]);

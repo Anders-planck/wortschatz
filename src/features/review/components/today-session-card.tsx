@@ -4,13 +4,11 @@ import { textStyles } from "@/features/shared/theme/typography";
 
 interface TodaySessionCardProps {
   wordCount: number;
-  completedCount: number;
   onStart: () => void;
 }
 
 export function TodaySessionCard({
   wordCount,
-  completedCount,
   onStart,
 }: TodaySessionCardProps) {
   const dots = Array.from({ length: Math.max(wordCount, 0) }, (_, i) => i);
@@ -54,8 +52,7 @@ export function TodaySessionCard({
                 width: 8,
                 height: 8,
                 borderRadius: 4,
-                backgroundColor:
-                  i < completedCount ? colors.der : "rgba(44, 44, 44, 0.08)",
+                backgroundColor: "rgba(44, 44, 44, 0.08)",
               }}
             />
           ))}

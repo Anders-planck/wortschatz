@@ -3,8 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
 import { hapticLight } from "@/features/shared/hooks/use-haptics";
-
-type WordFilter = "noun" | "verb" | "preposition" | undefined;
+import type { WordFilter } from "@/features/dictionary/types";
 
 interface FilterChipsProps {
   filter: WordFilter;

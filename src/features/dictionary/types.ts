@@ -19,3 +19,5 @@ const validCases = new Set<string>(["akk", "dat", "gen", "nom"]);
 export function isCaseType(value: string): value is CaseType {
   return validCases.has(value);
 }
+
+export type WordFilter = WordType | undefined;

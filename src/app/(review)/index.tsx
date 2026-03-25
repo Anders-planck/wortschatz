@@ -23,7 +23,6 @@ export default function ReviewScreen() {
         <DashboardGreeting streak={streak} totalCount={totalCount} />
         <TodaySessionCard
           wordCount={wordsToReview.length}
-          completedCount={0}
           onStart={() => router.push("/(review)/session")}
         />
         <TrickyWordsList words={trickyWords} />
