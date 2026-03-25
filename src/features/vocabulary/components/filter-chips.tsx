@@ -46,7 +46,9 @@ export function FilterChips({
               setFilter(chip.value);
             }}
             style={{
-              backgroundColor: isActive ? colors.textPrimary : "#F5F2EC",
+              backgroundColor: isActive
+                ? colors.textPrimary
+                : colors.chipInactive,
               borderRadius: 4,
               borderCurve: "continuous",
               paddingHorizontal: 10,

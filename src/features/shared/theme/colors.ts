@@ -23,4 +23,11 @@ export const colors = {
   akkText: "#8A7A5A",
   datBg: "#E0ECD8",
   datText: "#5A7A50",
+  genBg: "#E8E0F0",
+  genText: "#7A6A8A",
+  nomBg: "#E0E8F0",
+  nomText: "#5A6A7A",
+
+  againText: "#8A6058",
+  chipInactive: "#F5F2EC",
 } as const;

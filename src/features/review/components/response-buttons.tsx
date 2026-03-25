@@ -12,7 +12,7 @@ interface ButtonConfig {
 }
 
 const BUTTONS: Record<Response, ButtonConfig> = {
-  0: { label: "Again", borderColor: colors.die, textColor: "#8A6058" },
+  0: { label: "Again", borderColor: colors.die, textColor: colors.againText },
   1: {
     label: "Hard",
     borderColor: colors.border,

@@ -7,8 +7,8 @@ type CaseType = "akk" | "dat" | "gen" | "nom";
 const caseStyles: Record<CaseType, { bg: string; text: string }> = {
   akk: { bg: colors.akkBg, text: colors.akkText },
   dat: { bg: colors.datBg, text: colors.datText },
-  gen: { bg: "#E8E0F0", text: "#7A6A8A" },
-  nom: { bg: "#E0E8F0", text: "#5A6A7A" },
+  gen: { bg: colors.genBg, text: colors.genText },
+  nom: { bg: colors.nomBg, text: colors.nomText },
 };
 
 const caseLabels: Record<CaseType, string> = {
