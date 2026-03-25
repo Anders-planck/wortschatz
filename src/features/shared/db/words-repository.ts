@@ -172,3 +172,49 @@ export async function getRecentWords(limit = 10): Promise<Word[]> {
   );
   return rows.map(rowToWord);
 }
+
+export async function getWeeklyActivity(): Promise<number[]> {
+  const db = await getDatabase();
+  const now = new Date();
+  const dayOfWeek = (now.getDay() + 6) % 7; // Monday = 0
+
+  const counts: number[] = Array(7).fill(0);
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(now);
+    date.setDate(now.getDate() - (dayOfWeek - i));
+    const dayStr = date.toISOString().split("T")[0];
+    const result = await db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) as count FROM words WHERE DATE(searched_at) = ?",
+      [dayStr],
+    );
+    counts[i] = result?.count ?? 0;
+  }
+
+  return counts;
+}
+
+export async function getStreak(): Promise<number> {
+  const db = await getDatabase();
+  let streak = 0;
+  const now = new Date();
+
+  for (let i = 0; i < 365; i++) {
+    const date = new Date(now);
+    date.setDate(now.getDate() - i);
+    const dayStr = date.toISOString().split("T")[0];
+    const result = await db.getFirstAsync<{ count: number }>(
+      "SELECT COUNT(*) as count FROM words WHERE DATE(searched_at) = ?",
+      [dayStr],
+    );
+    if ((result?.count ?? 0) > 0) {
+      streak++;
+    } else {
+      // Allow today to have 0 if yesterday had activity
+      if (i === 0) continue;
+      break;
+    }
+  }
+
+  return streak;
+}
