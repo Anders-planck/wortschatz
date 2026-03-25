@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WortSchatz — Ubuntu Mono + Serif Variations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #F0EDE6;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 60px;
+  }
+
+  .page-title { text-align: center; margin-bottom: 12px; }
+  .page-title h1 { font-family: 'Ubuntu Mono', monospace; font-size: 28px; font-weight: 700; color: #2C2C2C; }
+  .page-title p { color: #A09890; font-size: 13px; margin-top: 4px; font-weight: 300; }
+
+  /* Variant selector */
+  .variant-tabs {
+    display: flex; justify-content: center; gap: 6px; margin-bottom: 32px; flex-wrap: wrap;
+  }
+  .vtab {
+    padding: 8px 16px; border-radius: 6px; border: 1.5px solid #DDD8D0;
+    background: #fff; color: #8A8078; font-family: 'Ubuntu Mono'; font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .vtab:hover { border-color: #B5AFA8; }
+  .vtab.active { background: #2C2C2C; color: #fff; border-color: #2C2C2C; }
+
+  .variant-section { display: none; }
+  .variant-section.active { display: block; }
+
+  .variant-info { text-align: center; margin-bottom: 24px; }
+  .variant-info h2 { font-size: 18px; font-weight: 400; color: #5C5650; }
+  .variant-info .pair { font-family: 'Ubuntu Mono'; font-size: 12px; color: #B5AFA8; margin-top: 4px; }
+
+  .phones-grid {
+    display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; max-width: 1500px; margin: 0 auto;
+  }
+
+  .phone-col { display: flex; flex-direction: column; align-items: center; }
+  .phone-label { font-family: 'Ubuntu Mono'; font-size: 11px; color: #B5AFA8; margin-bottom: 8px; letter-spacing: 1px; }
+
+  .phone {
+    width: 290px; height: 600px; background: #FFFFFF; border-radius: 32px;
+    overflow: hidden; position: relative; box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+  }
+
+  .safe-area { height: 48px; }
+  .screen { padding: 0 24px; height: calc(100% - 48px - 60px); overflow-y: auto; }
+  .screen::-webkit-scrollbar { width: 0; }
+
+  .tab-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+    background: #fff; border-top: 1px solid #F0EDE8;
+    display: flex; justify-content: space-around; align-items: center; padding-bottom: 8px;
+  }
+  .tab-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-family: 'Ubuntu Mono'; font-size: 9px; color: #C5BFB5; }
+  .tab-item.a { color: #2C2C2C; }
+  .tab-icon { font-size: 17px; }
+
+  /* Shared */
+  .divider { height: 1px; background: linear-gradient(90deg, #E8E4DD 0%, transparent 100%); margin: 14px 0; }
+  .s-title { font-family: 'Ubuntu Mono'; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C5BFB5; margin-bottom: 8px; }
+
+  .gender-strip { width: 28px; height: 3px; border-radius: 2px; margin-bottom: 12px; }
+  .gs-der { background: #C4A96A; }
+  .gs-die { background: #D4AAA0; }
+  .gs-das { background: #8DB58A; }
+
+  .gender-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .gd-der { background: #C4A96A; }
+  .gd-die { background: #D4AAA0; }
+  .gd-das { background: #8DB58A; }
+
+  .phonetic { font-family: 'Ubuntu Mono'; font-size: 12px; color: #B5AFA8; margin-top: 4px; }
+  .translation { font-size: 15px; font-weight: 400; color: #5C5650; margin-top: 12px; }
+  .audio-btn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 1px solid #E8E4DD; border-radius: 50%; font-size: 10px; color: #C5BFB5; background: none; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+
+  .decl { display: grid; grid-template-columns: 24px 1fr 1fr; gap: 3px 12px; font-size: 12px; color: #5C5650; }
+  .decl .cl { font-family: 'Ubuntu Mono'; font-size: 10px; color: #C5BFB5; font-weight: 700; }
+  .conj { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; font-size: 12px; color: #5C5650; }
+
+  .ex-it { font-size: 11px; color: #B5AFA8; margin-top: 4px; }
+  .ctx { font-size: 12px; font-weight: 300; color: #8A8078; line-height: 1.6; padding: 12px 14px; background: #FAF8F4; border-radius: 6px; }
+  .ctx strong { font-weight: 500; color: #5C5650; }
+
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 4px; font-family: 'Ubuntu Mono'; font-size: 10px; font-weight: 700; }
+  .pill-akk { background: #F0E8D8; color: #8A7A5A; }
+  .pill-dat { background: #E0ECD8; color: #5A7A50; }
+
+  /* Vocab */
+  .v-item { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid #F0EDE8; }
+  .v-bar { width: 4px; height: 28px; border-radius: 2px; flex-shrink: 0; }
+  .v-trans { font-size: 11px; color: #B5AFA8; }
+
+  .chips { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .chip { padding: 5px 12px; border-radius: 4px; font-family: 'Ubuntu Mono'; font-size: 10px; background: #F5F2EC; color: #8A8078; border: none; cursor: pointer; }
+  .chip.on { background: #2C2C2C; color: #fff; }
+
+  /* Review */
+  .stats { display: flex; gap: 8px; margin-bottom: 16px; }
+  .stat { flex: 1; text-align: center; padding: 12px 6px; background: #FAF8F4; border-radius: 6px; }
+  .stat-n { font-size: 22px; font-weight: 500; line-height: 1; }
+  .stat-l { font-family: 'Ubuntu Mono'; font-size: 8px; color: #B5AFA8; margin-top: 3px; letter-spacing: 0.5px; }
+  .r-card { background: #FAF8F4; border-radius: 6px; padding: 24px 20px; text-align: center; margin-bottom: 14px; }
+  .r-hint { font-family: 'Ubuntu Mono'; font-size: 11px; color: #C5BFB5; margin-top: 8px; }
+  .r-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
+  .r-btn { padding: 8px 16px; border-radius: 4px; font-family: 'Ubuntu Mono'; font-size: 11px; border: 1.5px solid #E8E4DD; background: #fff; color: #8A8078; cursor: pointer; }
+  .r-btn.yes { border-color: #8DB58A; color: #5A7A50; }
+  .r-btn.no { border-color: #D4AAA0; color: #8A6058; }
+
+  .p-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .p-label { font-family: 'Ubuntu Mono'; font-size: 9px; color: #B5AFA8; width: 48px; }
+  .p-bar { flex: 1; height: 4px; background: #F0EDE8; border-radius: 2px; overflow: hidden; }
+  .p-fill { height: 100%; border-radius: 2px; }
+
+  /* Splash */
+  .splash { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100% - 48px - 60px); position: relative; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50% 40% 60% 45% / 50% 55% 45% 50%; }
+  .b1 { width: 180px; height: 220px; background: #E8B98A; opacity: 0.45; top: 50px; left: -30px; transform: rotate(-15deg); }
+  .b2 { width: 120px; height: 140px; background: #D4A87C; opacity: 0.3; top: 200px; left: 30px; border-radius: 45% 55% 50% 48% / 52% 45% 55% 48%; transform: rotate(20deg); }
+  .b3 { width: 100px; height: 120px; background: #D4AAA0; opacity: 0.35; top: 300px; left: -5px; border-radius: 52% 48% 45% 55% / 48% 52% 48% 52%; }
+  .splash-sub { font-family: 'Ubuntu Mono'; font-size: 12px; color: #B5AFA8; z-index: 1; margin-top: 6px; }
+
+  /* Search input */
+  .search-input { width: 100%; padding: 12px 14px; border: 1.5px solid #E0DCD5; border-radius: 8px; font-size: 15px; color: #2C2C2C; background: #fff; outline: none; }
+  .search-hint { font-family: 'Ubuntu Mono'; font-size: 11px; color: #B5AFA8; margin-bottom: 10px; }
+
+  .recent-word { font-size: 15px; font-weight: 500; color: #2C2C2C; display: flex; align-items: center; gap: 7px; }
+  .recent-def { font-size: 12px; font-weight: 300; color: #A09890; margin-top: 3px; line-height: 1.4; }
+
+  /* --- FONT VARIANT OVERRIDES --- */
+
+  /* V1: Playfair Display (original) */
+  .v-playfair .word-display { font-family: 'Playfair Display', serif; }
+  .v-playfair .splash-word { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 400; color: #2C2C2C; z-index: 1; }
+  .v-playfair .search-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 400; color: #2C2C2C; margin-bottom: 4px; }
+  .v-playfair .card-word { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 400; color: #2C2C2C; line-height: 1.1; }
+  .v-playfair .ex { font-family: 'Playfair Display', serif; font-size: 14px; font-style: italic; color: #3C3830; line-height: 1.6; }
+  .v-playfair .ex .hl { background: linear-gradient(to bottom, transparent 55%, rgba(196,169,106,0.15) 55%); cursor: pointer; }
+  .v-playfair .v-word { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; color: #2C2C2C; flex: 1; }
+  .v-playfair .r-word { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; color: #2C2C2C; }
+  .v-playfair .stat-n { font-family: 'Playfair Display', serif; }
+  .v-playfair .recent-word { font-family: 'Playfair Display', serif; }
+
+  /* V2: Lora */
+  .v-lora .word-display { font-family: 'Lora', serif; }
+  .v-lora .splash-word { font-family: 'Lora', serif; font-size: 34px; font-weight: 500; color: #2C2C2C; z-index: 1; }
+  .v-lora .search-title { font-family: 'Lora', serif; font-size: 24px; font-weight: 500; color: #2C2C2C; margin-bottom: 4px; }
+  .v-lora .card-word { font-family: 'Lora', serif; font-size: 32px; font-weight: 500; color: #2C2C2C; line-height: 1.1; }
+  .v-lora .ex { font-family: 'Lora', serif; font-size: 14px; font-style: italic; color: #3C3830; line-height: 1.6; }
+  .v-lora .ex .hl { background: linear-gradient(to bottom, transparent 55%, rgba(196,169,106,0.15) 55%); cursor: pointer; }
+  .v-lora .v-word { font-family: 'Lora', serif; font-size: 15px; font-weight: 500; color: #2C2C2C; flex: 1; }
+  .v-lora .r-word { font-family: 'Lora', serif; font-size: 30px; font-weight: 500; color: #2C2C2C; }
+  .v-lora .stat-n { font-family: 'Lora', serif; }
+  .v-lora .recent-word { font-family: 'Lora', serif; }
+
+  /* V3: Crimson Pro */
+  .v-crimson .word-display { font-family: 'Crimson Pro', serif; }
+  .v-crimson .splash-word { font-family: 'Crimson Pro', serif; font-size: 38px; font-weight: 400; color: #2C2C2C; z-index: 1; letter-spacing: -0.5px; }
+  .v-crimson .search-title { font-family: 'Crimson Pro', serif; font-size: 26px; font-weight: 400; color: #2C2C2C; margin-bottom: 4px; }
+  .v-crimson .card-word { font-family: 'Crimson Pro', serif; font-size: 36px; font-weight: 400; color: #2C2C2C; line-height: 1.1; letter-spacing: -0.5px; }
+  .v-crimson .ex { font-family: 'Crimson Pro', serif; font-size: 15px; font-style: italic; color: #3C3830; line-height: 1.6; }
+  .v-crimson .ex .hl { background: linear-gradient(to bottom, transparent 55%, rgba(196,169,106,0.15) 55%); cursor: pointer; }
+  .v-crimson .v-word { font-family: 'Crimson Pro', serif; font-size: 16px; font-weight: 500; color: #2C2C2C; flex: 1; }
+  .v-crimson .r-word { font-family: 'Crimson Pro', serif; font-size: 34px; font-weight: 400; color: #2C2C2C; }
+  .v-crimson .stat-n { font-family: 'Crimson Pro', serif; }
+  .v-crimson .recent-word { font-family: 'Crimson Pro', serif; }
+
+  /* V4: Source Serif 4 */
+  .v-source .word-display { font-family: 'Source Serif 4', serif; }
+  .v-source .splash-word { font-family: 'Source Serif 4', serif; font-size: 34px; font-weight: 400; color: #2C2C2C; z-index: 1; }
+  .v-source .search-title { font-family: 'Source Serif 4', serif; font-size: 24px; font-weight: 500; color: #2C2C2C; margin-bottom: 4px; }
+  .v-source .card-word { font-family: 'Source Serif 4', serif; font-size: 32px; font-weight: 500; color: #2C2C2C; line-height: 1.1; }
+  .v-source .ex { font-family: 'Source Serif 4', serif; font-size: 14px; font-style: italic; color: #3C3830; line-height: 1.6; }
+  .v-source .ex .hl { background: linear-gradient(to bottom, transparent 55%, rgba(196,169,106,0.15) 55%); cursor: pointer; }
+  .v-source .v-word { font-family: 'Source Serif 4', serif; font-size: 15px; font-weight: 500; color: #2C2C2C; flex: 1; }
+  .v-source .r-word { font-family: 'Source Serif 4', serif; font-size: 30px; font-weight: 500; color: #2C2C2C; }
+  .v-source .stat-n { font-family: 'Source Serif 4', serif; }
+  .v-source .recent-word { font-family: 'Source Serif 4', serif; }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>Ubuntu Mono + Serif</h1>
+  <p>Same layout — 4 serif pairings. Ubuntu Mono for labels, data, UI.</p>
+</div>
+
+<div class="variant-tabs">
+  <button class="vtab active" onclick="showV('playfair')">Playfair Display</button>
+  <button class="vtab" onclick="showV('lora')">Lora</button>
+  <button class="vtab" onclick="showV('crimson')">Crimson Pro</button>
+  <button class="vtab" onclick="showV('source')">Source Serif 4</button>
+</div>
+
+<!-- MACRO: each variant wraps the same 7 screens with a class override -->
+<!-- We use JS to toggle visibility, all 4 variants share the same HTML -->
+
+<div class="variant-section active v-playfair" id="v-playfair">
+  <div class="variant-info">
+    <h2 style="font-family:'Playfair Display',serif;font-style:italic;">Playfair Display</h2>
+    <div class="pair">Ubuntu Mono 400/700 + Playfair Display 400/500</div>
+  </div>
+  <div class="phones-grid" id="grid-playfair"></div>
+</div>
+
+<div class="variant-section v-lora" id="v-lora">
+  <div class="variant-info">
+    <h2 style="font-family:'Lora',serif;">Lora</h2>
+    <div class="pair">Ubuntu Mono 400/700 + Lora 400/500/600</div>
+  </div>
+  <div class="phones-grid" id="grid-lora"></div>
+</div>
+
+<div class="variant-section v-crimson" id="v-crimson">
+  <div class="variant-info">
+    <h2 style="font-family:'Crimson Pro',serif;font-size:22px;">Crimson Pro</h2>
+    <div class="pair">Ubuntu Mono 400/700 + Crimson Pro 300/400/500</div>
+  </div>
+  <div class="phones-grid" id="grid-crimson"></div>
+</div>
+
+<div class="variant-section v-source" id="v-source">
+  <div class="variant-info">
+    <h2 style="font-family:'Source Serif 4',serif;">Source Serif 4</h2>
+    <div class="pair">Ubuntu Mono 400/700 + Source Serif 4 400/500</div>
+  </div>
+  <div class="phones-grid" id="grid-source"></div>
+</div>
+
+<div style="text-align:center;padding:30px 20px 40px;color:#B5AFA8;font-family:'Ubuntu Mono';font-size:12px;">
+  Click the tabs to compare. All use Ubuntu Mono for UI + different serif for display.
+</div>
+
+<script>
+// Template for all 7 screens
+function makeScreens() {
+  return `
+  <!-- HOME -->
+  <div class="phone-col"><div class="phone-label">Home</div><div class="phone"><div class="safe-area"></div>
+    <div class="splash"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+      <div class="splash-word">WortSchatz</div>
+      <div class="splash-sub">il tuo tedesco, parola per parola</div>
+    </div>
+    <div class="tab-bar"><div class="tab-item a"><span class="tab-icon">⌕</span>Cerca</div><div class="tab-item"><span class="tab-icon">☰</span>Parole</div><div class="tab-item"><span class="tab-icon">↻</span>Ripasso</div></div>
+  </div></div>
+
+  <!-- SEARCH -->
+  <div class="phone-col"><div class="phone-label">Search</div><div class="phone"><div class="safe-area"></div>
+    <div class="screen">
+      <div class="search-title">Search</div>
+      <div class="search-hint">Type a word</div>
+      <input class="search-input" readonly />
+      <div style="margin-top:22px;"><div class="s-title">Recent</div>
+        <div style="padding:10px 0;"><div class="recent-word"><span class="gender-dot gd-der"></span>Tisch</div><div class="recent-def">tavolo, scrivania</div><div class="divider"></div></div>
+        <div style="padding:10px 0;"><div class="recent-word"><span class="gender-dot gd-die"></span>Angst</div><div class="recent-def">paura, angoscia</div><div class="divider"></div></div>
+        <div style="padding:10px 0;"><div class="recent-word">gehen</div><div class="recent-def">andare (a piedi)</div><div class="divider"></div></div>
+        <div style="padding:10px 0;"><div class="recent-word">auf</div><div class="recent-def">su, sopra</div><div class="divider"></div></div>
+        <div style="padding:10px 0;"><div class="recent-word"><span class="gender-dot gd-das"></span>Haus</div><div class="recent-def">casa, edificio</div></div>
+      </div>
+    </div>
+    <div class="tab-bar"><div class="tab-item a"><span class="tab-icon">⌕</span>Cerca</div><div class="tab-item"><span class="tab-icon">☰</span>Parole</div><div class="tab-item"><span class="tab-icon">↻</span>Ripasso</div></div>
+  </div></div>
+
+  <!-- NOUN -->
+  <div class="phone-col"><div class="phone-label">Noun</div><div class="phone"><div class="safe-area"></div>
+    <div class="screen">
+      <div class="gender-strip gs-der"></div>
+      <div class="card-word">Tisch</div>
+      <div class="phonetic">[tɪʃ] · Noun <button class="audio-btn">♪</button></div>
+      <div class="phonetic" style="margin-top:2px;"><span style="color:#C4A96A;font-weight:700;">der</span> · pl. die Tische</div>
+      <div class="divider"></div>
+      <div class="translation">tavolo, scrivania</div>
+      <div class="divider"></div>
+      <div class="s-title">Declension</div>
+      <div class="decl"><span class="cl">N</span><span>der Tisch</span><span>die Tische</span><span class="cl">A</span><span>den Tisch</span><span>die Tische</span><span class="cl">D</span><span>dem Tisch</span><span>den Tischen</span><span class="cl">G</span><span>des Tisches</span><span>der Tische</span></div>
+      <div class="divider"></div>
+      <div class="s-title">Examples</div>
+      <div class="ex">„<span class="hl">Leg</span> <span class="hl">das</span> <span class="hl">Buch</span> <span class="hl">auf</span> <span class="hl">den</span> <span class="hl">Tisch</span>."</div>
+      <div class="ex-it">Metti il libro sul tavolo.</div>
+      <div class="divider"></div>
+      <div class="s-title">Context</div>
+      <div class="ctx"><strong>Tisch</strong> = generic table. Dining → <em>Esstisch</em>. Desk → <em>Schreibtisch</em>.</div>
+    </div>
+    <div class="tab-bar"><div class="tab-item a"><span class="tab-icon">⌕</span>Cerca</div><div class="tab-item"><span class="tab-icon">☰</span>Parole</div><div class="tab-item"><span class="tab-icon">↻</span>Ripasso</div></div>
+  </div></div>
+
+  <!-- VERB -->
+  <div class="phone-col"><div class="phone-label">Verb</div><div class="phone"><div class="safe-area"></div>
+    <div class="screen">
+      <div class="card-word">gehen</div>
+      <div class="phonetic">[ˈɡeːən] · Verb <button class="audio-btn">♪</button></div>
+      <div class="phonetic" style="margin-top:2px;font-style:italic;">ging · ist gegangen</div>
+      <div class="divider"></div>
+      <div class="translation">andare</div>
+      <div class="divider"></div>
+      <div class="s-title">Present</div>
+      <div class="conj"><span>ich gehe</span><span>wir gehen</span><span>du gehst</span><span>ihr geht</span><span>er/sie geht</span><span>sie gehen</span></div>
+      <div class="divider"></div>
+      <div class="s-title">Governs</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:baseline;gap:8px;"><span class="pill pill-akk">Akk</span><span style="font-size:11px;color:#8A8078;">direction — den Weg gehen</span></div>
+        <div style="display:flex;align-items:baseline;gap:8px;"><span class="pill pill-dat">Dat</span><span style="font-size:11px;color:#8A8078;">zu + Dat — zur Arbeit</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="s-title">Examples</div>
+      <div class="ex">„<span class="hl">Ich</span> <span class="hl">gehe</span> <span class="hl">jeden</span> <span class="hl">Tag</span> <span class="hl">zu</span> <span class="hl">Fuß</span> <span class="hl">zur</span> <span class="hl">Arbeit</span>."</div>
+      <div class="ex-it">Vado al lavoro a piedi ogni giorno.</div>
+      <div class="divider"></div>
+      <div class="s-title">Context</div>
+      <div class="ctx"><strong>gehen</strong> = on foot. Vehicles → <em>fahren</em>. „Wie geht's?" = how are you.</div>
+    </div>
+    <div class="tab-bar"><div class="tab-item a"><span class="tab-icon">⌕</span>Cerca</div><div class="tab-item"><span class="tab-icon">☰</span>Parole</div><div class="tab-item"><span class="tab-icon">↻</span>Ripasso</div></div>
+  </div></div>
+
+  <!-- PREPOSITION -->
+  <div class="phone-col"><div class="phone-label">Preposition</div><div class="phone"><div class="safe-area"></div>
+    <div class="screen">
+      <div class="card-word">auf</div>
+      <div class="phonetic">[aʊ̯f] · Wechselpräposition <button class="audio-btn">♪</button></div>
+      <div class="divider"></div>
+      <div class="translation">su, sopra</div>
+      <div class="divider"></div>
+      <div class="s-title">Cases</div>
+      <div style="margin-bottom:14px;">
+        <div style="margin-bottom:6px;"><span class="pill pill-akk">+ Akkusativ</span> <span style="font-size:10px;color:#B5AFA8;margin-left:4px;">movement</span></div>
+        <div class="ex" style="font-size:13px;">„<span class="hl">Leg</span> <span class="hl">es</span> <span class="hl">auf</span> <span class="hl">den</span> <span class="hl">Tisch</span>."</div>
+        <div class="ex-it">Mettilo sul tavolo.</div>
+      </div>
+      <div>
+        <div style="margin-bottom:6px;"><span class="pill pill-dat">+ Dativ</span> <span style="font-size:10px;color:#B5AFA8;margin-left:4px;">position</span></div>
+        <div class="ex" style="font-size:13px;">„<span class="hl">Es</span> <span class="hl">liegt</span> <span class="hl">auf</span> <span class="hl">dem</span> <span class="hl">Tisch</span>."</div>
+        <div class="ex-it">È sul tavolo.</div>
+      </div>
+      <div class="divider"></div>
+      <div class="s-title">Context</div>
+      <div class="ctx"><strong>auf</strong> = on a surface. Akk for movement, Dat for position. Compare: <em>an</em> (vertical), <em>über</em> (above).</div>
+    </div>
+    <div class="tab-bar"><div class="tab-item a"><span class="tab-icon">⌕</span>Cerca</div><div class="tab-item"><span class="tab-icon">☰</span>Parole</div><div class="tab-item"><span class="tab-icon">↻</span>Ripasso</div></div>
+  </div></div>
+
+  <!-- VOCABULARY -->
+  <div class="phone-col"><div class="phone-label">Vocabulary</div><div class="phone"><div class="safe-area"></div>
+    <div class="screen">
+      <div class="search-title" style="font-size:22px;margin-bottom:14px;">My Words</div>
+      <div class="chips"><span class="chip on">All (47)</span><span class="chip">Nouns</span><span class="chip">Verbs</span><span class="chip">Prep.</span></div>
+      <div class="v-item"><div class="v-bar" style="background:#C4A96A;"></div><span class="v-word">Tisch</span><span class="v-trans">tavolo</span></div>
+      <div class="v-item"><div class="v-bar" style="background:#D4AAA0;"></div><span class="v-word">Angst</span><span class="v-trans">paura</span></div>
+      <div class="v-item"><div class="v-bar" style="background:#B0A8D0;"></div><span class="v-word">gehen</span><span class="v-trans">andare</span></div>
+      <div class="v-item"><div class="v-bar" style="background:#8DB58A;"></div><span class="v-word">Haus</span><span class="v-trans">casa</span></div>
+      <div class="v-item"><div class="v-bar" style="background:#A8C0D0;"></div><span class="v-word">auf</span><span class="v-trans">su</span></div>
+      <div class="v-item"><div class="v-bar" style="background:#B0A8D0;"></div><span class="v-word">machen</span><span class="v-trans">fare</span></div>
+      <div class="v-item"><div class="v-bar" style="background:#C4A96A;"></div><span class="v-word">Hund</span><span class="v-trans">cane</span></div>
+      <div class="v-item"><div class="v-bar" style="background:#D4AAA0;"></div><span class="v-word">Katze</span><span class="v-trans">gatto</span></div>
+    </div>
+    <div class="tab-bar"><div class="tab-item"><span class="tab-icon">⌕</span>Cerca</div><div class="tab-item a"><span class="tab-icon">☰</span>Parole</div><div class="tab-item"><span class="tab-icon">↻</span>Ripasso</div></div>
+  </div></div>
+
+  <!-- REVIEW -->
+  <div class="phone-col"><div class="phone-label">Review</div><div class="phone"><div class="safe-area"></div>
+    <div class="screen">
+      <div class="search-title" style="font-size:22px;margin-bottom:14px;">Ripasso</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-n" style="color:#5A7A50;">32</div><div class="stat-l">learned</div></div>
+        <div class="stat"><div class="stat-n" style="color:#C4A96A;">12</div><div class="stat-l">review</div></div>
+        <div class="stat"><div class="stat-n" style="color:#B07060;">3</div><div class="stat-l">tricky</div></div>
+      </div>
+      <div class="r-card">
+        <div class="gender-strip gs-der" style="margin:0 auto 6px;"></div>
+        <div class="r-word">Tisch</div>
+        <div class="r-hint">tap to reveal</div>
+        <div class="r-btns"><div class="r-btn no">Don't know</div><div class="r-btn">Almost</div><div class="r-btn yes">Know it</div></div>
+      </div>
+      <div class="s-title">Progress</div>
+      <div class="p-row"><span class="p-label">Nouns</span><div class="p-bar"><div class="p-fill" style="width:65%;background:#C4A96A;"></div></div></div>
+      <div class="p-row"><span class="p-label">Verbs</span><div class="p-bar"><div class="p-fill" style="width:40%;background:#B0A8D0;"></div></div></div>
+      <div class="p-row"><span class="p-label">Prep.</span><div class="p-bar"><div class="p-fill" style="width:25%;background:#A8C0D0;"></div></div></div>
+    </div>
+    <div class="tab-bar"><div class="tab-item"><span class="tab-icon">⌕</span>Cerca</div><div class="tab-item"><span class="tab-icon">☰</span>Parole</div><div class="tab-item a"><span class="tab-icon">↻</span>Ripasso</div></div>
+  </div></div>`;
+}
+
+// Populate all 4 grids with the same screens
+['playfair','lora','crimson','source'].forEach(v => {
+  document.getElementById('grid-' + v).innerHTML = makeScreens();
+});
+
+function showV(id) {
+  document.querySelectorAll('.variant-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
+  document.getElementById('v-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>

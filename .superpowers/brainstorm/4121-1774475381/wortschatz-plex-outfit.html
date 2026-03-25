@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WortSchatz — IBM Plex Sans + Outfit + Ubuntu Sans Mono</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Outfit:wght@200;300;400;500;600;700;800&family=Ubuntu+Sans+Mono:wght@400;500;600;700&display=swap');
+
+  :root {
+    --sans: 'IBM Plex Sans', ui-sans-serif, sans-serif, system-ui;
+    --serif: 'Outfit', ui-sans-serif, sans-serif, system-ui;
+    --mono: 'Ubuntu Sans Mono', ui-monospace, monospace;
+
+    --bg: #F0EDE6;
+    --card: #FFFFFF;
+    --cream: #FAF8F4;
+    --text: #2C2C2C;
+    --text-2: #5C5650;
+    --text-3: #8A8078;
+    --text-4: #A09890;
+    --text-5: #B5AFA8;
+    --text-6: #C5BFB5;
+    --border: #E8E4DD;
+    --border-light: #F0EDE8;
+
+    --der: #C4A96A;
+    --die: #D4AAA0;
+    --das: #8DB58A;
+    --verb: #B0A8D0;
+    --prep: #A8C0D0;
+
+    --akk-bg: #F0E8D8;
+    --akk-text: #8A7A5A;
+    --dat-bg: #E0ECD8;
+    --dat-text: #5A7A50;
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 40px 20px 60px;
+  }
+
+  .page-title { text-align: center; margin-bottom: 32px; }
+  .page-title h1 { font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; }
+  .page-title p { color: var(--text-4); font-size: 13px; margin-top: 6px; font-weight: 300; }
+  .page-title .stack {
+    font-family: var(--mono); font-size: 10px; color: var(--text-5);
+    margin-top: 8px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  }
+  .page-title .stack span { padding: 3px 8px; background: var(--card); border-radius: var(--radius-sm); }
+
+  .phones-grid {
+    display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; max-width: 1500px; margin: 0 auto;
+  }
+
+  .phone-col { display: flex; flex-direction: column; align-items: center; }
+  .phone-label { font-family: var(--mono); font-size: 10px; color: var(--text-5); margin-bottom: 8px; letter-spacing: 1px; }
+
+  .phone {
+    width: 290px; height: 610px; background: var(--card); border-radius: 32px;
+    overflow: hidden; position: relative; box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+  }
+
+  .safe { height: 48px; }
+  .scr { padding: 0 24px; height: calc(100% - 48px - 58px); overflow-y: auto; }
+  .scr::-webkit-scrollbar { width: 0; }
+
+  .tabs {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 58px;
+    background: var(--card); border-top: 1px solid var(--border-light);
+    display: flex; justify-content: space-around; align-items: center; padding-bottom: 8px;
+  }
+  .ti { display: flex; flex-direction: column; align-items: center; gap: 2px; font-family: var(--mono); font-size: 9px; font-weight: 500; color: var(--text-6); }
+  .ti.a { color: var(--text); }
+  .ti-i { font-size: 17px; }
+
+  /* Divider */
+  .div { height: 1px; background: linear-gradient(90deg, var(--border) 0%, transparent 100%); margin: 14px 0; }
+
+  /* Section title */
+  .st { font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-6); margin-bottom: 8px; }
+
+  /* Gender strip */
+  .gs { width: 28px; height: 3px; border-radius: 2px; margin-bottom: 12px; }
+
+  /* Gender dot */
+  .gd { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+  /* Audio */
+  .aud { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 10px; color: var(--text-5); background: none; cursor: pointer; margin-left: 6px; vertical-align: middle; }
+
+  /* Phonetic / meta */
+  .phon { font-family: var(--mono); font-size: 11px; color: var(--text-5); margin-top: 3px; }
+
+  /* Main word */
+  .word { font-family: var(--serif); font-size: 34px; font-weight: 700; color: var(--text); letter-spacing: -1px; line-height: 1.1; }
+
+  /* Translation */
+  .trans { font-family: var(--sans); font-size: 15px; font-weight: 400; color: var(--text-2); margin-top: 12px; }
+
+  /* Declension */
+  .decl { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 3px 12px; font-family: var(--sans); font-size: 12px; color: var(--text-2); }
+  .decl .cl { font-family: var(--mono); font-size: 9px; color: var(--text-6); font-weight: 600; }
+
+  /* Conjugation */
+  .conj { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; font-family: var(--sans); font-size: 12px; color: var(--text-2); }
+
+  /* Examples */
+  .ex { font-family: var(--sans); font-size: 14px; color: var(--text); line-height: 1.6; font-weight: 400; }
+  .ex .hl { background: linear-gradient(to bottom, transparent 58%, rgba(196,169,106,0.18) 58%); cursor: pointer; }
+  .ex-it { font-family: var(--sans); font-size: 11px; font-weight: 300; color: var(--text-5); margin-top: 4px; }
+
+  /* Context */
+  .ctx { font-family: var(--sans); font-size: 12px; font-weight: 300; color: var(--text-3); line-height: 1.6; padding: 12px 14px; background: var(--cream); border-radius: var(--radius-md); }
+  .ctx strong { font-weight: 500; color: var(--text-2); }
+  .ctx em { font-style: italic; color: var(--text-4); }
+
+  /* Case pills */
+  .pill { display: inline-block; padding: 2px 8px; border-radius: var(--radius-sm); font-family: var(--mono); font-size: 9px; font-weight: 600; }
+  .p-akk { background: var(--akk-bg); color: var(--akk-text); }
+  .p-dat { background: var(--dat-bg); color: var(--dat-text); }
+
+  /* Search */
+  .search-title { font-family: var(--serif); font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; margin-bottom: 4px; }
+  .search-hint { font-family: var(--mono); font-size: 11px; color: var(--text-5); margin-bottom: 10px; }
+  .search-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-family: var(--sans); font-size: 15px; color: var(--text); background: var(--card); outline: none; }
+
+  /* Recent items */
+  .rec-word { font-family: var(--serif); font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 7px; letter-spacing: -0.2px; }
+  .rec-def { font-family: var(--sans); font-size: 12px; font-weight: 300; color: var(--text-4); margin-top: 3px; }
+
+  /* Vocab list */
+  .vi { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border-light); }
+  .vi:last-child { border-bottom: none; }
+  .vb { width: 4px; height: 28px; border-radius: 2px; flex-shrink: 0; }
+  .vw { font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--text); flex: 1; letter-spacing: -0.2px; }
+  .vt { font-family: var(--sans); font-size: 11px; font-weight: 300; color: var(--text-5); }
+
+  .chips { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .chip { padding: 5px 12px; border-radius: var(--radius-sm); font-family: var(--mono); font-size: 10px; font-weight: 500; background: #F5F2EC; color: var(--text-3); border: none; cursor: pointer; }
+  .chip.on { background: var(--text); color: var(--card); }
+
+  /* Review */
+  .stats { display: flex; gap: 8px; margin-bottom: 16px; }
+  .stat { flex: 1; text-align: center; padding: 12px 6px; background: var(--cream); border-radius: var(--radius-md); }
+  .stat-n { font-family: var(--serif); font-size: 24px; font-weight: 700; line-height: 1; }
+  .stat-l { font-family: var(--mono); font-size: 8px; font-weight: 500; color: var(--text-5); margin-top: 3px; }
+
+  .rc { background: var(--cream); border-radius: var(--radius-lg); padding: 24px 20px; text-align: center; margin-bottom: 14px; }
+  .rc-w { font-family: var(--serif); font-size: 32px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .rc-h { font-family: var(--mono); font-size: 10px; color: var(--text-6); margin-top: 8px; }
+  .rc-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
+  .rc-btn { padding: 8px 16px; border-radius: var(--radius-sm); font-family: var(--sans); font-size: 11px; font-weight: 500; border: 1.5px solid var(--border); background: var(--card); color: var(--text-3); cursor: pointer; }
+  .rc-btn.yes { border-color: var(--das); color: var(--dat-text); }
+  .rc-btn.no { border-color: var(--die); color: #8A6058; }
+
+  .pr { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .pr-l { font-family: var(--mono); font-size: 9px; font-weight: 500; color: var(--text-5); width: 48px; }
+  .pr-b { flex: 1; height: 4px; background: var(--border-light); border-radius: 2px; overflow: hidden; }
+  .pr-f { height: 100%; border-radius: 2px; }
+
+  /* Splash */
+  .splash { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100% - 48px - 58px); position: relative; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50% 40% 60% 45% / 50% 55% 45% 50%; }
+  .b1 { width: 180px; height: 220px; background: #E8B98A; opacity: 0.45; top: 50px; left: -30px; transform: rotate(-15deg); }
+  .b2 { width: 120px; height: 140px; background: #D4A87C; opacity: 0.3; top: 200px; left: 30px; border-radius: 45% 55% 50% 48% / 52% 45% 55% 48%; transform: rotate(20deg); }
+  .b3 { width: 100px; height: 120px; background: #D4AAA0; opacity: 0.35; top: 300px; left: -5px; border-radius: 52% 48% 45% 55% / 48% 52% 48% 52%; }
+  .sp-title { font-family: var(--serif); font-size: 36px; font-weight: 700; color: var(--text); z-index: 1; letter-spacing: -1px; }
+  .sp-sub { font-family: var(--mono); font-size: 11px; color: var(--text-5); z-index: 1; margin-top: 6px; }
+
+  /* Governs */
+  .gov { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .gov-d { font-family: var(--sans); font-size: 11px; font-weight: 300; color: var(--text-3); }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>WortSchatz</h1>
+  <p>Light, clean, editorial — all 7 screens</p>
+  <div class="stack">
+    <span>--sans: IBM Plex Sans</span>
+    <span>--serif: Outfit</span>
+    <span>--mono: Ubuntu Sans Mono</span>
+  </div>
+</div>
+
+<div class="phones-grid">
+
+  <!-- 1. HOME -->
+  <div class="phone-col"><div class="phone-label">home</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="splash">
+        <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+        <div class="sp-title">WortSchatz</div>
+        <div class="sp-sub">il tuo tedesco, parola per parola</div>
+      </div>
+      <div class="tabs"><div class="ti a"><span class="ti-i">⌕</span>Cerca</div><div class="ti"><span class="ti-i">☰</span>Parole</div><div class="ti"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+  <!-- 2. SEARCH -->
+  <div class="phone-col"><div class="phone-label">search</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="scr">
+        <div class="search-title">Search</div>
+        <div class="search-hint">Type a word</div>
+        <input class="search-input" readonly />
+        <div style="margin-top:22px;">
+          <div class="st">Recent</div>
+          <div style="padding:10px 0;"><div class="rec-word"><span class="gd" style="background:var(--der);"></span>Tisch</div><div class="rec-def">tavolo, scrivania</div><div class="div"></div></div>
+          <div style="padding:10px 0;"><div class="rec-word"><span class="gd" style="background:var(--die);"></span>Angst</div><div class="rec-def">paura, angoscia</div><div class="div"></div></div>
+          <div style="padding:10px 0;"><div class="rec-word">gehen</div><div class="rec-def">andare (a piedi)</div><div class="div"></div></div>
+          <div style="padding:10px 0;"><div class="rec-word">auf</div><div class="rec-def">su, sopra — Wechselpräposition</div><div class="div"></div></div>
+          <div style="padding:10px 0;"><div class="rec-word"><span class="gd" style="background:var(--das);"></span>Haus</div><div class="rec-def">casa, edificio</div></div>
+        </div>
+      </div>
+      <div class="tabs"><div class="ti a"><span class="ti-i">⌕</span>Cerca</div><div class="ti"><span class="ti-i">☰</span>Parole</div><div class="ti"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+  <!-- 3. NOUN -->
+  <div class="phone-col"><div class="phone-label">noun</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="scr">
+        <div class="gs" style="background:var(--der);"></div>
+        <div class="word">Tisch</div>
+        <div class="phon">[tɪʃ] · Noun <button class="aud">♪</button></div>
+        <div class="phon" style="margin-top:2px;"><span style="color:var(--der);font-weight:600;">der</span> · pl. die Tische</div>
+        <div class="div"></div>
+        <div class="trans">tavolo, scrivania</div>
+        <div class="div"></div>
+        <div class="st">Declension</div>
+        <div class="decl"><span class="cl">N</span><span>der Tisch</span><span>die Tische</span><span class="cl">A</span><span>den Tisch</span><span>die Tische</span><span class="cl">D</span><span>dem Tisch</span><span>den Tischen</span><span class="cl">G</span><span>des Tisches</span><span>der Tische</span></div>
+        <div class="div"></div>
+        <div class="st">Examples</div>
+        <div class="ex">„<span class="hl">Leg</span> <span class="hl">das</span> <span class="hl">Buch</span> <span class="hl">auf</span> <span class="hl">den</span> <span class="hl">Tisch</span>."</div>
+        <div class="ex-it">Metti il libro sul tavolo.</div>
+        <div class="div"></div>
+        <div class="st">Context</div>
+        <div class="ctx"><strong>Tisch</strong> = generic table. Dining → <em>Esstisch</em>. Desk → <em>Schreibtisch</em>. Common: <em>am Tisch sitzen</em>.</div>
+      </div>
+      <div class="tabs"><div class="ti a"><span class="ti-i">⌕</span>Cerca</div><div class="ti"><span class="ti-i">☰</span>Parole</div><div class="ti"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+  <!-- 4. VERB -->
+  <div class="phone-col"><div class="phone-label">verb</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="scr">
+        <div class="word">gehen</div>
+        <div class="phon">[ˈɡeːən] · Verb <button class="aud">♪</button></div>
+        <div class="phon" style="margin-top:2px;font-style:italic;">ging · ist gegangen</div>
+        <div class="div"></div>
+        <div class="trans">andare</div>
+        <div class="div"></div>
+        <div class="st">Present</div>
+        <div class="conj"><span>ich gehe</span><span>wir gehen</span><span>du gehst</span><span>ihr geht</span><span>er/sie geht</span><span>sie gehen</span></div>
+        <div class="div"></div>
+        <div class="st">Governs</div>
+        <div class="gov"><span class="pill p-akk">Akk</span><span class="gov-d">direction — den Weg gehen</span></div>
+        <div class="gov"><span class="pill p-dat">Dat</span><span class="gov-d">zu + Dat — zur Arbeit gehen</span></div>
+        <div class="div"></div>
+        <div class="st">Examples</div>
+        <div class="ex">„<span class="hl">Ich</span> <span class="hl">gehe</span> <span class="hl">jeden</span> <span class="hl">Tag</span> <span class="hl">zu</span> <span class="hl">Fuß</span> <span class="hl">zur</span> <span class="hl">Arbeit</span>."</div>
+        <div class="ex-it">Vado al lavoro a piedi ogni giorno.</div>
+        <div class="div"></div>
+        <div class="st">Context</div>
+        <div class="ctx"><strong>gehen</strong> = on foot. Vehicles → <em>fahren</em>. „Wie geht's?" = how are you, nothing to do with walking.</div>
+      </div>
+      <div class="tabs"><div class="ti a"><span class="ti-i">⌕</span>Cerca</div><div class="ti"><span class="ti-i">☰</span>Parole</div><div class="ti"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+  <!-- 5. PREPOSITION -->
+  <div class="phone-col"><div class="phone-label">preposition</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="scr">
+        <div class="word">auf</div>
+        <div class="phon">[aʊ̯f] · Wechselpräposition <button class="aud">♪</button></div>
+        <div class="div"></div>
+        <div class="trans">su, sopra</div>
+        <div class="div"></div>
+        <div class="st">Cases</div>
+        <div style="margin-bottom:14px;">
+          <div style="margin-bottom:6px;"><span class="pill p-akk">+ Akkusativ</span> <span style="font-size:10px;color:var(--text-5);margin-left:4px;">movement</span></div>
+          <div class="ex" style="font-size:13px;">„<span class="hl">Leg</span> <span class="hl">es</span> <span class="hl">auf</span> <span class="hl">den</span> <span class="hl">Tisch</span>."</div>
+          <div class="ex-it">Mettilo sul tavolo.</div>
+        </div>
+        <div>
+          <div style="margin-bottom:6px;"><span class="pill p-dat">+ Dativ</span> <span style="font-size:10px;color:var(--text-5);margin-left:4px;">position</span></div>
+          <div class="ex" style="font-size:13px;">„<span class="hl">Es</span> <span class="hl">liegt</span> <span class="hl">auf</span> <span class="hl">dem</span> <span class="hl">Tisch</span>."</div>
+          <div class="ex-it">È sul tavolo.</div>
+        </div>
+        <div class="div"></div>
+        <div class="st">Context</div>
+        <div class="ctx"><strong>auf</strong> = on a surface. Akk when movement toward, Dat when already there. Compare: <em>an</em> (vertical), <em>über</em> (above, no contact).</div>
+      </div>
+      <div class="tabs"><div class="ti a"><span class="ti-i">⌕</span>Cerca</div><div class="ti"><span class="ti-i">☰</span>Parole</div><div class="ti"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+  <!-- 6. VOCABULARY -->
+  <div class="phone-col"><div class="phone-label">vocabulary</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="scr">
+        <div class="search-title" style="font-size:22px;margin-bottom:14px;">My Words</div>
+        <div class="chips"><span class="chip on">All (47)</span><span class="chip">Nouns</span><span class="chip">Verbs</span><span class="chip">Prep.</span></div>
+        <div class="vi"><div class="vb" style="background:var(--der);"></div><span class="vw">Tisch</span><span class="vt">tavolo</span></div>
+        <div class="vi"><div class="vb" style="background:var(--die);"></div><span class="vw">Angst</span><span class="vt">paura</span></div>
+        <div class="vi"><div class="vb" style="background:var(--verb);"></div><span class="vw">gehen</span><span class="vt">andare</span></div>
+        <div class="vi"><div class="vb" style="background:var(--das);"></div><span class="vw">Haus</span><span class="vt">casa</span></div>
+        <div class="vi"><div class="vb" style="background:var(--prep);"></div><span class="vw">auf</span><span class="vt">su</span></div>
+        <div class="vi"><div class="vb" style="background:var(--verb);"></div><span class="vw">machen</span><span class="vt">fare</span></div>
+        <div class="vi"><div class="vb" style="background:var(--der);"></div><span class="vw">Hund</span><span class="vt">cane</span></div>
+        <div class="vi"><div class="vb" style="background:var(--die);"></div><span class="vw">Katze</span><span class="vt">gatto</span></div>
+        <div class="vi"><div class="vb" style="background:var(--das);"></div><span class="vw">Buch</span><span class="vt">libro</span></div>
+        <div class="vi"><div class="vb" style="background:var(--verb);"></div><span class="vw">schreiben</span><span class="vt">scrivere</span></div>
+      </div>
+      <div class="tabs"><div class="ti"><span class="ti-i">⌕</span>Cerca</div><div class="ti a"><span class="ti-i">☰</span>Parole</div><div class="ti"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+  <!-- 7. REVIEW — DASHBOARD -->
+  <div class="phone-col"><div class="phone-label">review — home</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="scr">
+        <!-- Greeting -->
+        <div style="margin-bottom:20px;">
+          <div style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--text);letter-spacing:-0.3px;">Buongiorno</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-5);margin-top:4px;">7 days streak · 47 words total</div>
+        </div>
+
+        <!-- Today's session card -->
+        <div style="background:var(--cream);border-radius:var(--radius-lg);padding:18px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="font-family:var(--sans);font-size:13px;font-weight:500;color:var(--text);">Today</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text-5);">12 words</div>
+          </div>
+          <!-- Dot progress -->
+          <div style="display:flex;gap:5px;margin-bottom:14px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--das);"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--das);"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--der);"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--die);"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0.15;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0.08;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0.08;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0.08;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0.08;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0.08;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0.08;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--text);opacity:0.08;"></div>
+          </div>
+          <div style="font-family:var(--sans);font-size:13px;font-weight:500;color:var(--card);background:var(--text);padding:10px 0;text-align:center;border-radius:var(--radius-sm);cursor:pointer;">Start session</div>
+        </div>
+
+        <!-- Tricky words -->
+        <div style="margin-bottom:16px;">
+          <div class="st">Tricky words</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--cream);border-radius:var(--radius-md);">
+              <div style="width:4px;height:24px;border-radius:2px;background:var(--die);"></div>
+              <div style="flex:1;">
+                <div style="font-family:var(--serif);font-size:13px;font-weight:600;color:var(--text);">Angst</div>
+                <div style="font-family:var(--mono);font-size:9px;color:var(--text-5);">missed 3 times</div>
+              </div>
+              <div style="font-family:var(--sans);font-size:10px;color:var(--die);">review</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--cream);border-radius:var(--radius-md);">
+              <div style="width:4px;height:24px;border-radius:2px;background:var(--prep);"></div>
+              <div style="flex:1;">
+                <div style="font-family:var(--serif);font-size:13px;font-weight:600;color:var(--text);">auf</div>
+                <div style="font-family:var(--mono);font-size:9px;color:var(--text-5);">Akk/Dat confusion</div>
+              </div>
+              <div style="font-family:var(--sans);font-size:10px;color:var(--prep);">review</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--cream);border-radius:var(--radius-md);">
+              <div style="width:4px;height:24px;border-radius:2px;background:var(--der);"></div>
+              <div style="flex:1;">
+                <div style="font-family:var(--serif);font-size:13px;font-weight:600;color:var(--text);">Hund</div>
+                <div style="font-family:var(--mono);font-size:9px;color:var(--text-5);">gender mix-up</div>
+              </div>
+              <div style="font-family:var(--sans);font-size:10px;color:var(--der);">review</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly -->
+        <div>
+          <div class="st">This week</div>
+          <div style="display:flex;gap:6px;align-items:flex-end;height:60px;">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <div style="width:100%;background:var(--das);border-radius:2px;height:32px;opacity:0.6;"></div>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--text-6);">L</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <div style="width:100%;background:var(--das);border-radius:2px;height:44px;opacity:0.7;"></div>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--text-6);">M</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <div style="width:100%;background:var(--das);border-radius:2px;height:28px;opacity:0.5;"></div>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--text-6);">M</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <div style="width:100%;background:var(--das);border-radius:2px;height:52px;opacity:0.8;"></div>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--text-6);">G</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <div style="width:100%;background:var(--das);border-radius:2px;height:38px;opacity:0.65;"></div>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--text-6);">V</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <div style="width:100%;background:var(--das);border-radius:2px;height:18px;opacity:0.35;"></div>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--text-6);">S</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <div style="width:100%;background:var(--text);border-radius:2px;height:8px;opacity:0.1;"></div>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--text);font-weight:600;">D</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tabs"><div class="ti"><span class="ti-i">⌕</span>Cerca</div><div class="ti"><span class="ti-i">☰</span>Parole</div><div class="ti a"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+  <!-- 8. REVIEW — ACTIVE SESSION -->
+  <div class="phone-col"><div class="phone-label">review — session</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="scr" style="display:flex;flex-direction:column;">
+        <!-- Session header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-5);">4 / 12</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-6);">✕ end</div>
+        </div>
+
+        <!-- Mini progress dots -->
+        <div style="display:flex;gap:4px;margin-bottom:28px;">
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--das);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--das);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--der);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--die);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+        </div>
+
+        <!-- The card — centered -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="width:4px;height:4px;border-radius:50%;background:var(--die);margin-bottom:14px;"></div>
+          <div style="font-family:var(--serif);font-size:42px;font-weight:700;color:var(--text);letter-spacing:-1.5px;line-height:1;">Angst</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-6);margin-top:10px;">die · pl. die Ängste</div>
+
+          <!-- Tap to reveal area -->
+          <div style="margin-top:32px;padding:14px 20px;border:1.5px dashed var(--border);border-radius:var(--radius-md);cursor:pointer;">
+            <div style="font-family:var(--sans);font-size:13px;color:var(--text-5);text-align:center;">tap to reveal</div>
+          </div>
+        </div>
+
+        <!-- Response buttons -->
+        <div style="display:flex;gap:8px;padding:16px 0 8px;">
+          <div style="flex:1;padding:12px 0;text-align:center;border:1.5px solid var(--die);border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:#8A6058;cursor:pointer;">Again</div>
+          <div style="flex:1;padding:12px 0;text-align:center;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text-3);cursor:pointer;">Hard</div>
+          <div style="flex:1;padding:12px 0;text-align:center;border:1.5px solid var(--der);border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:var(--akk-text);cursor:pointer;">Good</div>
+          <div style="flex:1;padding:12px 0;text-align:center;border:1.5px solid var(--das);border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:var(--dat-text);cursor:pointer;">Easy</div>
+        </div>
+      </div>
+      <div class="tabs"><div class="ti"><span class="ti-i">⌕</span>Cerca</div><div class="ti"><span class="ti-i">☰</span>Parole</div><div class="ti a"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+  <!-- 9. REVIEW — REVEALED -->
+  <div class="phone-col"><div class="phone-label">review — revealed</div>
+    <div class="phone"><div class="safe"></div>
+      <div class="scr" style="display:flex;flex-direction:column;">
+        <!-- Session header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-5);">4 / 12</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-6);">✕ end</div>
+        </div>
+
+        <div style="display:flex;gap:4px;margin-bottom:20px;">
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--das);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--das);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--der);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--die);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+          <div style="flex:1;height:3px;border-radius:2px;background:var(--border-light);"></div>
+        </div>
+
+        <!-- Revealed card -->
+        <div style="flex:1;overflow-y:auto;">
+          <div style="text-align:center;margin-bottom:14px;">
+            <div style="width:4px;height:4px;border-radius:50%;background:var(--die);margin:0 auto 10px;"></div>
+            <div style="font-family:var(--serif);font-size:34px;font-weight:700;color:var(--text);letter-spacing:-1px;">Angst</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text-6);margin-top:4px;">die · [aŋst] · pl. die Ängste</div>
+          </div>
+
+          <div class="div"></div>
+
+          <div style="text-align:center;font-family:var(--sans);font-size:16px;color:var(--text-2);font-weight:400;padding:4px 0;">paura, angoscia, timore</div>
+
+          <div class="div"></div>
+
+          <div class="st">Governs</div>
+          <div style="font-family:var(--sans);font-size:12px;color:var(--text-3);margin-bottom:4px;">
+            <span class="pill p-dat" style="margin-right:4px;">Dat</span> Angst <em style="color:var(--text-4);">vor</em> + Dat — paura di
+          </div>
+          <div style="font-family:var(--sans);font-size:12px;color:var(--text-3);">
+            <span class="pill p-akk" style="margin-right:4px;">Akk</span> Angst <em style="color:var(--text-4);">um</em> + Akk — paura per
+          </div>
+
+          <div class="div"></div>
+
+          <div class="st">Example</div>
+          <div class="ex" style="font-size:13px;">„<span class="hl">Sie</span> <span class="hl">hat</span> <span class="hl">Angst</span> <span class="hl">vor</span> <span class="hl">der</span> <span class="hl">Prüfung</span>."</div>
+          <div class="ex-it">Ha paura dell'esame.</div>
+
+          <div class="div"></div>
+
+          <div class="ctx" style="font-size:11px;"><strong>Angst</strong> is visceral, irrational fear. For rational fear → <em>Furcht</em>. Always „Angst haben", never „Angst sein".</div>
+        </div>
+
+        <!-- Response buttons -->
+        <div style="display:flex;gap:8px;padding:12px 0 8px;flex-shrink:0;">
+          <div style="flex:1;padding:12px 0;text-align:center;border:1.5px solid var(--die);border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:#8A6058;cursor:pointer;">Again</div>
+          <div style="flex:1;padding:12px 0;text-align:center;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text-3);cursor:pointer;">Hard</div>
+          <div style="flex:1;padding:12px 0;text-align:center;border:1.5px solid var(--der);border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:var(--akk-text);cursor:pointer;">Good</div>
+          <div style="flex:1;padding:12px 0;text-align:center;border:1.5px solid var(--das);border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;font-weight:500;color:var(--dat-text);cursor:pointer;">Easy</div>
+        </div>
+      </div>
+      <div class="tabs"><div class="ti"><span class="ti-i">⌕</span>Cerca</div><div class="ti"><span class="ti-i">☰</span>Parole</div><div class="ti a"><span class="ti-i">↻</span>Ripasso</div></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

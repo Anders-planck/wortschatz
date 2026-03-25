@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WortSchatz — 6 Famous Design Systems</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&family=Geist+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --phone-w: 260px;
+    --phone-h: 540px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #09090b; color: #e4e4e7; font-family: 'Inter', sans-serif; }
+
+  .page-header { text-align: center; padding: 48px 20px 16px; }
+  .page-header h1 { font-family: 'Geist', sans-serif; font-size: 34px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+  .page-header p { color: #52525b; margin-top: 6px; font-size: 13px; }
+
+  /* Tab navigation */
+  .tabs {
+    display: flex; justify-content: center; gap: 4px;
+    padding: 16px 20px; position: sticky; top: 0; z-index: 50;
+    background: rgba(9,9,11,0.9); backdrop-filter: blur(12px);
+    border-bottom: 1px solid #1c1c1e;
+  }
+  .tab-btn {
+    padding: 8px 16px; border: 1px solid #27272a; border-radius: 8px;
+    background: transparent; color: #71717a; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; font-family: 'Geist', sans-serif;
+  }
+  .tab-btn:hover { border-color: #3f3f46; color: #a1a1aa; }
+  .tab-btn.active { background: #fff; color: #09090b; border-color: #fff; }
+
+  /* Design section */
+  .design-section { display: none; padding: 24px 24px 60px; }
+  .design-section.active { display: block; }
+
+  .section-header {
+    max-width: 600px; margin: 0 auto 28px; text-align: center;
+  }
+  .section-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #52525b; font-family: 'Geist Mono', monospace; }
+  .section-name { font-size: 28px; font-weight: 700; color: #fff; margin-top: 4px; }
+  .section-desc { font-size: 13px; color: #52525b; margin-top: 8px; line-height: 1.6; }
+  .section-tags { display: flex; justify-content: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .stag { font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid #27272a; color: #52525b; }
+
+  .phones-row {
+    display: flex; gap: 20px; overflow-x: auto; padding: 10px 0 20px;
+    justify-content: center; flex-wrap: wrap;
+  }
+  .phones-row::-webkit-scrollbar { height: 0; }
+
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; }
+  .phone-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #3f3f46; margin-bottom: 8px; font-family: 'Geist Mono', monospace; }
+
+  /* Phone shell */
+  .ph {
+    width: var(--phone-w); height: var(--phone-h);
+    border-radius: 32px; overflow: hidden; position: relative;
+    font-size: 11px;
+  }
+  .ph-safe { height: 44px; }
+  .ph-tabs {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 56px;
+    display: flex; justify-content: space-around; align-items: center; padding-bottom: 8px;
+  }
+  .ph-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 8px; }
+  .ph-tab-i { font-size: 16px; }
+
+  .ph-search {
+    margin: 0 14px; height: 38px;
+    display: flex; align-items: center; gap: 8px; padding: 0 12px;
+  }
+  .ph-search-i { font-size: 12px; }
+  .ph-search-t { font-size: 13px; }
+
+  .card-area { margin: 10px 12px 0; overflow-y: auto; max-height: 380px; }
+
+  .s-title { font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .s-block { padding: 8px 0; }
+
+  .decl-grid { display: grid; grid-template-columns: 20px 1fr 1fr; gap: 1px 8px; font-size: 10px; }
+  .conj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 12px; font-size: 10px; }
+  .cl { font-size: 9px; }
+
+  .ex { font-size: 11px; line-height: 1.5; }
+  .ex-it { font-size: 9px; margin-top: 2px; }
+  .ctx { font-size: 10px; line-height: 1.5; padding: 6px 8px; border-radius: 6px; }
+
+  /* Vote */
+  .vote-bar { text-align: center; padding: 20px; }
+  .vote-btn {
+    padding: 10px 24px; border: 1px solid #27272a; border-radius: 8px;
+    background: transparent; color: #71717a; font-size: 13px; cursor: pointer;
+    font-family: 'Geist', sans-serif; transition: all 0.2s; margin: 4px;
+  }
+  .vote-btn:hover { border-color: #fff; color: #fff; }
+
+  /* ========================================== */
+  /* 1. VERCEL                                   */
+  /* ========================================== */
+  .v-ph { background: #000; border: 1px solid #1c1c1e; }
+  .v-ph .ph-search { border: 1px solid #333; border-radius: 8px; background: #111; }
+  .v-ph .ph-search-i { color: #555; }
+  .v-ph .ph-search-t { font-family: 'Geist', sans-serif; font-weight: 500; color: #fafafa; }
+  .v-ph .ph-tabs { background: #000; border-top: 1px solid #1c1c1e; }
+  .v-ph .ph-tab { font-family: 'Geist', sans-serif; color: #555; font-weight: 500; }
+  .v-ph .ph-tab.a { color: #fafafa; }
+
+  .v-ph .s-title { font-family: 'Geist Mono', monospace; color: #444; }
+  .v-ph .s-block { border-bottom: 1px solid #1c1c1e; }
+
+  .v-gender { display: inline-block; padding: 2px 8px; border-radius: 4px; font-family: 'Geist Mono'; font-size: 10px; font-weight: 600; }
+  .v-der { background: #172554; color: #3b82f6; }
+  .v-die { background: #450a0a; color: #ef4444; }
+  .v-das { background: #052e16; color: #22c55e; }
+
+  .v-word { font-family: 'Geist'; font-size: 28px; font-weight: 700; color: #fafafa; letter-spacing: -1px; margin-top: 4px; }
+  .v-meta { font-family: 'Geist Mono'; font-size: 10px; color: #444; margin-top: 2px; }
+  .v-trans { font-family: 'Geist'; font-size: 13px; color: #a1a1aa; margin-top: 10px; padding-bottom: 10px; border-bottom: 1px solid #1c1c1e; }
+
+  .v-ph .decl-grid { color: #71717a; font-family: 'Geist'; }
+  .v-ph .cl { color: #333; font-family: 'Geist Mono'; font-weight: 600; }
+  .v-ph .conj-grid { color: #71717a; font-family: 'Geist'; }
+  .v-ph .ex { color: #d4d4d8; font-family: 'Geist'; }
+  .v-ph .ex .w { color: #3b82f6; border-bottom: 1px solid rgba(59,130,246,0.3); cursor: pointer; }
+  .v-ph .ex-it { color: #3f3f46; }
+  .v-ph .ctx { background: #111; color: #71717a; font-family: 'Geist'; border-left: 2px solid #27272a; border-radius: 0; }
+  .v-ph .ctx strong { color: #d4d4d8; }
+
+  .v-case-pill { display: inline-block; padding: 1px 6px; border-radius: 4px; font-family: 'Geist Mono'; font-size: 9px; font-weight: 600; }
+  .v-akk { background: #172554; color: #3b82f6; }
+  .v-dat { background: #052e16; color: #22c55e; }
+
+  /* vocab list specific */
+  .v-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1c1c1e; }
+  .v-list-word { font-family: 'Geist'; font-weight: 600; color: #fafafa; font-size: 13px; flex: 1; }
+  .v-list-trans { font-family: 'Geist'; color: #52525b; font-size: 11px; }
+  .v-list-badge { font-family: 'Geist Mono'; font-size: 9px; padding: 2px 6px; border-radius: 4px; }
+
+  /* review card */
+  .v-review-card { background: #111; border: 1px solid #1c1c1e; border-radius: 12px; padding: 20px; text-align: center; }
+  .v-review-word { font-family: 'Geist'; font-size: 32px; font-weight: 700; color: #fafafa; }
+  .v-review-hint { font-family: 'Geist Mono'; font-size: 10px; color: #3f3f46; margin-top: 8px; }
+  .v-review-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
+  .v-review-btn { padding: 8px 16px; border-radius: 6px; font-family: 'Geist'; font-size: 11px; font-weight: 500; border: 1px solid #27272a; color: #a1a1aa; background: transparent; }
+  .v-review-btn.g { border-color: #166534; color: #22c55e; }
+  .v-review-btn.r { border-color: #7f1d1d; color: #ef4444; }
+
+  /* ========================================== */
+  /* 2. POSTHOG                                  */
+  /* ========================================== */
+  .pg-ph { background: #F9FAFB; border: 1px solid #e5e7eb; }
+  .pg-ph .ph-search { border: 1.5px solid #d1d5db; border-radius: 8px; background: #fff; }
+  .pg-ph .ph-search-i { color: #9ca3af; }
+  .pg-ph .ph-search-t { font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; color: #111827; }
+  .pg-ph .ph-tabs { background: #F9FAFB; border-top: 1px solid #e5e7eb; }
+  .pg-ph .ph-tab { font-family: 'IBM Plex Sans'; color: #9ca3af; font-weight: 500; }
+  .pg-ph .ph-tab.a { color: #111827; }
+
+  .pg-ph .s-title { font-family: 'IBM Plex Mono', monospace; color: #9ca3af; font-weight: 500; }
+  .pg-ph .s-block { border-bottom: 1px solid #f3f4f6; }
+
+  .pg-gender { display: inline-block; padding: 2px 8px; border-radius: 999px; font-family: 'IBM Plex Sans'; font-size: 10px; font-weight: 600; }
+  .pg-der { background: #dbeafe; color: #1d4ed8; }
+  .pg-die { background: #fee2e2; color: #b91c1c; }
+  .pg-das { background: #dcfce7; color: #15803d; }
+
+  .pg-word { font-family: 'IBM Plex Sans'; font-size: 26px; font-weight: 700; color: #111827; margin-top: 4px; }
+  .pg-meta { font-family: 'IBM Plex Mono'; font-size: 10px; color: #9ca3af; margin-top: 2px; }
+  .pg-trans { font-family: 'IBM Plex Sans'; font-size: 13px; color: #6b7280; margin-top: 10px; padding-bottom: 10px; border-bottom: 1px solid #f3f4f6; }
+
+  .pg-ph .decl-grid { color: #4b5563; font-family: 'IBM Plex Sans'; }
+  .pg-ph .cl { color: #d1d5db; font-family: 'IBM Plex Mono'; font-weight: 500; }
+  .pg-ph .conj-grid { color: #4b5563; font-family: 'IBM Plex Sans'; }
+  .pg-ph .ex { color: #1f2937; font-family: 'IBM Plex Sans'; }
+  .pg-ph .ex .w { color: #2563eb; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; cursor: pointer; }
+  .pg-ph .ex-it { color: #9ca3af; }
+  .pg-ph .ctx { background: #f0f9ff; color: #4b5563; font-family: 'IBM Plex Sans'; border-left: 3px solid #93c5fd; }
+  .pg-ph .ctx strong { color: #111827; }
+
+  .pg-case { font-family: 'IBM Plex Mono'; font-size: 9px; font-weight: 500; padding: 1px 6px; border-radius: 999px; }
+  .pg-akk { background: #dbeafe; color: #1d4ed8; }
+  .pg-dat { background: #dcfce7; color: #15803d; }
+
+  .pg-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+  .pg-list-word { font-family: 'IBM Plex Sans'; font-weight: 600; color: #111827; font-size: 13px; flex: 1; }
+  .pg-list-trans { font-family: 'IBM Plex Sans'; color: #9ca3af; font-size: 11px; }
+
+  .pg-review-card { background: #fff; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 20px; text-align: center; }
+  .pg-review-word { font-family: 'IBM Plex Sans'; font-size: 30px; font-weight: 700; color: #111827; }
+  .pg-review-hint { font-family: 'IBM Plex Mono'; font-size: 10px; color: #d1d5db; margin-top: 8px; }
+  .pg-review-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
+  .pg-review-btn { padding: 8px 16px; border-radius: 8px; font-family: 'IBM Plex Sans'; font-size: 11px; font-weight: 500; border: 1.5px solid #e5e7eb; color: #6b7280; background: #fff; }
+  .pg-review-btn.g { border-color: #86efac; color: #15803d; background: #f0fdf4; }
+  .pg-review-btn.r { border-color: #fca5a5; color: #b91c1c; background: #fef2f2; }
+
+  /* ========================================== */
+  /* 3. LINEAR                                   */
+  /* ========================================== */
+  .ln-ph { background: #0C0D10; border: 1px solid #1E2028; }
+  .ln-ph .ph-search { border: 1px solid #2A2C36; border-radius: 8px; background: #14151A; }
+  .ln-ph .ph-search-i { color: #4B4D5A; }
+  .ln-ph .ph-search-t { font-family: 'Inter', sans-serif; font-weight: 500; color: #EDEDF0; }
+  .ln-ph .ph-tabs { background: #0C0D10; border-top: 1px solid #1E2028; }
+  .ln-ph .ph-tab { font-family: 'Inter'; color: #4B4D5A; font-weight: 500; }
+  .ln-ph .ph-tab.a { color: #EDEDF0; }
+
+  .ln-ph .s-title { font-family: 'Inter'; color: #3A3C48; font-weight: 600; letter-spacing: 1px; }
+  .ln-ph .s-block { border-bottom: 1px solid #1E2028; }
+
+  .ln-gender { display: inline-block; padding: 2px 8px; border-radius: 4px; font-family: 'Inter'; font-size: 10px; font-weight: 600; }
+  .ln-der { background: rgba(88,120,220,0.15); color: #5878DC; }
+  .ln-die { background: rgba(220,88,110,0.15); color: #DC586E; }
+  .ln-das { background: rgba(88,200,120,0.15); color: #58C878; }
+
+  .ln-word { font-family: 'Inter'; font-size: 26px; font-weight: 600; color: #EDEDF0; letter-spacing: -0.5px; margin-top: 4px; }
+  .ln-meta { font-family: 'Inter'; font-size: 10px; color: #3A3C48; margin-top: 2px; }
+  .ln-trans { font-family: 'Inter'; font-size: 13px; color: #6E7081; margin-top: 10px; padding-bottom: 10px; border-bottom: 1px solid #1E2028; }
+
+  .ln-ph .decl-grid { color: #6E7081; font-family: 'Inter'; }
+  .ln-ph .cl { color: #2A2C36; font-family: 'Inter'; font-weight: 600; }
+  .ln-ph .conj-grid { color: #6E7081; font-family: 'Inter'; }
+  .ln-ph .ex { color: #B4B6C3; font-family: 'Inter'; }
+  .ln-ph .ex .w { color: #5878DC; cursor: pointer; }
+  .ln-ph .ex-it { color: #3A3C48; }
+  .ln-ph .ctx { background: #14151A; color: #6E7081; font-family: 'Inter'; border-left: 2px solid #2A2C36; }
+  .ln-ph .ctx strong { color: #B4B6C3; }
+
+  .ln-case { font-family: 'Inter'; font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 4px; }
+  .ln-akk { background: rgba(88,120,220,0.12); color: #5878DC; }
+  .ln-dat { background: rgba(88,200,120,0.12); color: #58C878; }
+
+  .ln-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1E2028; }
+  .ln-list-word { font-family: 'Inter'; font-weight: 500; color: #EDEDF0; font-size: 13px; flex: 1; }
+  .ln-list-trans { font-family: 'Inter'; color: #4B4D5A; font-size: 11px; }
+
+  .ln-review-card { background: #14151A; border: 1px solid #1E2028; border-radius: 10px; padding: 20px; text-align: center; }
+  .ln-review-word { font-family: 'Inter'; font-size: 30px; font-weight: 600; color: #EDEDF0; letter-spacing: -0.5px; }
+  .ln-review-hint { font-family: 'Inter'; font-size: 10px; color: #3A3C48; margin-top: 8px; }
+  .ln-review-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
+  .ln-review-btn { padding: 8px 16px; border-radius: 6px; font-family: 'Inter'; font-size: 11px; font-weight: 500; border: 1px solid #2A2C36; color: #6E7081; background: transparent; }
+  .ln-review-btn.g { border-color: rgba(88,200,120,0.3); color: #58C878; }
+  .ln-review-btn.r { border-color: rgba(220,88,110,0.3); color: #DC586E; }
+
+  /* ========================================== */
+  /* 4. STRIPE                                   */
+  /* ========================================== */
+  .st-ph { background: #0A2540; border: 1px solid #1A3A5C; }
+  .st-ph .ph-search { border: 1px solid #1A3A5C; border-radius: 8px; background: #0E2F50; }
+  .st-ph .ph-search-i { color: #4A6A8A; }
+  .st-ph .ph-search-t { font-family: 'Space Grotesk', sans-serif; font-weight: 500; color: #F6F9FC; }
+  .st-ph .ph-tabs { background: #0A2540; border-top: 1px solid #1A3A5C; }
+  .st-ph .ph-tab { font-family: 'Space Grotesk'; color: #4A6A8A; font-weight: 500; }
+  .st-ph .ph-tab.a { color: #F6F9FC; }
+
+  .st-ph .s-title { font-family: 'Space Grotesk'; color: #2A4A6A; font-weight: 600; }
+  .st-ph .s-block { border-bottom: 1px solid #1A3A5C; }
+
+  .st-gender { display: inline-block; padding: 2px 8px; border-radius: 6px; font-family: 'Space Grotesk'; font-size: 10px; font-weight: 600; }
+  .st-der { background: rgba(99,91,255,0.15); color: #635BFF; }
+  .st-die { background: rgba(255,91,120,0.15); color: #FF5B78; }
+  .st-das { background: rgba(91,220,130,0.15); color: #5BDC82; }
+
+  .st-word { font-family: 'Space Grotesk'; font-size: 26px; font-weight: 700; color: #F6F9FC; letter-spacing: -0.5px; margin-top: 4px; }
+  .st-meta { font-family: 'Space Grotesk'; font-size: 10px; color: #4A6A8A; margin-top: 2px; font-weight: 400; }
+  .st-trans { font-family: 'Space Grotesk'; font-size: 13px; color: #7A9ABC; margin-top: 10px; padding-bottom: 10px; border-bottom: 1px solid #1A3A5C; }
+
+  .st-ph .decl-grid { color: #7A9ABC; font-family: 'Space Grotesk'; }
+  .st-ph .cl { color: #2A4A6A; font-family: 'Space Grotesk'; font-weight: 600; }
+  .st-ph .conj-grid { color: #7A9ABC; font-family: 'Space Grotesk'; }
+  .st-ph .ex { color: #C0D4E8; font-family: 'Space Grotesk'; }
+  .st-ph .ex .w { color: #635BFF; cursor: pointer; }
+  .st-ph .ex-it { color: #3A5A7A; }
+  .st-ph .ctx { background: #0E2F50; color: #7A9ABC; font-family: 'Space Grotesk'; border-left: 2px solid #635BFF; }
+  .st-ph .ctx strong { color: #C0D4E8; }
+
+  .st-case { font-family: 'Space Grotesk'; font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 6px; }
+  .st-akk { background: rgba(99,91,255,0.12); color: #635BFF; }
+  .st-dat { background: rgba(91,220,130,0.12); color: #5BDC82; }
+
+  .st-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1A3A5C; }
+  .st-list-word { font-family: 'Space Grotesk'; font-weight: 600; color: #F6F9FC; font-size: 13px; flex: 1; }
+  .st-list-trans { font-family: 'Space Grotesk'; color: #4A6A8A; font-size: 11px; }
+
+  .st-review-card { background: #0E2F50; border: 1px solid #1A3A5C; border-radius: 12px; padding: 20px; text-align: center; }
+  .st-review-word { font-family: 'Space Grotesk'; font-size: 30px; font-weight: 700; color: #F6F9FC; }
+  .st-review-hint { font-family: 'Space Grotesk'; font-size: 10px; color: #3A5A7A; margin-top: 8px; }
+  .st-review-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
+  .st-review-btn { padding: 8px 16px; border-radius: 8px; font-family: 'Space Grotesk'; font-size: 11px; font-weight: 500; border: 1px solid #1A3A5C; color: #7A9ABC; background: transparent; }
+  .st-review-btn.g { border-color: rgba(91,220,130,0.3); color: #5BDC82; }
+  .st-review-btn.r { border-color: rgba(255,91,120,0.3); color: #FF5B78; }
+
+  /* ========================================== */
+  /* 5. RAYCAST                                  */
+  /* ========================================== */
+  .rc-ph { background: #1A1B1E; border: 1px solid #2C2D31; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+  .rc-ph .ph-search { border: 1px solid #3C3D42; border-radius: 10px; background: #232428; }
+  .rc-ph .ph-search-i { color: #5C5D63; }
+  .rc-ph .ph-search-t { font-family: 'Manrope', sans-serif; font-weight: 600; color: #F0F0F2; }
+  .rc-ph .ph-tabs { background: #1A1B1E; border-top: 1px solid #2C2D31; }
+  .rc-ph .ph-tab { font-family: 'Manrope'; color: #5C5D63; font-weight: 600; }
+  .rc-ph .ph-tab.a { color: #F0F0F2; }
+
+  .rc-ph .s-title { font-family: 'Manrope'; color: #3C3D42; font-weight: 700; }
+  .rc-ph .s-block { border-bottom: 1px solid #2C2D31; }
+
+  .rc-gender { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; font-family: 'Manrope'; font-size: 10px; font-weight: 700; }
+  .rc-der { background: #2563eb; color: #fff; }
+  .rc-die { background: #e11d48; color: #fff; }
+  .rc-das { background: #16a34a; color: #fff; }
+
+  .rc-word { font-family: 'Manrope'; font-size: 24px; font-weight: 800; color: #F0F0F2; letter-spacing: -0.5px; margin-top: 2px; }
+  .rc-meta { font-family: 'Manrope'; font-size: 10px; color: #5C5D63; margin-top: 2px; font-weight: 500; }
+  .rc-trans { font-family: 'Manrope'; font-size: 13px; color: #8B8C93; margin-top: 8px; padding-bottom: 8px; border-bottom: 1px solid #2C2D31; font-weight: 500; }
+
+  .rc-ph .decl-grid { color: #8B8C93; font-family: 'Manrope'; font-weight: 500; }
+  .rc-ph .cl { color: #3C3D42; font-family: 'Manrope'; font-weight: 700; }
+  .rc-ph .conj-grid { color: #8B8C93; font-family: 'Manrope'; font-weight: 500; }
+  .rc-ph .ex { color: #CCCDD2; font-family: 'Manrope'; font-weight: 500; }
+  .rc-ph .ex .w { color: #60a5fa; cursor: pointer; }
+  .rc-ph .ex-it { color: #4C4D53; }
+  .rc-ph .ctx { background: #232428; color: #8B8C93; font-family: 'Manrope'; font-weight: 500; border-radius: 8px; }
+  .rc-ph .ctx strong { color: #CCCDD2; font-weight: 700; }
+
+  .rc-case { font-family: 'Manrope'; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 5px; }
+  .rc-akk { background: rgba(37,99,235,0.15); color: #60a5fa; }
+  .rc-dat { background: rgba(22,163,74,0.15); color: #4ade80; }
+
+  .rc-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #2C2D31; }
+  .rc-list-word { font-family: 'Manrope'; font-weight: 700; color: #F0F0F2; font-size: 13px; flex: 1; }
+  .rc-list-trans { font-family: 'Manrope'; color: #5C5D63; font-size: 11px; font-weight: 500; }
+
+  .rc-review-card { background: #232428; border: 1px solid #2C2D31; border-radius: 12px; padding: 20px; text-align: center; }
+  .rc-review-word { font-family: 'Manrope'; font-size: 28px; font-weight: 800; color: #F0F0F2; }
+  .rc-review-hint { font-family: 'Manrope'; font-size: 10px; color: #4C4D53; margin-top: 8px; font-weight: 500; }
+  .rc-review-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
+  .rc-review-btn { padding: 8px 16px; border-radius: 8px; font-family: 'Manrope'; font-size: 11px; font-weight: 600; border: 1px solid #3C3D42; color: #8B8C93; background: transparent; }
+  .rc-review-btn.g { border-color: rgba(22,163,74,0.4); color: #4ade80; }
+  .rc-review-btn.r { border-color: rgba(225,29,72,0.4); color: #fb7185; }
+
+  /* ========================================== */
+  /* 6. NOTION                                   */
+  /* ========================================== */
+  .no-ph { background: #FFFFFF; border: 1px solid #e3e3e0; }
+  .no-ph .ph-search { border-bottom: 1px solid #e3e3e0; border-radius: 0; }
+  .no-ph .ph-search-i { color: #b4b4b0; }
+  .no-ph .ph-search-t { font-family: 'DM Sans', sans-serif; font-weight: 500; color: #191919; }
+  .no-ph .ph-tabs { background: #fff; border-top: 1px solid #f0f0ee; }
+  .no-ph .ph-tab { font-family: 'DM Sans'; color: #b4b4b0; font-weight: 500; }
+  .no-ph .ph-tab.a { color: #191919; }
+
+  .no-ph .s-title { font-family: 'DM Sans'; color: #b4b4b0; font-weight: 600; }
+  .no-ph .s-block { border-bottom: 1px solid #f0f0ee; }
+
+  .no-gender { display: inline-block; padding: 2px 8px; border-radius: 3px; font-family: 'DM Sans'; font-size: 10px; font-weight: 600; }
+  .no-der { background: #D3E5EF; color: #2E6B8A; }
+  .no-die { background: #FBDBD7; color: #93362F; }
+  .no-das { background: #DBEDDB; color: #2E7D32; }
+
+  .no-word { font-family: 'DM Sans'; font-size: 28px; font-weight: 700; color: #191919; letter-spacing: -0.5px; margin-top: 4px; }
+  .no-meta { font-family: 'DM Sans'; font-size: 10px; color: #b4b4b0; margin-top: 2px; }
+  .no-trans { font-family: 'DM Sans'; font-size: 13px; color: #787774; margin-top: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0ee; }
+
+  .no-ph .decl-grid { color: #787774; font-family: 'DM Sans'; }
+  .no-ph .cl { color: #d3d3d0; font-family: 'DM Sans'; font-weight: 600; }
+  .no-ph .conj-grid { color: #787774; font-family: 'DM Sans'; }
+  .no-ph .ex { color: #37352f; font-family: 'DM Sans'; }
+  .no-ph .ex .w { background: #FFF8C5; padding: 0 2px; cursor: pointer; }
+  .no-ph .ex-it { color: #b4b4b0; }
+  .no-ph .ctx { background: #F7F6F3; color: #787774; font-family: 'DM Sans'; border-radius: 4px; }
+  .no-ph .ctx strong { color: #37352f; }
+
+  .no-case { font-family: 'DM Sans'; font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 3px; }
+  .no-akk { background: #D3E5EF; color: #2E6B8A; }
+  .no-dat { background: #DBEDDB; color: #2E7D32; }
+
+  .no-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f0ee; }
+  .no-list-word { font-family: 'DM Sans'; font-weight: 600; color: #191919; font-size: 13px; flex: 1; }
+  .no-list-trans { font-family: 'DM Sans'; color: #b4b4b0; font-size: 11px; }
+
+  .no-review-card { background: #F7F6F3; border: 1px solid #e3e3e0; border-radius: 8px; padding: 20px; text-align: center; }
+  .no-review-word { font-family: 'DM Sans'; font-size: 30px; font-weight: 700; color: #191919; }
+  .no-review-hint { font-family: 'DM Sans'; font-size: 10px; color: #d3d3d0; margin-top: 8px; }
+  .no-review-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
+  .no-review-btn { padding: 8px 16px; border-radius: 6px; font-family: 'DM Sans'; font-size: 11px; font-weight: 500; border: 1px solid #e3e3e0; color: #787774; background: #fff; }
+  .no-review-btn.g { background: #DBEDDB; color: #2E7D32; border-color: #DBEDDB; }
+  .no-review-btn.r { background: #FBDBD7; color: #93362F; border-color: #FBDBD7; }
+
+  /* Stat bars */
+  .stat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .stat-label { font-size: 10px; width: 60px; }
+  .stat-bar { height: 6px; border-radius: 3px; flex: 1; background: #222; overflow: hidden; }
+  .stat-fill { height: 100%; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>WortSchatz × 6 Design Systems</h1>
+  <p>Each tab shows all 5 views: noun, verb, preposition, vocabulary list, review</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('vercel')">Vercel</button>
+  <button class="tab-btn" onclick="showTab('posthog')">PostHog</button>
+  <button class="tab-btn" onclick="showTab('linear')">Linear</button>
+  <button class="tab-btn" onclick="showTab('stripe')">Stripe</button>
+  <button class="tab-btn" onclick="showTab('raycast')">Raycast</button>
+  <button class="tab-btn" onclick="showTab('notion')">Notion</button>
+</div>
+
+<!-- ============ VERCEL ============ -->
+<div class="design-section active" id="vercel">
+  <div class="section-header">
+    <div class="section-label">Design System 1</div>
+    <div class="section-name">Vercel / Geist</div>
+    <div class="section-desc">Dark-first. Geist Sans + Geist Mono. High contrast. Semantic color pills. Swiss precision meets developer aesthetics.</div>
+    <div class="section-tags"><span class="stag">Geist fonts</span><span class="stag">Dark canvas</span><span class="stag">#000 base</span><span class="stag">Blue/Red/Green pills</span><span class="stag">Mono accents</span></div>
+  </div>
+  <div class="phones-row">
+    <div class="phone-wrap"><div class="phone-title">Noun — der Tisch</div>
+      <div class="ph v-ph"><div class="ph-safe"></div>
+        <div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">Tisch</span></div>
+        <div class="card-area">
+          <span class="v-gender v-der">der</span>
+          <div class="v-word">Tisch</div>
+          <div class="v-meta">pl. die Tische</div>
+          <div class="v-trans">tavolo, scrivania</div>
+          <div class="s-block"><div class="s-title">DECLINAZIONE</div><div class="decl-grid"><span class="cl">N</span><span>der Tisch</span><span>die Tische</span><span class="cl">A</span><span>den Tisch</span><span>die Tische</span><span class="cl">D</span><span>dem Tisch</span><span>den Tischen</span><span class="cl">G</span><span>des Tisches</span><span>der Tische</span></div></div>
+          <div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Leg</span> <span class="w">das</span> <span class="w">Buch</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Metti il libro sul tavolo.</div></div>
+          <div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>Tisch</strong> = tavolo generico. Pranzo → <em>Esstisch</em>. Scrivania → <em>Schreibtisch</em>.</div></div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div>
+    </div>
+    <div class="phone-wrap"><div class="phone-title">Verb — gehen</div>
+      <div class="ph v-ph"><div class="ph-safe"></div>
+        <div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">gehen</span></div>
+        <div class="card-area">
+          <div class="v-word">gehen</div>
+          <div class="v-meta">ging · ist gegangen</div>
+          <div class="v-trans">andare</div>
+          <div class="s-block"><div class="s-title">PRESENTE</div><div class="conj-grid"><span>ich gehe</span><span>wir gehen</span><span>du gehst</span><span>ihr geht</span><span>er/sie geht</span><span>sie gehen</span></div></div>
+          <div class="s-block"><div class="s-title">REGGE</div><div style="display:flex;flex-direction:column;gap:4px;"><div><span class="v-case-pill v-akk">AKK</span> <span style="color:#71717a;font-size:10px;">direzione — den Weg gehen</span></div><div><span class="v-case-pill v-dat">DAT</span> <span style="color:#71717a;font-size:10px;">zu + Dat — zur Arbeit gehen</span></div></div></div>
+          <div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Ich</span> <span class="w">gehe</span> <span class="w">jeden</span> <span class="w">Tag</span> <span class="w">zu</span> <span class="w">Fuß</span> <span class="w">zur</span> <span class="w">Arbeit</span>."</div><div class="ex-it">Vado al lavoro a piedi ogni giorno.</div></div>
+          <div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>gehen</strong> = a piedi. Veicoli → <em>fahren</em>. „Wie geht's?" = come stai.</div></div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div>
+    </div>
+    <div class="phone-wrap"><div class="phone-title">Preposition — auf</div>
+      <div class="ph v-ph"><div class="ph-safe"></div>
+        <div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">auf</span></div>
+        <div class="card-area">
+          <div class="v-meta" style="color:#a1a1aa;">WECHSELPRÄPOSITION</div>
+          <div class="v-word">auf</div>
+          <div class="v-trans">su, sopra</div>
+          <div class="s-block"><div class="s-title">CASI</div>
+            <div style="margin-bottom:10px;"><div style="margin-bottom:4px;"><span class="v-case-pill v-akk">+ AKK</span> <span style="color:#3f3f46;font-size:9px;">movimento</span></div><div class="ex" style="font-size:11px;">„<span class="w">Leg</span> <span class="w">es</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Mettilo sul tavolo.</div></div>
+            <div><div style="margin-bottom:4px;"><span class="v-case-pill v-dat">+ DAT</span> <span style="color:#3f3f46;font-size:9px;">stato</span></div><div class="ex" style="font-size:11px;">„<span class="w">Es</span> <span class="w">liegt</span> <span class="w">auf</span> <span class="w">dem</span> <span class="w">Tisch</span>."</div><div class="ex-it">È sul tavolo.</div></div>
+          </div>
+          <div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>auf</strong> = su superficie. <em>an</em> = contatto verticale. <em>über</em> = sopra senza contatto.</div></div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div>
+    </div>
+    <div class="phone-wrap"><div class="phone-title">Vocabulary List</div>
+      <div class="ph v-ph"><div class="ph-safe"></div>
+        <div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t" style="color:#52525b;">Filtra parole...</span></div>
+        <div class="card-area">
+          <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="font-family:'Geist Mono';font-size:9px;padding:3px 8px;border:1px solid #27272a;border-radius:4px;color:#71717a;">Tutti (47)</span>
+            <span style="font-family:'Geist Mono';font-size:9px;padding:3px 8px;border:1px solid #27272a;border-radius:4px;color:#3b82f6;border-color:#172554;">Sostantivi</span>
+            <span style="font-family:'Geist Mono';font-size:9px;padding:3px 8px;border:1px solid #27272a;border-radius:4px;color:#71717a;">Verbi</span>
+          </div>
+          <div class="v-list-item"><span class="v-list-badge v-der" style="background:#172554;color:#3b82f6;">der</span><span class="v-list-word">Tisch</span><span class="v-list-trans">tavolo</span></div>
+          <div class="v-list-item"><span class="v-list-badge v-die" style="background:#450a0a;color:#ef4444;">die</span><span class="v-list-word">Angst</span><span class="v-list-trans">paura</span></div>
+          <div class="v-list-item"><span class="v-list-badge" style="background:#1c1c1e;color:#71717a;">v.</span><span class="v-list-word">gehen</span><span class="v-list-trans">andare</span></div>
+          <div class="v-list-item"><span class="v-list-badge v-das" style="background:#052e16;color:#22c55e;">das</span><span class="v-list-word">Haus</span><span class="v-list-trans">casa</span></div>
+          <div class="v-list-item"><span class="v-list-badge" style="background:#1c1c1e;color:#71717a;">pr.</span><span class="v-list-word">auf</span><span class="v-list-trans">su</span></div>
+          <div class="v-list-item"><span class="v-list-badge" style="background:#1c1c1e;color:#71717a;">v.</span><span class="v-list-word">machen</span><span class="v-list-trans">fare</span></div>
+          <div class="v-list-item"><span class="v-list-badge v-der" style="background:#172554;color:#3b82f6;">der</span><span class="v-list-word">Hund</span><span class="v-list-trans">cane</span></div>
+          <div class="v-list-item"><span class="v-list-badge v-die" style="background:#450a0a;color:#ef4444;">die</span><span class="v-list-word">Katze</span><span class="v-list-trans">gatto</span></div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab a"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div>
+    </div>
+    <div class="phone-wrap"><div class="phone-title">Review / Ripasso</div>
+      <div class="ph v-ph"><div class="ph-safe"></div>
+        <div class="card-area" style="display:flex;flex-direction:column;gap:14px;padding-top:10px;">
+          <div style="text-align:center;margin-bottom:4px;">
+            <div style="font-family:'Geist';font-size:16px;font-weight:600;color:#fafafa;">Ripasso giornaliero</div>
+            <div style="font-family:'Geist Mono';font-size:10px;color:#3f3f46;margin-top:4px;">12 parole da ripassare</div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:center;">
+            <div style="text-align:center;padding:10px 14px;border:1px solid #27272a;border-radius:8px;"><div style="font-family:'Geist';font-size:20px;font-weight:700;color:#22c55e;">32</div><div style="font-family:'Geist Mono';font-size:8px;color:#3f3f46;">sapute</div></div>
+            <div style="text-align:center;padding:10px 14px;border:1px solid #27272a;border-radius:8px;"><div style="font-family:'Geist';font-size:20px;font-weight:700;color:#eab308;">12</div><div style="font-family:'Geist Mono';font-size:8px;color:#3f3f46;">da ripassare</div></div>
+            <div style="text-align:center;padding:10px 14px;border:1px solid #27272a;border-radius:8px;"><div style="font-family:'Geist';font-size:20px;font-weight:700;color:#ef4444;">3</div><div style="font-family:'Geist Mono';font-size:8px;color:#3f3f46;">difficili</div></div>
+          </div>
+          <div class="v-review-card">
+            <span class="v-gender v-der" style="font-size:9px;">der</span>
+            <div class="v-review-word" style="margin-top:8px;">Tisch</div>
+            <div class="v-review-hint">Tocca per vedere la traduzione</div>
+            <div class="v-review-btns">
+              <div class="v-review-btn r">Non lo so</div>
+              <div class="v-review-btn">Quasi</div>
+              <div class="v-review-btn g">Lo so</div>
+            </div>
+          </div>
+          <div style="margin-top:4px;">
+            <div class="stat-row"><span class="stat-label" style="color:#52525b;font-family:'Geist Mono';">Sost.</span><div class="stat-bar"><div class="stat-fill" style="width:65%;background:#3b82f6;"></div></div></div>
+            <div class="stat-row"><span class="stat-label" style="color:#52525b;font-family:'Geist Mono';">Verbi</span><div class="stat-bar"><div class="stat-fill" style="width:40%;background:#a855f7;"></div></div></div>
+            <div class="stat-row"><span class="stat-label" style="color:#52525b;font-family:'Geist Mono';">Prep.</span><div class="stat-bar"><div class="stat-fill" style="width:25%;background:#eab308;"></div></div></div>
+          </div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab a"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="vote-bar"><button class="vote-btn" onclick="vote('vercel')">Scegli Vercel</button></div>
+</div>
+
+<!-- Template function to generate the other 5 systems with same content structure but different styling -->
+<!-- 2. POSTHOG -->
+<div class="design-section" id="posthog">
+  <div class="section-header">
+    <div class="section-label">Design System 2</div>
+    <div class="section-name">PostHog</div>
+    <div class="section-desc">Light, friendly, professional. IBM Plex Sans + Mono. Blue accents (#2563eb). Rounded pills. Pastel gender badges. Generous whitespace.</div>
+    <div class="section-tags"><span class="stag">IBM Plex Sans</span><span class="stag">Light canvas</span><span class="stag">Pastel badges</span><span class="stag">Blue accents</span><span class="stag">Rounded</span></div>
+  </div>
+  <div class="phones-row">
+    <div class="phone-wrap"><div class="phone-title">Noun — der Tisch</div>
+      <div class="ph pg-ph"><div class="ph-safe"></div>
+        <div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">Tisch</span></div>
+        <div class="card-area">
+          <span class="pg-gender pg-der">der</span>
+          <div class="pg-word">Tisch</div><div class="pg-meta">pl. die Tische</div>
+          <div class="pg-trans">tavolo, scrivania</div>
+          <div class="s-block"><div class="s-title">DECLINAZIONE</div><div class="decl-grid"><span class="cl">N</span><span>der Tisch</span><span>die Tische</span><span class="cl">A</span><span>den Tisch</span><span>die Tische</span><span class="cl">D</span><span>dem Tisch</span><span>den Tischen</span><span class="cl">G</span><span>des Tisches</span><span>der Tische</span></div></div>
+          <div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Leg</span> <span class="w">das</span> <span class="w">Buch</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Metti il libro sul tavolo.</div></div>
+          <div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>Tisch</strong> = tavolo generico. Pranzo → <em>Esstisch</em>. Scrivania → <em>Schreibtisch</em>.</div></div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div></div>
+    <div class="phone-wrap"><div class="phone-title">Verb — gehen</div>
+      <div class="ph pg-ph"><div class="ph-safe"></div>
+        <div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">gehen</span></div>
+        <div class="card-area">
+          <div class="pg-word">gehen</div><div class="pg-meta">ging · ist gegangen</div><div class="pg-trans">andare</div>
+          <div class="s-block"><div class="s-title">PRESENTE</div><div class="conj-grid"><span>ich gehe</span><span>wir gehen</span><span>du gehst</span><span>ihr geht</span><span>er/sie geht</span><span>sie gehen</span></div></div>
+          <div class="s-block"><div class="s-title">REGGE</div><div style="display:flex;flex-direction:column;gap:4px;"><div><span class="pg-case pg-akk">AKK</span> <span style="color:#9ca3af;font-size:10px;">direzione</span></div><div><span class="pg-case pg-dat">DAT</span> <span style="color:#9ca3af;font-size:10px;">zu + Dat</span></div></div></div>
+          <div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Ich</span> <span class="w">gehe</span> <span class="w">jeden</span> <span class="w">Tag</span> <span class="w">zu</span> <span class="w">Fuß</span>."</div><div class="ex-it">Vado a piedi ogni giorno.</div></div>
+          <div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>gehen</strong> = a piedi. Veicoli → <em>fahren</em>.</div></div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div></div>
+    <div class="phone-wrap"><div class="phone-title">Preposition — auf</div>
+      <div class="ph pg-ph"><div class="ph-safe"></div>
+        <div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">auf</span></div>
+        <div class="card-area">
+          <div class="pg-meta" style="color:#6b7280;">WECHSELPRÄPOSITION</div><div class="pg-word">auf</div><div class="pg-trans">su, sopra</div>
+          <div class="s-block"><div class="s-title">CASI</div>
+            <div style="margin-bottom:8px;"><span class="pg-case pg-akk">+ AKK</span> <span style="color:#9ca3af;font-size:9px;">movimento</span><div class="ex" style="margin-top:4px;">„<span class="w">Leg</span> <span class="w">es</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Mettilo sul tavolo.</div></div>
+            <div><span class="pg-case pg-dat">+ DAT</span> <span style="color:#9ca3af;font-size:9px;">stato</span><div class="ex" style="margin-top:4px;">„<span class="w">Es</span> <span class="w">liegt</span> <span class="w">auf</span> <span class="w">dem</span> <span class="w">Tisch</span>."</div><div class="ex-it">È sul tavolo.</div></div>
+          </div>
+          <div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>auf</strong> = su superficie. <em>an</em> = verticale. <em>über</em> = sopra.</div></div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div></div>
+    <div class="phone-wrap"><div class="phone-title">Vocabulary List</div>
+      <div class="ph pg-ph"><div class="ph-safe"></div>
+        <div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t" style="color:#9ca3af;">Filtra parole...</span></div>
+        <div class="card-area">
+          <div class="pg-list-item"><span class="pg-gender pg-der" style="font-size:9px;">der</span><span class="pg-list-word">Tisch</span><span class="pg-list-trans">tavolo</span></div>
+          <div class="pg-list-item"><span class="pg-gender pg-die" style="font-size:9px;">die</span><span class="pg-list-word">Angst</span><span class="pg-list-trans">paura</span></div>
+          <div class="pg-list-item"><span style="font-family:'IBM Plex Mono';font-size:9px;padding:2px 8px;border-radius:999px;background:#f3f4f6;color:#6b7280;">v.</span><span class="pg-list-word">gehen</span><span class="pg-list-trans">andare</span></div>
+          <div class="pg-list-item"><span class="pg-gender pg-das" style="font-size:9px;">das</span><span class="pg-list-word">Haus</span><span class="pg-list-trans">casa</span></div>
+          <div class="pg-list-item"><span style="font-family:'IBM Plex Mono';font-size:9px;padding:2px 8px;border-radius:999px;background:#f3f4f6;color:#6b7280;">pr.</span><span class="pg-list-word">auf</span><span class="pg-list-trans">su</span></div>
+          <div class="pg-list-item"><span style="font-family:'IBM Plex Mono';font-size:9px;padding:2px 8px;border-radius:999px;background:#f3f4f6;color:#6b7280;">v.</span><span class="pg-list-word">machen</span><span class="pg-list-trans">fare</span></div>
+          <div class="pg-list-item"><span class="pg-gender pg-der" style="font-size:9px;">der</span><span class="pg-list-word">Hund</span><span class="pg-list-trans">cane</span></div>
+          <div class="pg-list-item"><span class="pg-gender pg-die" style="font-size:9px;">die</span><span class="pg-list-word">Katze</span><span class="pg-list-trans">gatto</span></div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab a"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div></div>
+    <div class="phone-wrap"><div class="phone-title">Review / Ripasso</div>
+      <div class="ph pg-ph"><div class="ph-safe"></div>
+        <div class="card-area" style="padding-top:10px;">
+          <div style="text-align:center;margin-bottom:12px;">
+            <div style="font-family:'IBM Plex Sans';font-size:16px;font-weight:600;color:#111827;">Ripasso giornaliero</div>
+            <div style="font-family:'IBM Plex Mono';font-size:10px;color:#9ca3af;margin-top:4px;">12 parole da ripassare</div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
+            <div style="text-align:center;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;background:#fff;"><div style="font-family:'IBM Plex Sans';font-size:20px;font-weight:700;color:#15803d;">32</div><div style="font-size:8px;color:#9ca3af;">sapute</div></div>
+            <div style="text-align:center;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;background:#fff;"><div style="font-family:'IBM Plex Sans';font-size:20px;font-weight:700;color:#d97706;">12</div><div style="font-size:8px;color:#9ca3af;">da ripassare</div></div>
+            <div style="text-align:center;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;background:#fff;"><div style="font-family:'IBM Plex Sans';font-size:20px;font-weight:700;color:#b91c1c;">3</div><div style="font-size:8px;color:#9ca3af;">difficili</div></div>
+          </div>
+          <div class="pg-review-card">
+            <span class="pg-gender pg-der" style="font-size:9px;">der</span>
+            <div class="pg-review-word" style="margin-top:8px;">Tisch</div>
+            <div class="pg-review-hint">Tocca per vedere la traduzione</div>
+            <div class="pg-review-btns"><div class="pg-review-btn r">Non lo so</div><div class="pg-review-btn">Quasi</div><div class="pg-review-btn g">Lo so</div></div>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="stat-row"><span class="stat-label" style="color:#9ca3af;font-family:'IBM Plex Mono';">Sost.</span><div class="stat-bar" style="background:#f3f4f6;"><div class="stat-fill" style="width:65%;background:#2563eb;"></div></div></div>
+            <div class="stat-row"><span class="stat-label" style="color:#9ca3af;font-family:'IBM Plex Mono';">Verbi</span><div class="stat-bar" style="background:#f3f4f6;"><div class="stat-fill" style="width:40%;background:#7c3aed;"></div></div></div>
+            <div class="stat-row"><span class="stat-label" style="color:#9ca3af;font-family:'IBM Plex Mono';">Prep.</span><div class="stat-bar" style="background:#f3f4f6;"><div class="stat-fill" style="width:25%;background:#d97706;"></div></div></div>
+          </div>
+        </div>
+        <div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab a"><span class="ph-tab-i">↻</span>Ripasso</div></div>
+      </div></div>
+  </div>
+  <div class="vote-bar"><button class="vote-btn" onclick="vote('posthog')">Scegli PostHog</button></div>
+</div>
+
+<!-- 3-6: Simplified generation for remaining systems -->
+<div class="design-section" id="linear">
+  <div class="section-header">
+    <div class="section-label">Design System 3</div>
+    <div class="section-name">Linear</div>
+    <div class="section-desc">Deep dark, indigo-accented. Inter font at various weights. Calm authority. Muted gender colors that don't fight for attention. Focus-first.</div>
+    <div class="section-tags"><span class="stag">Inter</span><span class="stag">#0C0D10 base</span><span class="stag">Indigo accents</span><span class="stag">Muted tones</span><span class="stag">LCH colors</span></div>
+  </div>
+  <div class="phones-row">
+    <div class="phone-wrap"><div class="phone-title">Noun — der Tisch</div><div class="ph ln-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">Tisch</span></div><div class="card-area"><span class="ln-gender ln-der">der</span><div class="ln-word">Tisch</div><div class="ln-meta">pl. die Tische</div><div class="ln-trans">tavolo, scrivania</div><div class="s-block"><div class="s-title">DECLINAZIONE</div><div class="decl-grid"><span class="cl">N</span><span>der Tisch</span><span>die Tische</span><span class="cl">A</span><span>den Tisch</span><span>die Tische</span><span class="cl">D</span><span>dem Tisch</span><span>den Tischen</span><span class="cl">G</span><span>des Tisches</span><span>der Tische</span></div></div><div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Leg</span> <span class="w">das</span> <span class="w">Buch</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Metti il libro sul tavolo.</div></div><div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>Tisch</strong> = tavolo generico. Pranzo → <em>Esstisch</em>.</div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Verb — gehen</div><div class="ph ln-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">gehen</span></div><div class="card-area"><div class="ln-word">gehen</div><div class="ln-meta">ging · ist gegangen</div><div class="ln-trans">andare</div><div class="s-block"><div class="s-title">PRESENTE</div><div class="conj-grid"><span>ich gehe</span><span>wir gehen</span><span>du gehst</span><span>ihr geht</span><span>er/sie geht</span><span>sie gehen</span></div></div><div class="s-block"><div class="s-title">REGGE</div><div style="display:flex;flex-direction:column;gap:4px;"><div><span class="ln-case ln-akk">AKK</span> <span style="color:#4B4D5A;font-size:10px;">direzione</span></div><div><span class="ln-case ln-dat">DAT</span> <span style="color:#4B4D5A;font-size:10px;">zu + Dat</span></div></div></div><div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Ich</span> <span class="w">gehe</span> <span class="w">zur</span> <span class="w">Arbeit</span>."</div><div class="ex-it">Vado al lavoro.</div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Preposition — auf</div><div class="ph ln-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">auf</span></div><div class="card-area"><div class="ln-meta" style="color:#6E7081;">WECHSELPRÄPOSITION</div><div class="ln-word">auf</div><div class="ln-trans">su, sopra</div><div class="s-block"><div class="s-title">CASI</div><div style="margin-bottom:8px;"><span class="ln-case ln-akk">+ AKK</span> <span style="color:#4B4D5A;font-size:9px;">movimento</span><div class="ex" style="margin-top:4px;">„<span class="w">Leg</span> <span class="w">es</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Mettilo sul tavolo.</div></div><div><span class="ln-case ln-dat">+ DAT</span> <span style="color:#4B4D5A;font-size:9px;">stato</span><div class="ex" style="margin-top:4px;">„<span class="w">Es</span> <span class="w">liegt</span> <span class="w">auf</span> <span class="w">dem</span> <span class="w">Tisch</span>."</div><div class="ex-it">È sul tavolo.</div></div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Vocabulary List</div><div class="ph ln-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t" style="color:#4B4D5A;">Filtra...</span></div><div class="card-area"><div class="ln-list-item"><span class="ln-gender ln-der" style="font-size:9px;">der</span><span class="ln-list-word">Tisch</span><span class="ln-list-trans">tavolo</span></div><div class="ln-list-item"><span class="ln-gender ln-die" style="font-size:9px;">die</span><span class="ln-list-word">Angst</span><span class="ln-list-trans">paura</span></div><div class="ln-list-item"><span style="font-size:9px;padding:2px 6px;border-radius:4px;background:#1E2028;color:#6E7081;">v.</span><span class="ln-list-word">gehen</span><span class="ln-list-trans">andare</span></div><div class="ln-list-item"><span class="ln-gender ln-das" style="font-size:9px;">das</span><span class="ln-list-word">Haus</span><span class="ln-list-trans">casa</span></div><div class="ln-list-item"><span style="font-size:9px;padding:2px 6px;border-radius:4px;background:#1E2028;color:#6E7081;">pr.</span><span class="ln-list-word">auf</span><span class="ln-list-trans">su</span></div><div class="ln-list-item"><span style="font-size:9px;padding:2px 6px;border-radius:4px;background:#1E2028;color:#6E7081;">v.</span><span class="ln-list-word">machen</span><span class="ln-list-trans">fare</span></div></div><div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab a"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Review</div><div class="ph ln-ph"><div class="ph-safe"></div><div class="card-area" style="padding-top:10px;display:flex;flex-direction:column;gap:12px;"><div style="text-align:center;"><div style="font-family:'Inter';font-size:16px;font-weight:600;color:#EDEDF0;">Ripasso</div><div style="font-size:10px;color:#3A3C48;margin-top:4px;">12 parole</div></div><div style="display:flex;gap:8px;justify-content:center;"><div style="text-align:center;padding:10px 14px;border:1px solid #1E2028;border-radius:8px;"><div style="font-size:20px;font-weight:600;color:#58C878;">32</div><div style="font-size:8px;color:#3A3C48;">sapute</div></div><div style="text-align:center;padding:10px 14px;border:1px solid #1E2028;border-radius:8px;"><div style="font-size:20px;font-weight:600;color:#D4A020;">12</div><div style="font-size:8px;color:#3A3C48;">ripasso</div></div><div style="text-align:center;padding:10px 14px;border:1px solid #1E2028;border-radius:8px;"><div style="font-size:20px;font-weight:600;color:#DC586E;">3</div><div style="font-size:8px;color:#3A3C48;">difficili</div></div></div><div class="ln-review-card"><span class="ln-gender ln-der" style="font-size:9px;">der</span><div class="ln-review-word" style="margin-top:8px;">Tisch</div><div class="ln-review-hint">Tocca per la traduzione</div><div class="ln-review-btns"><div class="ln-review-btn r">No</div><div class="ln-review-btn">Quasi</div><div class="ln-review-btn g">Sì</div></div></div></div><div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab a"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+  </div>
+  <div class="vote-bar"><button class="vote-btn" onclick="vote('linear')">Scegli Linear</button></div>
+</div>
+
+<!-- 4. STRIPE -->
+<div class="design-section" id="stripe">
+  <div class="section-header">
+    <div class="section-label">Design System 4</div>
+    <div class="section-name">Stripe</div>
+    <div class="section-desc">Deep navy (#0A2540). Cornflower purple (#635BFF) accents. Space Grotesk font. Premium, trustworthy. Gender colors are luminous on dark blue.</div>
+    <div class="section-tags"><span class="stag">Space Grotesk</span><span class="stag">Navy #0A2540</span><span class="stag">Purple #635BFF</span><span class="stag">Premium feel</span><span class="stag">Luminous colors</span></div>
+  </div>
+  <div class="phones-row">
+    <div class="phone-wrap"><div class="phone-title">Noun — der Tisch</div><div class="ph st-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">Tisch</span></div><div class="card-area"><span class="st-gender st-der">der</span><div class="st-word">Tisch</div><div class="st-meta">pl. die Tische</div><div class="st-trans">tavolo, scrivania</div><div class="s-block"><div class="s-title">DECLINAZIONE</div><div class="decl-grid"><span class="cl">N</span><span>der Tisch</span><span>die Tische</span><span class="cl">A</span><span>den Tisch</span><span>die Tische</span><span class="cl">D</span><span>dem Tisch</span><span>den Tischen</span><span class="cl">G</span><span>des Tisches</span><span>der Tische</span></div></div><div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Leg</span> <span class="w">das</span> <span class="w">Buch</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Metti il libro sul tavolo.</div></div><div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>Tisch</strong> = tavolo generico. Pranzo → <em>Esstisch</em>.</div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Verb — gehen</div><div class="ph st-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">gehen</span></div><div class="card-area"><div class="st-word">gehen</div><div class="st-meta">ging · ist gegangen</div><div class="st-trans">andare</div><div class="s-block"><div class="s-title">PRESENTE</div><div class="conj-grid"><span>ich gehe</span><span>wir gehen</span><span>du gehst</span><span>ihr geht</span><span>er/sie geht</span><span>sie gehen</span></div></div><div class="s-block"><div class="s-title">REGGE</div><div style="display:flex;flex-direction:column;gap:4px;"><div><span class="st-case st-akk">AKK</span> <span style="color:#4A6A8A;font-size:10px;">direzione</span></div><div><span class="st-case st-dat">DAT</span> <span style="color:#4A6A8A;font-size:10px;">zu + Dat</span></div></div></div><div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Ich</span> <span class="w">gehe</span> <span class="w">zur</span> <span class="w">Arbeit</span>."</div><div class="ex-it">Vado al lavoro.</div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Preposition — auf</div><div class="ph st-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">auf</span></div><div class="card-area"><div class="st-meta" style="color:#7A9ABC;">WECHSELPRÄPOSITION</div><div class="st-word">auf</div><div class="st-trans">su, sopra</div><div class="s-block"><div class="s-title">CASI</div><div style="margin-bottom:8px;"><span class="st-case st-akk">+ AKK</span> <span style="color:#4A6A8A;font-size:9px;">movimento</span><div class="ex" style="margin-top:4px;">„<span class="w">Leg</span> <span class="w">es</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Mettilo sul tavolo.</div></div><div><span class="st-case st-dat">+ DAT</span> <span style="color:#4A6A8A;font-size:9px;">stato</span><div class="ex" style="margin-top:4px;">„<span class="w">Es</span> <span class="w">liegt</span> <span class="w">auf</span> <span class="w">dem</span> <span class="w">Tisch</span>."</div><div class="ex-it">È sul tavolo.</div></div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Vocabulary List</div><div class="ph st-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t" style="color:#4A6A8A;">Filtra...</span></div><div class="card-area"><div class="st-list-item"><span class="st-gender st-der" style="font-size:9px;">der</span><span class="st-list-word">Tisch</span><span class="st-list-trans">tavolo</span></div><div class="st-list-item"><span class="st-gender st-die" style="font-size:9px;">die</span><span class="st-list-word">Angst</span><span class="st-list-trans">paura</span></div><div class="st-list-item"><span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(99,91,255,0.1);color:#635BFF;">v.</span><span class="st-list-word">gehen</span><span class="st-list-trans">andare</span></div><div class="st-list-item"><span class="st-gender st-das" style="font-size:9px;">das</span><span class="st-list-word">Haus</span><span class="st-list-trans">casa</span></div><div class="st-list-item"><span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(99,91,255,0.1);color:#635BFF;">pr.</span><span class="st-list-word">auf</span><span class="st-list-trans">su</span></div><div class="st-list-item"><span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(99,91,255,0.1);color:#635BFF;">v.</span><span class="st-list-word">machen</span><span class="st-list-trans">fare</span></div></div><div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab a"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Review</div><div class="ph st-ph"><div class="ph-safe"></div><div class="card-area" style="padding-top:10px;display:flex;flex-direction:column;gap:12px;"><div style="text-align:center;"><div style="font-family:'Space Grotesk';font-size:16px;font-weight:600;color:#F6F9FC;">Ripasso</div><div style="font-size:10px;color:#3A5A7A;margin-top:4px;">12 parole</div></div><div style="display:flex;gap:8px;justify-content:center;"><div style="text-align:center;padding:10px 14px;border:1px solid #1A3A5C;border-radius:10px;"><div style="font-size:20px;font-weight:700;color:#5BDC82;">32</div><div style="font-size:8px;color:#3A5A7A;">sapute</div></div><div style="text-align:center;padding:10px 14px;border:1px solid #1A3A5C;border-radius:10px;"><div style="font-size:20px;font-weight:700;color:#FFB347;">12</div><div style="font-size:8px;color:#3A5A7A;">ripasso</div></div><div style="text-align:center;padding:10px 14px;border:1px solid #1A3A5C;border-radius:10px;"><div style="font-size:20px;font-weight:700;color:#FF5B78;">3</div><div style="font-size:8px;color:#3A5A7A;">difficili</div></div></div><div class="st-review-card"><span class="st-gender st-der" style="font-size:9px;">der</span><div class="st-review-word" style="margin-top:8px;">Tisch</div><div class="st-review-hint">Tocca per la traduzione</div><div class="st-review-btns"><div class="st-review-btn r">No</div><div class="st-review-btn">Quasi</div><div class="st-review-btn g">Sì</div></div></div></div><div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab a"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+  </div>
+  <div class="vote-bar"><button class="vote-btn" onclick="vote('stripe')">Scegli Stripe</button></div>
+</div>
+
+<!-- 5. RAYCAST -->
+<div class="design-section" id="raycast">
+  <div class="section-header">
+    <div class="section-label">Design System 5</div>
+    <div class="section-name">Raycast</div>
+    <div class="section-desc">Mac-native dark. Manrope font, heavy weights for hierarchy. Compact, fast, delightful. Small rounded badges. Subtle elevated surfaces.</div>
+    <div class="section-tags"><span class="stag">Manrope 800</span><span class="stag">#1A1B1E base</span><span class="stag">Compact</span><span class="stag">Elevated cards</span><span class="stag">Mac-native</span></div>
+  </div>
+  <div class="phones-row">
+    <div class="phone-wrap"><div class="phone-title">Noun — der Tisch</div><div class="ph rc-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">Tisch</span></div><div class="card-area"><div style="display:flex;align-items:center;gap:8px;"><span class="rc-gender rc-der">der</span><div><div class="rc-word">Tisch</div><div class="rc-meta">pl. die Tische</div></div></div><div class="rc-trans">tavolo, scrivania</div><div class="s-block"><div class="s-title">DECLINAZIONE</div><div class="decl-grid"><span class="cl">N</span><span>der Tisch</span><span>die Tische</span><span class="cl">A</span><span>den Tisch</span><span>die Tische</span><span class="cl">D</span><span>dem Tisch</span><span>den Tischen</span><span class="cl">G</span><span>des Tisches</span><span>der Tische</span></div></div><div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Leg</span> <span class="w">das</span> <span class="w">Buch</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Metti il libro sul tavolo.</div></div><div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>Tisch</strong> = tavolo generico. Pranzo → <em>Esstisch</em>.</div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Verb — gehen</div><div class="ph rc-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">gehen</span></div><div class="card-area"><div class="rc-word">gehen</div><div class="rc-meta">ging · ist gegangen</div><div class="rc-trans">andare</div><div class="s-block"><div class="s-title">PRESENTE</div><div class="conj-grid"><span>ich gehe</span><span>wir gehen</span><span>du gehst</span><span>ihr geht</span><span>er/sie geht</span><span>sie gehen</span></div></div><div class="s-block"><div class="s-title">REGGE</div><div style="display:flex;flex-direction:column;gap:4px;"><div><span class="rc-case rc-akk">AKK</span> <span style="color:#5C5D63;font-size:10px;">direzione</span></div><div><span class="rc-case rc-dat">DAT</span> <span style="color:#5C5D63;font-size:10px;">zu + Dat</span></div></div></div><div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Ich</span> <span class="w">gehe</span> <span class="w">zur</span> <span class="w">Arbeit</span>."</div><div class="ex-it">Vado al lavoro.</div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Preposition — auf</div><div class="ph rc-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">auf</span></div><div class="card-area"><div class="rc-meta" style="color:#8B8C93;">WECHSELPRÄPOSITION</div><div class="rc-word">auf</div><div class="rc-trans">su, sopra</div><div class="s-block"><div class="s-title">CASI</div><div style="margin-bottom:8px;"><span class="rc-case rc-akk">+ AKK</span> <span style="color:#5C5D63;font-size:9px;">movimento</span><div class="ex" style="margin-top:4px;">„<span class="w">Leg</span> <span class="w">es</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Mettilo sul tavolo.</div></div><div><span class="rc-case rc-dat">+ DAT</span> <span style="color:#5C5D63;font-size:9px;">stato</span><div class="ex" style="margin-top:4px;">„<span class="w">Es</span> <span class="w">liegt</span> <span class="w">auf</span> <span class="w">dem</span> <span class="w">Tisch</span>."</div><div class="ex-it">È sul tavolo.</div></div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Vocabulary List</div><div class="ph rc-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t" style="color:#5C5D63;">Filtra...</span></div><div class="card-area"><div class="rc-list-item"><span class="rc-gender rc-der" style="font-size:8px;">der</span><span class="rc-list-word">Tisch</span><span class="rc-list-trans">tavolo</span></div><div class="rc-list-item"><span class="rc-gender rc-die" style="font-size:8px;">die</span><span class="rc-list-word">Angst</span><span class="rc-list-trans">paura</span></div><div class="rc-list-item"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;font-size:8px;font-weight:700;background:#2C2D31;color:#8B8C93;">v.</span><span class="rc-list-word">gehen</span><span class="rc-list-trans">andare</span></div><div class="rc-list-item"><span class="rc-gender rc-das" style="font-size:8px;">das</span><span class="rc-list-word">Haus</span><span class="rc-list-trans">casa</span></div><div class="rc-list-item"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;font-size:8px;font-weight:700;background:#2C2D31;color:#8B8C93;">pr.</span><span class="rc-list-word">auf</span><span class="rc-list-trans">su</span></div></div><div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab a"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Review</div><div class="ph rc-ph"><div class="ph-safe"></div><div class="card-area" style="padding-top:10px;display:flex;flex-direction:column;gap:12px;"><div style="text-align:center;"><div style="font-family:'Manrope';font-size:16px;font-weight:800;color:#F0F0F2;">Ripasso</div><div style="font-size:10px;color:#4C4D53;margin-top:4px;font-weight:500;">12 parole</div></div><div style="display:flex;gap:8px;justify-content:center;"><div style="text-align:center;padding:10px 14px;background:#232428;border-radius:10px;"><div style="font-size:20px;font-weight:800;color:#4ade80;">32</div><div style="font-size:8px;color:#4C4D53;font-weight:600;">sapute</div></div><div style="text-align:center;padding:10px 14px;background:#232428;border-radius:10px;"><div style="font-size:20px;font-weight:800;color:#fbbf24;">12</div><div style="font-size:8px;color:#4C4D53;font-weight:600;">ripasso</div></div><div style="text-align:center;padding:10px 14px;background:#232428;border-radius:10px;"><div style="font-size:20px;font-weight:800;color:#fb7185;">3</div><div style="font-size:8px;color:#4C4D53;font-weight:600;">difficili</div></div></div><div class="rc-review-card"><span class="rc-gender rc-der" style="font-size:8px;">der</span><div class="rc-review-word" style="margin-top:8px;">Tisch</div><div class="rc-review-hint">Tocca per la traduzione</div><div class="rc-review-btns"><div class="rc-review-btn r">No</div><div class="rc-review-btn">Quasi</div><div class="rc-review-btn g">Sì</div></div></div></div><div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab a"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+  </div>
+  <div class="vote-bar"><button class="vote-btn" onclick="vote('raycast')">Scegli Raycast</button></div>
+</div>
+
+<!-- 6. NOTION -->
+<div class="design-section" id="notion">
+  <div class="section-header">
+    <div class="section-label">Design System 6</div>
+    <div class="section-name">Notion</div>
+    <div class="section-desc">Clean white workspace. DM Sans. Muted Notion-style color blocks for gender. Yellow highlight on clickable words. Distraction-free, workspace feel.</div>
+    <div class="section-tags"><span class="stag">DM Sans</span><span class="stag">White #FFF</span><span class="stag">Notion pastels</span><span class="stag">Yellow highlights</span><span class="stag">Workspace feel</span></div>
+  </div>
+  <div class="phones-row">
+    <div class="phone-wrap"><div class="phone-title">Noun — der Tisch</div><div class="ph no-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">Tisch</span></div><div class="card-area"><span class="no-gender no-der">der</span><div class="no-word">Tisch</div><div class="no-meta">pl. die Tische</div><div class="no-trans">tavolo, scrivania</div><div class="s-block"><div class="s-title">DECLINAZIONE</div><div class="decl-grid"><span class="cl">N</span><span>der Tisch</span><span>die Tische</span><span class="cl">A</span><span>den Tisch</span><span>die Tische</span><span class="cl">D</span><span>dem Tisch</span><span>den Tischen</span><span class="cl">G</span><span>des Tisches</span><span>der Tische</span></div></div><div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Leg</span> <span class="w">das</span> <span class="w">Buch</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Metti il libro sul tavolo.</div></div><div class="s-block"><div class="s-title">CONTESTO</div><div class="ctx"><strong>Tisch</strong> = tavolo generico. Pranzo → <em>Esstisch</em>.</div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Verb — gehen</div><div class="ph no-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">gehen</span></div><div class="card-area"><div class="no-word">gehen</div><div class="no-meta">ging · ist gegangen</div><div class="no-trans">andare</div><div class="s-block"><div class="s-title">PRESENTE</div><div class="conj-grid"><span>ich gehe</span><span>wir gehen</span><span>du gehst</span><span>ihr geht</span><span>er/sie geht</span><span>sie gehen</span></div></div><div class="s-block"><div class="s-title">REGGE</div><div style="display:flex;flex-direction:column;gap:4px;"><div><span class="no-case no-akk">AKK</span> <span style="color:#b4b4b0;font-size:10px;">direzione</span></div><div><span class="no-case no-dat">DAT</span> <span style="color:#b4b4b0;font-size:10px;">zu + Dat</span></div></div></div><div class="s-block"><div class="s-title">ESEMPIO</div><div class="ex">„<span class="w">Ich</span> <span class="w">gehe</span> <span class="w">zur</span> <span class="w">Arbeit</span>."</div><div class="ex-it">Vado al lavoro.</div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Preposition — auf</div><div class="ph no-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t">auf</span></div><div class="card-area"><div class="no-meta" style="color:#787774;">WECHSELPRÄPOSITION</div><div class="no-word">auf</div><div class="no-trans">su, sopra</div><div class="s-block"><div class="s-title">CASI</div><div style="margin-bottom:8px;"><span class="no-case no-akk">+ AKK</span> <span style="color:#b4b4b0;font-size:9px;">movimento</span><div class="ex" style="margin-top:4px;">„<span class="w">Leg</span> <span class="w">es</span> <span class="w">auf</span> <span class="w">den</span> <span class="w">Tisch</span>."</div><div class="ex-it">Mettilo sul tavolo.</div></div><div><span class="no-case no-dat">+ DAT</span> <span style="color:#b4b4b0;font-size:9px;">stato</span><div class="ex" style="margin-top:4px;">„<span class="w">Es</span> <span class="w">liegt</span> <span class="w">auf</span> <span class="w">dem</span> <span class="w">Tisch</span>."</div><div class="ex-it">È sul tavolo.</div></div></div></div><div class="ph-tabs"><div class="ph-tab a"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Vocabulary List</div><div class="ph no-ph"><div class="ph-safe"></div><div class="ph-search"><span class="ph-search-i">⌕</span><span class="ph-search-t" style="color:#b4b4b0;">Filtra...</span></div><div class="card-area"><div class="no-list-item"><span class="no-gender no-der" style="font-size:9px;">der</span><span class="no-list-word">Tisch</span><span class="no-list-trans">tavolo</span></div><div class="no-list-item"><span class="no-gender no-die" style="font-size:9px;">die</span><span class="no-list-word">Angst</span><span class="no-list-trans">paura</span></div><div class="no-list-item"><span style="font-size:9px;padding:2px 8px;border-radius:3px;background:#f0f0ee;color:#787774;">v.</span><span class="no-list-word">gehen</span><span class="no-list-trans">andare</span></div><div class="no-list-item"><span class="no-gender no-das" style="font-size:9px;">das</span><span class="no-list-word">Haus</span><span class="no-list-trans">casa</span></div><div class="no-list-item"><span style="font-size:9px;padding:2px 8px;border-radius:3px;background:#f0f0ee;color:#787774;">pr.</span><span class="no-list-word">auf</span><span class="no-list-trans">su</span></div><div class="no-list-item"><span style="font-size:9px;padding:2px 8px;border-radius:3px;background:#f0f0ee;color:#787774;">v.</span><span class="no-list-word">machen</span><span class="no-list-trans">fare</span></div></div><div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab a"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+    <div class="phone-wrap"><div class="phone-title">Review</div><div class="ph no-ph"><div class="ph-safe"></div><div class="card-area" style="padding-top:10px;display:flex;flex-direction:column;gap:12px;"><div style="text-align:center;"><div style="font-family:'DM Sans';font-size:16px;font-weight:700;color:#191919;">Ripasso</div><div style="font-size:10px;color:#b4b4b0;margin-top:4px;">12 parole</div></div><div style="display:flex;gap:8px;justify-content:center;"><div style="text-align:center;padding:10px 14px;background:#f7f6f3;border-radius:8px;"><div style="font-size:20px;font-weight:700;color:#2E7D32;">32</div><div style="font-size:8px;color:#b4b4b0;">sapute</div></div><div style="text-align:center;padding:10px 14px;background:#f7f6f3;border-radius:8px;"><div style="font-size:20px;font-weight:700;color:#B8860B;">12</div><div style="font-size:8px;color:#b4b4b0;">ripasso</div></div><div style="text-align:center;padding:10px 14px;background:#f7f6f3;border-radius:8px;"><div style="font-size:20px;font-weight:700;color:#93362F;">3</div><div style="font-size:8px;color:#b4b4b0;">difficili</div></div></div><div class="no-review-card"><span class="no-gender no-der" style="font-size:9px;">der</span><div class="no-review-word" style="margin-top:8px;">Tisch</div><div class="no-review-hint">Tocca per la traduzione</div><div class="no-review-btns"><div class="no-review-btn r">No</div><div class="no-review-btn">Quasi</div><div class="no-review-btn g">Sì</div></div></div></div><div class="ph-tabs"><div class="ph-tab"><span class="ph-tab-i">⌕</span>Cerca</div><div class="ph-tab"><span class="ph-tab-i">▤</span>Parole</div><div class="ph-tab a"><span class="ph-tab-i">↻</span>Ripasso</div></div></div></div>
+  </div>
+  <div class="vote-bar"><button class="vote-btn" onclick="vote('notion')">Scegli Notion</button></div>
+</div>
+
+<div style="text-align:center;padding:20px 20px 60px;color:#3f3f46;font-size:12px;">
+  Clicca i tab in alto per navigare. Vota il design che preferisci o rispondi nel terminale.
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.design-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function vote(choice) {
+  if (window.__logEvent) window.__logEvent({ type:'click', choice, text:'Vote '+choice, timestamp:Math.floor(Date.now()/1000) });
+  document.querySelectorAll('.vote-btn').forEach(b => b.style.opacity = '0.3');
+  event.target.style.opacity = '1';
+  event.target.style.borderColor = '#fff';
+  event.target.style.color = '#fff';
+  event.target.textContent = '✓ ' + choice.charAt(0).toUpperCase() + choice.slice(1);
+}
+</script>
+
+</body>
+</html>
