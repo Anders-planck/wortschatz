@@ -1,6 +1,5 @@
 import { Text, View } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -20,25 +19,12 @@ export function DashboardGreeting({
 }: DashboardGreetingProps) {
   return (
     <View style={{ gap: 4 }}>
+      <Text style={textStyles.heading}>{getGreeting()}</Text>
       <Text
-        style={{
-          fontFamily: fonts.display,
-          fontSize: 22,
-          fontWeight: "600",
-          color: colors.textPrimary,
-          letterSpacing: -0.3,
-        }}
-      >
-        {getGreeting()}
-      </Text>
-      <Text
-        style={{
-          fontFamily: fonts.mono,
-          fontSize: 10,
-          fontWeight: "500",
-          color: colors.textHint,
-          fontVariant: ["tabular-nums"],
-        }}
+        style={[
+          textStyles.mono,
+          { fontSize: 10, fontVariant: ["tabular-nums"] },
+        ]}
       >
         {streak > 0 ? `${streak}d streak  ·  ` : ""}
         {totalCount} parole salvate

@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from "react-native";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import type { Example } from "@/features/dictionary/types";
 
 interface ExampleSentenceProps {
@@ -33,14 +33,16 @@ export function ExampleSentence({
                 onPress={() => onWordPress(stripped, meaning)}
               >
                 <Text
-                  style={{
-                    fontFamily: fonts.body,
-                    fontSize: 14,
-                    color: colors.textPrimary,
-                    backgroundColor: "rgba(196,169,106,0.18)",
-                    borderRadius: 3,
-                    overflow: "hidden",
-                  }}
+                  style={[
+                    textStyles.body,
+                    {
+                      fontSize: 14,
+                      color: colors.textPrimary,
+                      backgroundColor: "rgba(196,169,106,0.18)",
+                      borderRadius: 3,
+                      overflow: "hidden",
+                    },
+                  ]}
                 >
                   {token}
                 </Text>
@@ -51,11 +53,10 @@ export function ExampleSentence({
           return (
             <Text
               key={`${token}-${i}`}
-              style={{
-                fontFamily: fonts.body,
-                fontSize: 14,
-                color: colors.textPrimary,
-              }}
+              style={[
+                textStyles.body,
+                { fontSize: 14, color: colors.textPrimary },
+              ]}
             >
               {token}
             </Text>
@@ -64,12 +65,10 @@ export function ExampleSentence({
       </Text>
       <Text
         selectable
-        style={{
-          fontFamily: fonts.body,
-          fontSize: 12,
-          color: colors.textHint,
-          fontStyle: "italic",
-        }}
+        style={[
+          textStyles.bodyLight,
+          { fontSize: 12, color: colors.textHint, fontStyle: "italic" },
+        ]}
       >
         {example.translation}
       </Text>

@@ -4,7 +4,7 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import { Divider } from "@/features/shared/components/divider";
 import { SectionTitle } from "@/features/shared/components/section-title";
 
@@ -22,15 +22,7 @@ export function RecentSearches({ words }: RecentSearchesProps) {
   if (words.length === 0) {
     return (
       <View style={{ paddingTop: 8 }}>
-        <Text
-          selectable
-          style={{
-            fontFamily: fonts.body,
-            fontSize: 14,
-            fontWeight: "300",
-            color: colors.textHint,
-          }}
-        >
+        <Text selectable style={textStyles.bodyLight}>
           Nessuna ricerca recente. Inizia a cercare una parola in tedesco.
         </Text>
       </View>
@@ -69,24 +61,20 @@ export function RecentSearches({ words }: RecentSearchesProps) {
               )}
               <View style={{ flex: 1, gap: 2 }}>
                 <Text
-                  style={{
-                    fontFamily: fonts.display,
-                    fontSize: 15,
-                    fontWeight: "600",
-                    color: colors.textPrimary,
-                  }}
+                  style={[
+                    textStyles.heading,
+                    { fontSize: 15, letterSpacing: 0 },
+                  ]}
                 >
                   {word.term}
                 </Text>
                 {word.translations.length > 0 && (
                   <Text
                     selectable
-                    style={{
-                      fontFamily: fonts.body,
-                      fontSize: 12,
-                      fontWeight: "300",
-                      color: colors.textMuted,
-                    }}
+                    style={[
+                      textStyles.bodyLight,
+                      { fontSize: 12, color: colors.textMuted },
+                    ]}
                   >
                     {word.translations[0]}
                   </Text>

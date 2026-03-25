@@ -3,7 +3,7 @@ import { Stack, useRouter } from "expo-router";
 import { View, Text } from "react-native";
 
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import { useReviewSession } from "@/features/review/hooks/use-review-session";
 import { SessionProgress } from "@/features/review/components/session-progress";
 import { ReviewCard } from "@/features/review/components/review-card";
@@ -40,15 +40,7 @@ export default function SessionScreen() {
             backgroundColor: colors.bg,
           }}
         >
-          <Text
-            style={{
-              fontFamily: fonts.mono,
-              fontSize: 11,
-              color: colors.textHint,
-            }}
-          >
-            No words to review
-          </Text>
+          <Text style={textStyles.mono}>No words to review</Text>
         </View>
         <Stack.Screen.Title>Sessione</Stack.Screen.Title>
       </>

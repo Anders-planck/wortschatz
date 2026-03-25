@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import { hapticLight } from "@/features/shared/hooks/use-haptics";
 
 type WordFilter = "noun" | "verb" | "preposition" | undefined;
@@ -54,12 +54,13 @@ export function FilterChips({
             }}
           >
             <Text
-              style={{
-                fontFamily: fonts.mono,
-                fontSize: 10,
-                fontWeight: "500",
-                color: isActive ? "#FFFFFF" : colors.textTertiary,
-              }}
+              style={[
+                textStyles.mono,
+                {
+                  fontSize: 10,
+                  color: isActive ? colors.card : colors.textTertiary,
+                },
+              ]}
             >
               {label}
             </Text>

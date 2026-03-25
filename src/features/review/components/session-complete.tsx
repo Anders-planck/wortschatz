@@ -2,7 +2,7 @@ import { Pressable, Text } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 
 interface SessionCompleteProps {
   total: number;
@@ -28,26 +28,15 @@ export function SessionComplete({
         gap: 16,
       }}
     >
-      <Text
-        style={{
-          fontFamily: fonts.display,
-          fontSize: 28,
-          fontWeight: "700",
-          color: colors.textPrimary,
-          letterSpacing: -0.5,
-        }}
-      >
+      <Text style={[textStyles.word, { fontSize: 28, letterSpacing: -0.5 }]}>
         Fatto!
       </Text>
 
       <Text
-        style={{
-          fontFamily: fonts.mono,
-          fontSize: 11,
-          color: colors.textHint,
-          fontVariant: ["tabular-nums"],
-          textAlign: "center",
-        }}
+        style={[
+          textStyles.mono,
+          { fontVariant: ["tabular-nums"], textAlign: "center" },
+        ]}
       >
         {goodCount}/{total} correct · session complete
       </Text>
@@ -65,12 +54,10 @@ export function SessionComplete({
         })}
       >
         <Text
-          style={{
-            fontFamily: fonts.body,
-            fontSize: 13,
-            fontWeight: "500",
-            color: "#FFFFFF",
-          }}
+          style={[
+            textStyles.body,
+            { fontSize: 13, fontWeight: "500", color: colors.card },
+          ]}
         >
           Done
         </Text>

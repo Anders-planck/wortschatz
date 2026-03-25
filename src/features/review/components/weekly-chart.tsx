@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 
 const DAY_LABELS = ["L", "M", "M", "G", "V", "S", "D"];
 
@@ -54,12 +54,14 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
                 />
               </View>
               <Text
-                style={{
-                  fontFamily: fonts.mono,
-                  fontSize: 8,
-                  fontWeight: isToday ? "700" : "400",
-                  color: isToday ? colors.textPrimary : colors.textHint,
-                }}
+                style={[
+                  textStyles.mono,
+                  {
+                    fontSize: 8,
+                    fontWeight: isToday ? "700" : "400",
+                    color: isToday ? colors.textPrimary : colors.textHint,
+                  },
+                ]}
               >
                 {DAY_LABELS[i]}
               </Text>

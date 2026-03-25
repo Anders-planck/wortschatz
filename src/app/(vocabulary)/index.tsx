@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 import { FlatList, Text, View } from "react-native";
 
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import { useVocabulary } from "@/features/vocabulary/hooks/use-vocabulary";
 import { FilterChips } from "@/features/vocabulary/components/filter-chips";
 import { VocabularyItem } from "@/features/vocabulary/components/vocabulary-item";
@@ -43,13 +43,10 @@ export default function VocabularyScreen() {
         >
           <Text
             selectable
-            style={{
-              fontFamily: fonts.body,
-              fontSize: 13,
-              fontWeight: "300",
-              color: colors.textHint,
-              textAlign: "center",
-            }}
+            style={[
+              textStyles.bodyLight,
+              { color: colors.textHint, textAlign: "center" },
+            ]}
           >
             Nessuna parola salvata.{"\n"}Cerca una parola per iniziare.
           </Text>

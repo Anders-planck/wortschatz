@@ -4,7 +4,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import { getRecentWords } from "@/features/shared/db/words-repository";
 import { useDebouncedSearch } from "@/features/search/hooks/use-debounced-search";
 import { RecentSearches } from "@/features/search/components/recent-searches";
@@ -52,12 +52,10 @@ export default function SearchScreen() {
         {query.length === 1 && (
           <View style={{ paddingTop: 32, alignItems: "center" }}>
             <Text
-              style={{
-                fontFamily: fonts.body,
-                fontSize: 14,
-                fontWeight: "300",
-                color: colors.textHint,
-              }}
+              style={[
+                textStyles.bodyLight,
+                { fontSize: 14, color: colors.textHint },
+              ]}
             >
               Continua a scrivere...
             </Text>
@@ -66,16 +64,7 @@ export default function SearchScreen() {
 
         {query.length >= 2 && (
           <View style={{ paddingTop: 32, alignItems: "center" }}>
-            <Text
-              style={{
-                fontFamily: fonts.mono,
-                fontSize: 11,
-                fontWeight: "500",
-                color: colors.textHint,
-              }}
-            >
-              Cerco &ldquo;{query}&rdquo;...
-            </Text>
+            <Text style={textStyles.mono}>Cerco &ldquo;{query}&rdquo;...</Text>
           </View>
         )}
       </ScrollView>

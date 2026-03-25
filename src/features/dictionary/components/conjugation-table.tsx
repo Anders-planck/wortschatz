@@ -46,11 +46,10 @@ function ConjugationColumn({
           </Text>
           <Text
             selectable
-            style={{
-              fontSize: 13,
-              color: colors.textSecondary,
-              flex: 1,
-            }}
+            style={[
+              textStyles.bodyLight,
+              { color: colors.textSecondary, flex: 1 },
+            ]}
           >
             {data[key] ?? "—"}
           </Text>

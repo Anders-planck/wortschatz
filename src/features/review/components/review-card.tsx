@@ -4,7 +4,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import type { Word } from "@/features/dictionary/types";
 import { Divider } from "@/features/shared/components/divider";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 
 function getGenderColor(gender: string | null): string {
   if (gender === "der") return colors.der;
@@ -46,27 +46,16 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
 
         <Text
           selectable
-          style={{
-            fontFamily: fonts.display,
-            fontSize: 42,
-            fontWeight: "700",
-            color: colors.textPrimary,
-            letterSpacing: -1.5,
-            textAlign: "center",
-          }}
+          style={[
+            textStyles.word,
+            { fontSize: 42, letterSpacing: -1.5, textAlign: "center" },
+          ]}
         >
           {word.term}
         </Text>
 
         {word.type === "noun" && (
-          <Text
-            style={{
-              fontFamily: fonts.mono,
-              fontSize: 11,
-              fontWeight: "500",
-              color: colors.textHint,
-            }}
-          >
+          <Text style={textStyles.mono}>
             {word.gender}
             {word.plural ? `  ·  pl. ${word.plural}` : ""}
           </Text>
@@ -85,11 +74,10 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
             }}
           >
             <Text
-              style={{
-                fontFamily: fonts.mono,
-                fontSize: 10,
-                color: colors.textGhost,
-              }}
+              style={[
+                textStyles.mono,
+                { fontSize: 10, color: colors.textGhost },
+              ]}
             >
               tap to reveal
             </Text>
@@ -121,29 +109,12 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
         />
       )}
 
-      <Text
-        selectable
-        style={{
-          fontFamily: fonts.display,
-          fontSize: 34,
-          fontWeight: "700",
-          color: colors.textPrimary,
-          letterSpacing: -1,
-          textAlign: "center",
-        }}
-      >
+      <Text selectable style={[textStyles.word, { textAlign: "center" }]}>
         {word.term}
       </Text>
 
       {word.type === "noun" && (
-        <Text
-          style={{
-            fontFamily: fonts.mono,
-            fontSize: 11,
-            fontWeight: "500",
-            color: colors.textHint,
-          }}
-        >
+        <Text style={textStyles.mono}>
           {word.gender}
           {word.plural ? `  ·  pl. ${word.plural}` : ""}
         </Text>
@@ -155,13 +126,7 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
 
       <Text
         selectable
-        style={{
-          fontFamily: fonts.body,
-          fontSize: 16,
-          fontWeight: "400",
-          color: colors.textSecondary,
-          textAlign: "center",
-        }}
+        style={[textStyles.body, { fontSize: 16, textAlign: "center" }]}
       >
         {word.translations.join(", ")}
       </Text>
@@ -174,26 +139,24 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
           <View style={{ gap: 4, alignItems: "center" }}>
             <Text
               selectable
-              style={{
-                fontFamily: fonts.body,
-                fontSize: 13,
-                fontWeight: "400",
-                color: colors.textPrimary,
-                textAlign: "center",
-                fontStyle: "italic",
-              }}
+              style={[
+                textStyles.body,
+                {
+                  fontSize: 13,
+                  color: colors.textPrimary,
+                  textAlign: "center",
+                  fontStyle: "italic",
+                },
+              ]}
             >
               {word.examples[0].sentence}
             </Text>
             <Text
               selectable
-              style={{
-                fontFamily: fonts.body,
-                fontSize: 12,
-                fontWeight: "300",
-                color: colors.textTertiary,
-                textAlign: "center",
-              }}
+              style={[
+                textStyles.bodyLight,
+                { fontSize: 12, textAlign: "center" },
+              ]}
             >
               {word.examples[0].translation}
             </Text>
@@ -214,12 +177,10 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
         >
           <Text
             selectable
-            style={{
-              fontFamily: fonts.mono,
-              fontSize: 10,
-              color: colors.textMuted,
-              textAlign: "center",
-            }}
+            style={[
+              textStyles.mono,
+              { fontSize: 10, color: colors.textMuted, textAlign: "center" },
+            ]}
           >
             {word.usageContext}
           </Text>

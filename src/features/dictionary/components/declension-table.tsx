@@ -49,21 +49,19 @@ export function DeclensionTable({ data }: DeclensionTableProps) {
             </Text>
             <Text
               selectable
-              style={{
-                flex: 1,
-                fontSize: 13,
-                color: colors.textSecondary,
-              }}
+              style={[
+                textStyles.bodyLight,
+                { flex: 1, color: colors.textSecondary },
+              ]}
             >
               {row.singular ?? "—"}
             </Text>
             <Text
               selectable
-              style={{
-                flex: 1,
-                fontSize: 13,
-                color: colors.textSecondary,
-              }}
+              style={[
+                textStyles.bodyLight,
+                { flex: 1, color: colors.textSecondary },
+              ]}
             >
               {row.plural ?? "—"}
             </Text>

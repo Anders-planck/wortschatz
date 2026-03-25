@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 
 interface TodaySessionCardProps {
   wordCount: number;
@@ -32,24 +32,14 @@ export function TodaySessionCard({
           alignItems: "center",
         }}
       >
-        <Text
-          style={{
-            fontFamily: fonts.display,
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.textPrimary,
-          }}
-        >
+        <Text style={[textStyles.heading, { fontSize: 14, letterSpacing: 0 }]}>
           Today
         </Text>
         <Text
-          style={{
-            fontFamily: fonts.mono,
-            fontSize: 10,
-            fontWeight: "500",
-            color: colors.textHint,
-            fontVariant: ["tabular-nums"],
-          }}
+          style={[
+            textStyles.mono,
+            { fontSize: 10, fontVariant: ["tabular-nums"] },
+          ]}
         >
           {wordCount} words
         </Text>
@@ -84,12 +74,10 @@ export function TodaySessionCard({
         })}
       >
         <Text
-          style={{
-            fontFamily: fonts.body,
-            fontSize: 13,
-            fontWeight: "500",
-            color: "#FFFFFF",
-          }}
+          style={[
+            textStyles.body,
+            { fontSize: 13, fontWeight: "500", color: colors.card },
+          ]}
         >
           {wordCount === 0 ? "Nessuna parola da ripassare" : "Start session"}
         </Text>

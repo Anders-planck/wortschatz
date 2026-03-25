@@ -4,7 +4,7 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 
 function getTypeColor(word: Word): string {
   if (word.type === "noun") {
@@ -50,24 +50,19 @@ export function VocabularyItem({ word, index }: VocabularyItemProps) {
 
         <Text
           selectable
-          style={{
-            flex: 1,
-            fontFamily: fonts.display,
-            fontSize: 14,
-            fontWeight: "600",
-            color: colors.textPrimary,
-          }}
+          style={[
+            textStyles.heading,
+            { flex: 1, fontSize: 14, letterSpacing: 0 },
+          ]}
         >
           {word.term}
         </Text>
 
         <Text
-          style={{
-            fontFamily: fonts.body,
-            fontSize: 11,
-            fontWeight: "300",
-            color: colors.textHint,
-          }}
+          style={[
+            textStyles.bodyLight,
+            { fontSize: 11, color: colors.textHint },
+          ]}
         >
           {word.translations[0] ?? ""}
         </Text>

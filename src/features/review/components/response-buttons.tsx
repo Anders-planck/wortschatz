@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import { hapticMedium } from "@/features/shared/hooks/use-haptics";
 
 type Response = 0 | 1 | 2 | 3;
@@ -57,12 +57,10 @@ export function ResponseButtons({ onRespond }: ResponseButtonsProps) {
             })}
           >
             <Text
-              style={{
-                fontFamily: fonts.body,
-                fontSize: 12,
-                fontWeight: "500",
-                color: config.textColor,
-              }}
+              style={[
+                textStyles.body,
+                { fontSize: 12, fontWeight: "500", color: config.textColor },
+              ]}
             >
               {config.label}
             </Text>

@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import type { Word } from "@/features/dictionary/types";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 
 function getTypeColor(word: Word): string {
   if (word.type === "noun") {
@@ -71,33 +71,20 @@ export function TrickyWordsList({ words }: TrickyWordsListProps) {
 
               <View style={{ flex: 1, gap: 2 }}>
                 <Text
-                  style={{
-                    fontFamily: fonts.display,
-                    fontSize: 13,
-                    fontWeight: "600",
-                    color: colors.textPrimary,
-                  }}
+                  style={[
+                    textStyles.heading,
+                    { fontSize: 13, letterSpacing: 0 },
+                  ]}
                 >
                   {word.term}
                 </Text>
-                <Text
-                  style={{
-                    fontFamily: fonts.mono,
-                    fontSize: 9,
-                    color: colors.textHint,
-                  }}
-                >
+                <Text style={[textStyles.mono, { fontSize: 9 }]}>
                   {getTrickyReason(word)}
                 </Text>
               </View>
 
               <Text
-                style={{
-                  fontFamily: fonts.mono,
-                  fontSize: 10,
-                  fontWeight: "500",
-                  color: typeColor,
-                }}
+                style={[textStyles.mono, { fontSize: 10, color: typeColor }]}
               >
                 review
               </Text>

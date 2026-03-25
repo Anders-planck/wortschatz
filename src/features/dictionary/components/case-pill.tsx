@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 import { colors } from "@/features/shared/theme/colors";
-import { fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 
 type CaseType = "akk" | "dat" | "gen" | "nom";
 
@@ -37,13 +37,7 @@ export function CasePill({ caseType }: CasePillProps) {
       }}
     >
       <Text
-        style={{
-          fontFamily: fonts.mono,
-          fontSize: 9,
-          fontWeight: "600",
-          color: style.text,
-          letterSpacing: 1,
-        }}
+        style={[textStyles.monoLabel, { color: style.text, letterSpacing: 1 }]}
       >
         {caseLabels[caseType]}
       </Text>

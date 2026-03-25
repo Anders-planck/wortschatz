@@ -1,7 +1,7 @@
 import { View, Text, ActivityIndicator } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { colors } from "@/features/shared/theme/colors";
-import { textStyles, fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import { Divider } from "@/features/shared/components/divider";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { GenderStrip } from "./gender-strip";
@@ -76,15 +76,7 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
           }}
         >
           <ActivityIndicator size="small" color={colors.textHint} />
-          <Text
-            style={{
-              fontFamily: fonts.mono,
-              fontSize: 11,
-              color: colors.textHint,
-            }}
-          >
-            Loading context...
-          </Text>
+          <Text style={textStyles.mono}>Loading context...</Text>
         </Animated.View>
       )}
 

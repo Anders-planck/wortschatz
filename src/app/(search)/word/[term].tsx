@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ScrollView, Text, View, ActivityIndicator } from "react-native";
 
 import { colors } from "@/features/shared/theme/colors";
-import { textStyles, fonts } from "@/features/shared/theme/typography";
+import { textStyles } from "@/features/shared/theme/typography";
 import { useWordLookup } from "@/features/dictionary/hooks/use-word-lookup";
 import { WordCard } from "@/features/dictionary/components/word-card";
 
@@ -43,14 +43,7 @@ export default function WordDetailScreen() {
             }}
           >
             <ActivityIndicator size="small" color={colors.textHint} />
-            <Text
-              style={{
-                fontFamily: fonts.mono,
-                fontSize: 11,
-                color: colors.textHint,
-                marginTop: 10,
-              }}
-            >
+            <Text style={[textStyles.mono, { marginTop: 10 }]}>
               Looking up {term}...
             </Text>
           </View>
