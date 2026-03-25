@@ -5,12 +5,8 @@ export default function SearchLayout() {
     <Stack
       screenOptions={{
         headerTransparent: true,
-        headerBlurEffect: "none",
         headerBackButtonDisplayMode: "minimal",
       }}
-    >
-      <Stack.Screen name="index" />
-      <Stack.Screen name="word/[term]" />
-    </Stack>
+    />
   );
 }

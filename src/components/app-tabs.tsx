@@ -2,7 +2,10 @@ import { NativeTabs } from "expo-router/unstable-native-tabs";
 
 export default function AppTabs() {
   return (
-    <NativeTabs minimizeBehavior="onScrollDown">
+    <NativeTabs 
+    disableTransparentOnScrollEdge={true}
+    minimizeBehavior="onScrollDown"
+    >
       <NativeTabs.Trigger name="(search)">
         <NativeTabs.Trigger.Icon
           sf={{ default: "magnifyingglass", selected: "magnifyingglass" }}

@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import Stack from "expo-router/stack";
+import { Stack } from "expo-router";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ScrollView, Text, View, ActivityIndicator } from "react-native";
 
@@ -28,13 +28,11 @@ export default function WordDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: term ?? "" }} />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}
         style={{ backgroundColor: colors.bg }}
       >
-        {/* Loading state */}
         {isLoading && (
           <View
             style={{
@@ -58,7 +56,6 @@ export default function WordDetailScreen() {
           </View>
         )}
 
-        {/* Error state */}
         {error && (
           <View
             style={{
@@ -76,7 +73,6 @@ export default function WordDetailScreen() {
           </View>
         )}
 
-        {/* Word card */}
         {word && (
           <WordCard
             word={word}
@@ -85,6 +81,8 @@ export default function WordDetailScreen() {
           />
         )}
       </ScrollView>
+
+      <Stack.Screen.Title>{term ?? ""}</Stack.Screen.Title>
     </>
   );
 }
