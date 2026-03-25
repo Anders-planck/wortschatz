@@ -2,19 +2,15 @@ import { View } from "react-native";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { CasePill } from "./case-pill";
 import { ExampleSentence } from "./example-sentence";
-import type { Word, Example } from "@/features/dictionary/types";
+import {
+  type Word,
+  type Example,
+  isCaseType,
+} from "@/features/dictionary/types";
 
 interface PrepositionSectionsProps {
   word: Word;
   onWordPress?: (word: string, meaning: string) => void;
-}
-
-type CaseType = "akk" | "dat" | "gen" | "nom";
-
-const validCases: readonly string[] = ["akk", "dat", "gen", "nom"];
-
-function isCaseType(value: string): value is CaseType {
-  return validCases.includes(value);
 }
 
 interface PrepForms {

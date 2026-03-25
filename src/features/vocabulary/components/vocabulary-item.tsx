@@ -5,18 +5,7 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 import type { Word } from "@/features/dictionary/types";
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
-
-function getTypeColor(word: Word): string {
-  if (word.type === "noun") {
-    if (word.gender === "der") return colors.der;
-    if (word.gender === "die") return colors.die;
-    if (word.gender === "das") return colors.das;
-    return colors.textHint;
-  }
-  if (word.type === "verb") return colors.verb;
-  if (word.type === "preposition") return colors.prep;
-  return colors.textHint;
-}
+import { getWordTypeColor } from "@/features/shared/utils/word-colors";
 
 interface VocabularyItemProps {
   word: Word;
@@ -44,7 +33,7 @@ export function VocabularyItem({ word, index }: VocabularyItemProps) {
             width: 4,
             height: 28,
             borderRadius: 2,
-            backgroundColor: getTypeColor(word),
+            backgroundColor: getWordTypeColor(word),
           }}
         />
 

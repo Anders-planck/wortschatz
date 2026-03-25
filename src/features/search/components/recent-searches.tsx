@@ -7,12 +7,7 @@ import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
 import { Divider } from "@/features/shared/components/divider";
 import { SectionTitle } from "@/features/shared/components/section-title";
-
-const genderColor: Record<string, string> = {
-  der: colors.der,
-  die: colors.die,
-  das: colors.das,
-};
+import { GENDER_COLORS } from "@/features/shared/utils/word-colors";
 
 interface RecentSearchesProps {
   words: Word[];
@@ -47,13 +42,13 @@ export function RecentSearches({ words }: RecentSearchesProps) {
                 paddingVertical: 2,
               })}
             >
-              {word.gender && genderColor[word.gender] ? (
+              {word.gender && GENDER_COLORS[word.gender] ? (
                 <View
                   style={{
                     width: 7,
                     height: 7,
                     borderRadius: 3.5,
-                    backgroundColor: genderColor[word.gender],
+                    backgroundColor: GENDER_COLORS[word.gender],
                   }}
                 />
               ) : (

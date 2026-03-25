@@ -5,18 +5,7 @@ import type { Word } from "@/features/dictionary/types";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
-
-function getTypeColor(word: Word): string {
-  if (word.type === "noun") {
-    if (word.gender === "der") return colors.der;
-    if (word.gender === "die") return colors.die;
-    if (word.gender === "das") return colors.das;
-    return colors.textHint;
-  }
-  if (word.type === "verb") return colors.verb;
-  if (word.type === "preposition") return colors.prep;
-  return colors.textHint;
-}
+import { getWordTypeColor } from "@/features/shared/utils/word-colors";
 
 function getTrickyReason(word: Word): string {
   const score = word.reviewScore;
@@ -41,7 +30,7 @@ export function TrickyWordsList({ words }: TrickyWordsListProps) {
 
       <View style={{ gap: 6 }}>
         {words.map((word) => {
-          const typeColor = getTypeColor(word);
+          const typeColor = getWordTypeColor(word);
           return (
             <Pressable
               key={word.term}

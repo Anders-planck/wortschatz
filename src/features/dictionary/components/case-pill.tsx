@@ -1,8 +1,7 @@
 import { Text, View } from "react-native";
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
-
-type CaseType = "akk" | "dat" | "gen" | "nom";
+import type { CaseType } from "@/features/dictionary/types";
 
 const caseStyles: Record<CaseType, { bg: string; text: string }> = {
   akk: { bg: colors.akkBg, text: colors.akkText },

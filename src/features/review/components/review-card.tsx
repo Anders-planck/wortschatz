@@ -5,13 +5,7 @@ import type { Word } from "@/features/dictionary/types";
 import { Divider } from "@/features/shared/components/divider";
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
-
-function getGenderColor(gender: string | null): string {
-  if (gender === "der") return colors.der;
-  if (gender === "die") return colors.die;
-  if (gender === "das") return colors.das;
-  return colors.textHint;
-}
+import { GENDER_COLORS } from "@/features/shared/utils/word-colors";
 
 interface ReviewCardProps {
   word: Word;
@@ -39,7 +33,8 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
               width: 4,
               height: 4,
               borderRadius: 2,
-              backgroundColor: getGenderColor(word.gender),
+              backgroundColor:
+                GENDER_COLORS[word.gender ?? ""] ?? colors.textHint,
             }}
           />
         )}
@@ -104,7 +99,8 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
             width: 4,
             height: 4,
             borderRadius: 2,
-            backgroundColor: getGenderColor(word.gender),
+            backgroundColor:
+              GENDER_COLORS[word.gender ?? ""] ?? colors.textHint,
           }}
         />
       )}

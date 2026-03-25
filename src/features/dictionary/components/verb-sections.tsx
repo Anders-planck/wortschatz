@@ -2,7 +2,7 @@ import { View } from "react-native";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { ConjugationTable } from "./conjugation-table";
 import { CasePill } from "./case-pill";
-import type { Word } from "@/features/dictionary/types";
+import { type Word, isCaseType } from "@/features/dictionary/types";
 
 interface VerbSectionsProps {
   word: Word;
@@ -25,14 +25,6 @@ interface VerbForms {
 
 function isVerbForms(forms: Record<string, unknown>): forms is VerbForms {
   return "present" in forms || "governs" in forms;
-}
-
-type CaseType = "akk" | "dat" | "gen" | "nom";
-
-const validCases: readonly string[] = ["akk", "dat", "gen", "nom"];
-
-function isCaseType(value: string): value is CaseType {
-  return validCases.includes(value);
 }
 
 export function VerbSections({ word }: VerbSectionsProps) {

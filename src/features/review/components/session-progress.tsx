@@ -1,18 +1,6 @@
 import { View } from "react-native";
 import type { Word } from "@/features/dictionary/types";
-import { colors } from "@/features/shared/theme/colors";
-
-function getWordColor(word: Word): string {
-  if (word.type === "noun") {
-    if (word.gender === "der") return colors.der;
-    if (word.gender === "die") return colors.die;
-    if (word.gender === "das") return colors.das;
-    return colors.textHint;
-  }
-  if (word.type === "verb") return colors.verb;
-  if (word.type === "preposition") return colors.prep;
-  return colors.textHint;
-}
+import { getWordTypeColor } from "@/features/shared/utils/word-colors";
 
 interface SessionProgressProps {
   words: Word[];
@@ -45,7 +33,7 @@ export function SessionProgress({
               height: 3,
               borderRadius: 2,
               backgroundColor: isCompleted
-                ? getWordColor(word)
+                ? getWordTypeColor(word)
                 : isCurrent
                   ? "rgba(44, 44, 44, 0.2)"
                   : "rgba(44, 44, 44, 0.08)",

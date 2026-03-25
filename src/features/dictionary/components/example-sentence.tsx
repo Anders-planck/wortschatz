@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
@@ -12,12 +13,14 @@ export function ExampleSentence({
   example,
   onWordPress,
 }: ExampleSentenceProps) {
-  const clickableMap = new Map(
-    example.words.map((w) => [w.word.toLowerCase(), w.meaning]),
+  const clickableMap = useMemo(
+    () => new Map(example.words.map((w) => [w.word.toLowerCase(), w.meaning])),
+    [example],
   );
-
-  // Split sentence into words while preserving punctuation and spaces
-  const tokens = example.sentence.split(/(\s+)/);
+  const tokens = useMemo(
+    () => example.sentence.split(/(\s+)/),
+    [example.sentence],
+  );
 
   return (
     <View style={{ gap: 6 }}>

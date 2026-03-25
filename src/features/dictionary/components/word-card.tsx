@@ -33,15 +33,12 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
         boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
       }}
     >
-      {/* Gender strip for nouns */}
       {isNoun && word.gender && <GenderStrip gender={word.gender} />}
 
-      {/* Word title */}
       <Text selectable style={textStyles.word}>
         {word.term}
       </Text>
 
-      {/* Phonetic / type meta */}
       <Text style={[textStyles.mono, { marginTop: 4 }]}>
         {word.type}
         {isNoun && word.gender ? ` · ${word.gender}` : ""}
@@ -50,21 +47,18 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
 
       <Divider />
 
-      {/* Translation */}
       <Text selectable style={textStyles.body}>
         {word.translations.join(", ")}
       </Text>
 
       <Divider />
 
-      {/* Type-specific sections */}
       {isNoun && <NounSections word={word} />}
       {isVerb && <VerbSections word={word} />}
       {isPreposition && (
         <PrepositionSections word={word} onWordPress={onWordPress} />
       )}
 
-      {/* AI loading indicator */}
       {isAILoading && (
         <Animated.View
           entering={FadeInUp.duration(200)}
@@ -80,7 +74,6 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
         </Animated.View>
       )}
 
-      {/* AI-enriched content: examples */}
       {word.examples && word.examples.length > 0 && (
         <Animated.View
           entering={FadeInUp.duration(300)}
@@ -98,7 +91,6 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
         </Animated.View>
       )}
 
-      {/* AI-enriched content: usage context */}
       {word.usageContext && (
         <Animated.View
           entering={FadeInUp.duration(300).delay(100)}

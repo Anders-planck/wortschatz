@@ -1,12 +1,6 @@
 import { View } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
 import type { Gender } from "@/features/dictionary/types";
-
-const genderColors: Record<Gender, string> = {
-  der: colors.der,
-  die: colors.die,
-  das: colors.das,
-};
+import { GENDER_COLORS } from "@/features/shared/utils/word-colors";
 
 interface GenderStripProps {
   gender: Gender;
@@ -19,7 +13,7 @@ export function GenderStrip({ gender }: GenderStripProps) {
         width: 28,
         height: 3,
         borderRadius: 2,
-        backgroundColor: genderColors[gender],
+        backgroundColor: GENDER_COLORS[gender],
         marginBottom: 10,
       }}
     />

@@ -104,17 +104,21 @@ export async function updateWordAIContent(
   );
 }
 
-export async function getAllWords(filter?: { type?: string }): Promise<Word[]> {
+export async function getAllWords(
+  filter?: { type?: string },
+  limit = 200,
+): Promise<Word[]> {
   const db = await getDatabase();
   if (filter?.type) {
     const rows = await db.getAllAsync<WordRow>(
-      "SELECT * FROM words WHERE type = ? ORDER BY created_at DESC",
-      [filter.type],
+      "SELECT * FROM words WHERE type = ? ORDER BY created_at DESC LIMIT ?",
+      [filter.type, limit],
     );
     return rows.map(rowToWord);
   }
   const rows = await db.getAllAsync<WordRow>(
-    "SELECT * FROM words ORDER BY created_at DESC",
+    "SELECT * FROM words ORDER BY created_at DESC LIMIT ?",
+    [limit],
   );
   return rows.map(rowToWord);
 }
@@ -175,43 +179,49 @@ export async function getRecentWords(limit = 10): Promise<Word[]> {
 
 export async function getWeeklyActivity(): Promise<number[]> {
   const db = await getDatabase();
-  const now = new Date();
-  const dayOfWeek = (now.getDay() + 6) % 7; // Monday = 0
+  const rows = await db.getAllAsync<{ day: string; count: number }>(
+    `SELECT DATE(searched_at) as day, COUNT(*) as count
+     FROM words
+     WHERE DATE(searched_at) >= DATE('now', '-6 days')
+     GROUP BY day`,
+  );
 
-  const counts: number[] = Array(7).fill(0);
+  const countByDay = new Map(rows.map((r) => [r.day, r.count]));
+  const result: number[] = [];
+  const today = new Date();
 
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(now);
-    date.setDate(now.getDate() - (dayOfWeek - i));
-    const dayStr = date.toISOString().split("T")[0];
-    const result = await db.getFirstAsync<{ count: number }>(
-      "SELECT COUNT(*) as count FROM words WHERE DATE(searched_at) = ?",
-      [dayStr],
-    );
-    counts[i] = result?.count ?? 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split("T")[0];
+    result.push(countByDay.get(key) ?? 0);
   }
 
-  return counts;
+  return result;
 }
 
 export async function getStreak(): Promise<number> {
   const db = await getDatabase();
-  let streak = 0;
-  const now = new Date();
+  const rows = await db.getAllAsync<{ day: string }>(
+    `SELECT DISTINCT DATE(searched_at) as day
+     FROM words
+     ORDER BY day DESC`,
+  );
 
-  for (let i = 0; i < 365; i++) {
-    const date = new Date(now);
-    date.setDate(now.getDate() - i);
-    const dayStr = date.toISOString().split("T")[0];
-    const result = await db.getFirstAsync<{ count: number }>(
-      "SELECT COUNT(*) as count FROM words WHERE DATE(searched_at) = ?",
-      [dayStr],
-    );
-    if ((result?.count ?? 0) > 0) {
+  if (rows.length === 0) return 0;
+
+  let streak = 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < rows.length; i++) {
+    const expected = new Date(today);
+    expected.setDate(expected.getDate() - i);
+    const expectedStr = expected.toISOString().split("T")[0];
+
+    if (rows[i].day === expectedStr) {
       streak++;
     } else {
-      // Allow today to have 0 if yesterday had activity
-      if (i === 0) continue;
       break;
     }
   }
