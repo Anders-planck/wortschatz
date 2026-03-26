@@ -3,6 +3,7 @@ import type { Word } from "@/features/dictionary/types";
 import {
   lookupFromCache,
   lookupFromWiktionary,
+  lookupFromAI,
   enrichWithAI,
 } from "@/features/dictionary/services/word-lookup-service";
 
@@ -30,6 +31,7 @@ export function useWordLookup(): UseWordLookupReturn {
     setIsAILoading(false);
 
     try {
+      // 1. Cache → instant
       const cached = await lookupFromCache(normalized);
       if (cached) {
         setWord(cached);
@@ -37,28 +39,39 @@ export function useWordLookup(): UseWordLookupReturn {
         return;
       }
 
-      const baseWord = await lookupFromWiktionary(normalized);
-      if (!baseWord) {
-        setError(`"${normalized}" nicht gefunden`);
+      // 2. Wiktionary → fast, structured
+      let baseWord: Word | null = null;
+      try {
+        baseWord = await lookupFromWiktionary(normalized);
+      } catch {
+        // Wiktionary failed (network) — fall through to AI
+      }
+
+      if (baseWord) {
+        setWord(baseWord);
         setIsLoading(false);
+        setIsAILoading(true);
+
+        try {
+          const enriched = await enrichWithAI(baseWord);
+          setWord(enriched);
+        } catch {
+          // AI enrichment failed — word still usable with Wiktionary data
+        } finally {
+          setIsAILoading(false);
+        }
         return;
       }
 
-      setWord(baseWord);
-      setIsLoading(false);
+      // 3. AI-only fallback → Gemini generates everything
       setIsAILoading(true);
-
-      try {
-        const enriched = await enrichWithAI(baseWord);
-        setWord(enriched);
-      } catch {
-        // AI failure is non-critical
-      } finally {
-        setIsAILoading(false);
-      }
+      const aiWord = await lookupFromAI(normalized);
+      setWord(aiWord);
+      setIsLoading(false);
+      setIsAILoading(false);
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Fehler bei der Wortsuche";
+        err instanceof Error ? err.message : "Nessuna connessione";
       setError(message);
       setIsLoading(false);
       setIsAILoading(false);

@@ -7,11 +7,6 @@ import {
 } from "@/features/shared/db/words-repository";
 import { generateWordContext } from "./ai-context-service";
 
-export interface LookupResult {
-  word: Word;
-  fromCache: boolean;
-}
-
 export async function lookupFromCache(term: string): Promise<Word | null> {
   return getWordByTerm(term);
 }
@@ -41,6 +36,32 @@ export async function lookupFromWiktionary(term: string): Promise<Word | null> {
 
   const id = await insertWord(baseWord);
   return { ...baseWord, id };
+}
+
+export async function lookupFromAI(term: string): Promise<Word> {
+  const context = await generateWordContext({ term });
+
+  const now = new Date().toISOString();
+  const word: Omit<Word, "id"> = {
+    term,
+    type: context.wordType,
+    gender: context.gender,
+    plural: context.plural,
+    translations: context.translationsIt,
+    forms: null,
+    examples: context.examples,
+    usageContext: context.usageContext,
+    audioUrl: null,
+    rawWiktionary: null,
+    searchedAt: now,
+    reviewScore: 0,
+    nextReview: null,
+    category: context.category,
+    createdAt: now,
+  };
+
+  const id = await insertWord(word);
+  return { ...word, id };
 }
 
 export async function enrichWithAI(word: Word): Promise<Word> {

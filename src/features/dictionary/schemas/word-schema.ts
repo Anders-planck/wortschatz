@@ -21,6 +21,9 @@ export const ExampleSchema = z.object({
 });
 
 export const WordContextSchema = z.object({
+  wordType: WordTypeSchema.describe(
+    "Part of speech: noun, verb, preposition, adjective, or adverb",
+  ),
   gender: GenderSchema.nullable().describe(
     "Article for nouns (der/die/das), null for non-nouns",
   ),

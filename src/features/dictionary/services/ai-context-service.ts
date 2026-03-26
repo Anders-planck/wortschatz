@@ -37,6 +37,7 @@ Generate contextual learning data for the German word: "${term}" (${type})
 ${typeSpecificInstruction}
 
 Requirements:
+- "wordType": The part of speech (noun, verb, preposition, adjective, adverb). Determine it accurately.
 - "gender": For nouns, provide the correct article (der/die/das). For non-nouns, return null.
 - "plural": For nouns, provide the plural form (e.g. "Tische" for Tisch). For non-nouns, return null.
 - "translationsIt": 2-4 Italian translations of the word, most common first.
