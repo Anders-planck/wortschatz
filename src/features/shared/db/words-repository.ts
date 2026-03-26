@@ -181,6 +181,11 @@ export async function getWordCount(): Promise<number> {
   return result?.count ?? 0;
 }
 
+export async function deleteWord(term: string): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync("DELETE FROM words WHERE term = ? COLLATE NOCASE", [term]);
+}
+
 export async function getRecentWords(limit = 10): Promise<Word[]> {
   const db = await getDatabase();
   const rows = await db.getAllAsync<WordRow>(

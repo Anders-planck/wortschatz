@@ -18,7 +18,7 @@ export default function VocabularyScreen() {
         contentContainerStyle={{ padding: 24 }}
         data={words}
         renderItem={({ item, index }) => (
-          <VocabularyItem word={item} index={index} />
+          <VocabularyItem word={item} index={index} onDeleted={refresh} />
         )}
         keyExtractor={(item) => item.term}
         ListHeaderComponent={
