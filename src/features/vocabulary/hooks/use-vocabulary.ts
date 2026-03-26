@@ -7,45 +7,44 @@ import { getAllWords } from "@/features/shared/db/words-repository";
 export function useVocabulary() {
   const [words, setWords] = useState<Word[]>([]);
   const [filter, setFilter] = useState<WordFilter>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const filterRef = useRef(filter);
   filterRef.current = filter;
 
-  const refresh = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const filterArg = filterRef.current
-        ? { type: filterRef.current }
-        : undefined;
-      const result = await getAllWords(filterArg);
-      setWords(result);
-    } catch {
-      setWords([]);
-    } finally {
-      setIsLoading(false);
-    }
+  const load = useCallback(async () => {
+    const filterArg = filterRef.current
+      ? { type: filterRef.current }
+      : undefined;
+    const result = await getAllWords(filterArg);
+    setWords(result);
   }, []);
+
+  const pullToRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await load();
+    setIsRefreshing(false);
+  }, [load]);
 
   const handleSetFilter = useCallback(
     (newFilter: WordFilter) => {
       setFilter(newFilter);
       filterRef.current = newFilter;
-      refresh();
+      load();
     },
-    [refresh],
+    [load],
   );
 
   useFocusEffect(
     useCallback(() => {
-      refresh();
-    }, [refresh]),
+      load();
+    }, [load]),
   );
 
   return {
     words,
     filter,
     setFilter: handleSetFilter,
-    isLoading,
-    refresh,
+    isRefreshing,
+    refresh: pullToRefresh,
   };
 }

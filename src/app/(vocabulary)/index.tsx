@@ -8,7 +8,7 @@ import { VocabularyItem } from "@/features/vocabulary/components/vocabulary-item
 import { VocabularyEmpty } from "@/features/vocabulary/components/vocabulary-empty";
 
 export default function VocabularyScreen() {
-  const { words, filter, setFilter, isLoading, refresh } = useVocabulary();
+  const { words, filter, setFilter, isRefreshing, refresh } = useVocabulary();
 
   return (
     <>
@@ -28,9 +28,9 @@ export default function VocabularyScreen() {
             totalCount={words.length}
           />
         }
-        ListEmptyComponent={<VocabularyEmpty isLoading={isLoading} />}
+        ListEmptyComponent={<VocabularyEmpty isLoading={isRefreshing} />}
         onRefresh={refresh}
-        refreshing={isLoading}
+        refreshing={isRefreshing}
       />
 
       <Stack.Screen.Title large>Parole</Stack.Screen.Title>
