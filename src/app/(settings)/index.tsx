@@ -1,8 +1,8 @@
 import { ScrollView } from "react-native";
 import { Stack } from "expo-router";
-import * as Speech from "expo-speech";
 import Constants from "expo-constants";
 
+import { useSpeech } from "@/features/shared/hooks/use-speech";
 import { colors } from "@/features/shared/theme/colors";
 import { useSettings } from "@/features/settings/hooks/use-settings";
 import {
@@ -19,13 +19,10 @@ import { Divider } from "@/features/shared/components/divider";
 
 export default function SettingsScreen() {
   const { settings, updateSetting } = useSettings();
+  const { speak } = useSpeech({ speechRate: settings.speechRate });
 
   const handlePreview = () => {
-    Speech.stop();
-    Speech.speak("Willkommen bei WortSchatz", {
-      language: "de-DE",
-      rate: settings.speechRate,
-    });
+    speak("Willkommen bei WortSchatz");
   };
 
   const version = Constants.expoConfig?.version ?? "1.0.0";
@@ -41,7 +38,7 @@ export default function SettingsScreen() {
 
         <SettingsSection
           title="Pronuncia"
-          footer="La pronuncia usa la voce nativa del tuo dispositivo. Velocità più bassa aiuta a distinguere i suoni."
+          footer="La pronuncia usa Google Cloud per una voce naturale. Senza internet, usa la voce del dispositivo."
         >
           <SettingsToggleRow
             label="Auto-play al reveal"
