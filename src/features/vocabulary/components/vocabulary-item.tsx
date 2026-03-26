@@ -1,5 +1,5 @@
-import { Alert, Pressable, Text, View } from "react-native";
-import { useRouter } from "expo-router";
+import { Text, View } from "react-native";
+import { Link } from "expo-router";
 import Animated, { FadeInUp, FadeOutLeft } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
@@ -19,71 +19,67 @@ export function VocabularyItem({
   index,
   onDeleted,
 }: VocabularyItemProps) {
-  const router = useRouter();
-
-  const handleLongPress = () => {
-    Alert.alert(
-      `Delete "${word.term}"?`,
-      "This will remove the word from your vocabulary.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            await deleteWord(word.term);
-            onDeleted?.();
-          },
-        },
-      ],
-    );
-  };
-
   return (
     <Animated.View
       entering={FadeInUp.delay(index * 30).duration(300)}
       exiting={FadeOutLeft.duration(200)}
     >
-      <Pressable
-        onPress={() => router.push(`/word/${encodeURIComponent(word.term)}`)}
-        onLongPress={handleLongPress}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingVertical: 14,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.borderLight,
-          gap: 12,
-        }}
-      >
-        <View
-          style={{
-            width: 4,
-            height: 28,
-            borderRadius: 2,
-            backgroundColor: getWordTypeColor(word),
-          }}
-        />
+      <Link href={`/word/${encodeURIComponent(word.term)}`} asChild>
+        <Link.Trigger>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingVertical: 14,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.borderLight,
+              gap: 12,
+            }}
+          >
+            <View
+              style={{
+                width: 4,
+                height: 28,
+                borderRadius: 2,
+                backgroundColor: getWordTypeColor(word),
+              }}
+            />
 
-        <Text
-          selectable
-          style={[
-            textStyles.heading,
-            { flex: 1, fontSize: 14, letterSpacing: 0 },
-          ]}
-        >
-          {word.term}
-        </Text>
+            <Text
+              style={[
+                textStyles.heading,
+                { flex: 1, fontSize: 14, letterSpacing: 0 },
+              ]}
+            >
+              {word.term}
+            </Text>
 
-        <Text
-          style={[
-            textStyles.bodyLight,
-            { fontSize: 11, color: colors.textHint },
-          ]}
-        >
-          {word.translations[0] ?? ""}
-        </Text>
-      </Pressable>
+            <Text
+              style={[
+                textStyles.bodyLight,
+                { fontSize: 11, color: colors.textHint },
+              ]}
+            >
+              {word.translations[0] ?? ""}
+            </Text>
+          </View>
+        </Link.Trigger>
+
+        <Link.Preview />
+
+        <Link.Menu>
+          <Link.MenuAction title="Open" icon="book.fill" onPress={() => {}} />
+          <Link.MenuAction
+            title="Delete"
+            icon="trash"
+            destructive
+            onPress={async () => {
+              await deleteWord(word.term);
+              onDeleted?.();
+            }}
+          />
+        </Link.Menu>
+      </Link>
     </Animated.View>
   );
 }
