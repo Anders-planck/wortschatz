@@ -15,6 +15,7 @@ import { SettingsToggleRow } from "@/features/settings/components/settings-toggl
 import { SettingsSliderRow } from "@/features/settings/components/settings-slider-row";
 import { SettingsValueRow } from "@/features/settings/components/settings-value-row";
 import { VoicePreviewCard } from "@/features/settings/components/voice-preview-card";
+import { SettingsVoiceRow } from "@/features/settings/components/settings-voice-row";
 import { Divider } from "@/features/shared/components/divider";
 
 export default function SettingsScreen() {
@@ -53,6 +54,11 @@ export default function SettingsScreen() {
             max={SPEECH_RATE_MAX}
             step={SPEECH_RATE_STEP}
             onValueChange={(v) => updateSetting("speechRate", v)}
+          />
+          <Divider />
+          <SettingsVoiceRow
+            value={settings.ttsVoice}
+            onValueChange={(v) => updateSetting("ttsVoice", v)}
           />
         </SettingsSection>
 

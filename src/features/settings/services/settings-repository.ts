@@ -46,6 +46,17 @@ export async function updateSetting<K extends keyof AppSettings>(
   await setSetting(key, JSON.stringify(value));
 }
 
+export async function getTtsVoice(): Promise<string> {
+  const raw = await getSetting("ttsVoice");
+  if (raw === null) return DEFAULT_SETTINGS.ttsVoice;
+  try {
+    const voice = JSON.parse(raw);
+    return typeof voice === "string" ? voice : DEFAULT_SETTINGS.ttsVoice;
+  } catch {
+    return DEFAULT_SETTINGS.ttsVoice;
+  }
+}
+
 export async function getSpeechRate(): Promise<number> {
   const raw = await getSetting("speechRate");
   if (raw === null) return DEFAULT_SETTINGS.speechRate;

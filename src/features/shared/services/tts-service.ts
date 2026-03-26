@@ -6,16 +6,16 @@ import {
 import {
   GOOGLE_API_KEY,
   TTS_API_URL,
-  TTS_VOICE,
   TTS_LANGUAGE,
 } from "@/features/shared/config/google";
+import { getTtsVoice } from "@/features/settings/services/settings-repository";
 
 function getTtsCacheDir(): string {
   return `${Paths.cache}/tts`;
 }
 
-function getAudioFilePath(term: string): string {
-  return `${getTtsCacheDir()}/${encodeURIComponent(term)}.mp3`;
+function getAudioFilePath(term: string, voice: string): string {
+  return `${getTtsCacheDir()}/${encodeURIComponent(term)}_${voice}.mp3`;
 }
 
 function ensureCacheDir(): void {
@@ -38,6 +38,7 @@ async function fetchAndCacheAudio(
   text: string,
   filePath: string,
   speakingRate: number,
+  voice: string,
 ): Promise<string | null> {
   try {
     const response = await fetch(`${TTS_API_URL}?key=${GOOGLE_API_KEY}`, {
@@ -45,7 +46,7 @@ async function fetchAndCacheAudio(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         input: { text },
-        voice: { languageCode: TTS_LANGUAGE, name: TTS_VOICE },
+        voice: { languageCode: TTS_LANGUAGE, name: voice },
         audioConfig: { audioEncoding: "MP3", speakingRate },
       }),
     });
@@ -82,17 +83,14 @@ export async function getAudio(
   if (!GOOGLE_API_KEY) return null;
 
   try {
-    const dbPath = await getAudioUrl(text);
-    if (dbPath && (await fileExists(dbPath))) {
-      return dbPath;
-    }
+    const voice = await getTtsVoice();
 
-    const filePath = getAudioFilePath(text);
+    const filePath = getAudioFilePath(text, voice);
     if (await fileExists(filePath)) {
       return filePath;
     }
 
-    return fetchAndCacheAudio(text, filePath, speakingRate);
+    return fetchAndCacheAudio(text, filePath, speakingRate, voice);
   } catch {
     return null;
   }
