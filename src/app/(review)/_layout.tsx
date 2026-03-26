@@ -4,7 +4,6 @@ export default function ReviewLayout() {
   return (
     <Stack
       screenOptions={{
-        headerTransparent: true,
         headerBackButtonDisplayMode: "minimal",
       }}
     >
