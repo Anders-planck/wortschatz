@@ -5,6 +5,7 @@ export default function ReviewLayout() {
     <Stack
       screenOptions={{
         headerBackButtonDisplayMode: "minimal",
+        headerTransparent: true,
       }}
     >
       <Stack.Screen name="index" />

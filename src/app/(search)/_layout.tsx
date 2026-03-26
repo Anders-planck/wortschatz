@@ -5,6 +5,7 @@ export default function SearchLayout() {
     <Stack
       screenOptions={{
         headerBackButtonDisplayMode: "minimal",
+        headerTransparent: true,
       }}
     >
       <Stack.Screen name="index" />
