@@ -1,9 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <!-- Geometric book shape - two overlapping rectangles -->
-  <!-- Left page - ochre -->
-  <rect x="25" y="30" width="32" height="60" rx="3" fill="#C4A96A" transform="rotate(-6, 41, 60)"/>
-  <!-- Right page - dusty rose -->
-  <rect x="63" y="30" width="32" height="60" rx="3" fill="#D4AAA0" transform="rotate(6, 79, 60)"/>
-  <!-- Spine line -->
-  <line x1="60" y1="28" x2="60" y2="92" stroke="#2C2C2C" stroke-width="2" stroke-linecap="round"/>
+  <!-- Open book - left cover (ochre gold) -->
+  <polygon points="60,20 20,35 20,95 60,80" fill="#C4A96A"/>
+  <!-- Open book - right cover (dusty rose) -->
+  <polygon points="60,20 100,35 100,95 60,80" fill="#D4AAA0"/>
+  <!-- Inner pages - left -->
+  <polygon points="60,28 30,40 30,88 60,76" fill="#F0EDE6"/>
+  <!-- Inner pages - right -->
+  <polygon points="60,28 90,40 90,88 60,76" fill="#FAFAF6"/>
+  <!-- Spine shadow -->
+  <line x1="60" y1="20" x2="60" y2="80" stroke="#2C2C2C" stroke-width="1" opacity="0.15"/>
 </svg>
