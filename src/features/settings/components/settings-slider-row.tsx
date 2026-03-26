@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { Slider } from "@expo/ui/swift-ui";
+import Slider from "@react-native-community/slider";
 import { fonts } from "@/features/shared/theme/typography";
 import { colors } from "@/features/shared/theme/colors";
 
@@ -77,10 +77,11 @@ export function SettingsSliderRow({
         <View style={{ flex: 1 }}>
           <Slider
             value={value}
-            min={min}
-            max={max}
+            minimumValue={min}
+            maximumValue={max}
             step={step}
             onValueChange={onValueChange}
+            minimumTrackTintColor={colors.accent}
           />
         </View>
         <Text

@@ -13,6 +13,7 @@
   "dependencies": {
     "@ai-sdk/google": "^3.0.53",
     "@expo/ui": "~55.0.5",
+    "@react-native-community/slider": "5.1.2",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/elements": "^2.9.10",
     "@react-navigation/native": "^7.1.33",
