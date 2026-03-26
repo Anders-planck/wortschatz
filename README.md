@@ -1,56 +1,131 @@
-# Welcome to your Expo app 👋
+# WortSchatz
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A smart German-Italian dictionary app for language learners. Built with Expo SDK 55 and React Native.
 
-## Get started
+WortSchatz combines Wiktionary structured data with Gemini AI contextual enrichment to provide rich word cards with gender, plural forms, conjugation tables, example sentences, and usage context. Every searched word is automatically saved to your personal vocabulary for spaced repetition review.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- **Smart Search** — Search in German or Italian. The AI detects the language and returns the German equivalent with full context.
+- **Adaptive Word Cards** — Cards adapt to word type: nouns show gender/plural/declension, verbs show conjugation with stem highlighting, prepositions show governed cases.
+- **Full Conjugation Tables** — Prasens, Prateritum, Perfekt (with hilfsverb highlighting), and Konjunktiv II for every verb.
+- **Text-to-Speech** — Native iOS pronunciation for every word and conjugated form. Sequential playback for entire tense tables with row highlighting.
+- **Personal Vocabulary** — Every search is auto-saved. Filter by word type, long-press for context menu (pronounce, share, delete).
+- **Spaced Repetition** — SM-2 algorithm for review sessions. Dashboard with streak tracking, weekly activity chart, and tricky words list.
+- **Settings** — Configurable speech rate, auto-play on card reveal.
 
-2. Start the app
+## Tech Stack
 
-   ```bash
-   npx expo start
-   ```
+| Layer | Technology |
+|-------|-----------|
+| Framework | Expo SDK 55, React Native 0.83 |
+| Navigation | expo-router with NativeTabs (native iOS tab bar) |
+| Database | expo-sqlite (local, on-device) |
+| AI | Vercel AI SDK v6 + Google Gemini 2.5 Flash Lite |
+| Dictionary | Wiktionary REST API (en.wiktionary.org) |
+| TTS | expo-speech (native AVSpeechSynthesizer) |
+| Animations | react-native-reanimated |
+| Validation | Zod |
 
-In the output, you'll find options to open the app in a
+## Architecture
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Feature-based architecture under `src/features/`. Each feature is self-contained with its own components, hooks, services, and types.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+src/
+  app/                          # Expo Router routes
+    (search)/                   # Search tab
+    (vocabulary)/               # Vocabulary tab
+    (review)/                   # Review tab
+    (settings)/                 # Settings tab
+  components/                   # App-level components (tabs)
+  features/
+    dictionary/                 # Word lookup, cards, conjugation
+      components/
+      hooks/
+      services/
+      schemas/
+      types.ts
+    search/                     # Search screen, recent searches
+      components/
+      hooks/
+    vocabulary/                 # Vocabulary list, filters
+      components/
+      hooks/
+    review/                     # Spaced repetition, dashboard
+      components/
+      hooks/
+    settings/                   # App settings, persistence
+      components/
+      hooks/
+      services/
+      types.ts
+    shared/                     # Theme, database, utilities
+      theme/
+      db/
+      hooks/
+      components/
+      utils/
+      config/
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Data Flow
 
-### Other setup steps
+1. **Search** — User types a word (German or Italian)
+2. **Cache check** — Look up in local SQLite database
+3. **Wiktionary** — Fetch structured data from `en.wiktionary.org/api/rest_v1/page/definition/` (multi-case: as-is, capitalized, lowercase)
+4. **AI enrichment** — Gemini generates contextual data: translations, examples with clickable words, usage context, conjugation for verbs
+5. **AI-only fallback** — If Wiktionary has no German data, Gemini generates everything including gender, plural
+6. **Save** — Word is persisted to SQLite with all enriched data
+7. **Review** — SM-2 algorithm schedules words for spaced repetition
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Getting Started
 
-## Learn more
+### Prerequisites
 
-To learn more about developing your project with Expo, look at the following resources:
+- Node.js 18+
+- iOS Simulator or physical iPhone
+- Xcode (for native builds)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Setup
 
-## Join the community
+```bash
+# Install dependencies
+npm install
 
-Join our community of developers creating universal apps.
+# Create environment file
+cp .env.dist .env.local
+# Edit .env.local and add your Gemini API key
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# Start development
+npx expo start
+```
+
+### Environment Variables
+
+| Variable | Description |
+|----------|------------|
+| `EXPO_PUBLIC_GOOGLE_AI_KEY` | Google Gemini API key for AI enrichment |
+
+### Running on Device
+
+```bash
+# iOS Simulator
+npx expo run:ios
+
+# Physical iPhone (connected via USB)
+npx expo run:ios --device
+```
+
+## Design System
+
+Warm, editorial aesthetic inspired by Bauhaus minimalism.
+
+- **Fonts**: Outfit (display), IBM Plex Sans (body), Ubuntu Sans Mono (labels)
+- **Palette**: Cream background (`#F0EDE6`), warm ochre accent (`#C4943A`), muted earth tones
+- **Gender colors**: der = gold (`#C4A96A`), die = rose (`#D4AAA0`), das = sage (`#8DB58A`)
+- **Corners**: `borderCurve: "continuous"` everywhere (iOS squircles)
+
+## License
+
+Private project.
