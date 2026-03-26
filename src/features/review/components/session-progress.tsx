@@ -1,5 +1,6 @@
 import { View } from "react-native";
 import type { Word } from "@/features/dictionary/types";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { getWordTypeColor } from "@/features/shared/utils/word-colors";
 
 interface SessionProgressProps {
@@ -13,6 +14,8 @@ export function SessionProgress({
   currentIndex,
   responses,
 }: SessionProgressProps) {
+  const colors = useThemeColors();
+
   return (
     <View
       style={{
@@ -33,10 +36,10 @@ export function SessionProgress({
               height: 3,
               borderRadius: 2,
               backgroundColor: isCompleted
-                ? getWordTypeColor(word)
+                ? getWordTypeColor(word, colors)
                 : isCurrent
-                  ? "rgba(44, 44, 44, 0.2)"
-                  : "rgba(44, 44, 44, 0.08)",
+                  ? `${colors.textPrimary}33`
+                  : `${colors.textPrimary}14`,
             }}
           />
         );

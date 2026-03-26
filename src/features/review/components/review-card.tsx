@@ -7,9 +7,8 @@ import { getSetting } from "@/features/settings/services/settings-repository";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import { Divider } from "@/features/shared/components/divider";
 import { useSpeech } from "@/features/shared/hooks/use-speech";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
-import { GENDER_COLORS } from "@/features/shared/utils/word-colors";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
+import { getGenderColors } from "@/features/shared/utils/word-colors";
 
 interface ReviewCardProps {
   word: Word;
@@ -18,6 +17,8 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
+  const { colors, textStyles } = useAppTheme();
+  const genderColors = getGenderColors(colors);
   const { speak } = useSpeech();
   const hasAutoPlayed = useRef(false);
 
@@ -56,7 +57,7 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
               height: 4,
               borderRadius: 2,
               backgroundColor:
-                GENDER_COLORS[word.gender ?? ""] ?? colors.textHint,
+                genderColors[word.gender ?? ""] ?? colors.textHint,
             }}
           />
         )}
@@ -124,8 +125,7 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
             width: 4,
             height: 4,
             borderRadius: 2,
-            backgroundColor:
-              GENDER_COLORS[word.gender ?? ""] ?? colors.textHint,
+            backgroundColor: genderColors[word.gender ?? ""] ?? colors.textHint,
           }}
         />
       )}

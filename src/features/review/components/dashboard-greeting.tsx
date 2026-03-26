@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -17,6 +17,7 @@ export function DashboardGreeting({
   streak,
   totalCount,
 }: DashboardGreetingProps) {
+  const { textStyles } = useAppTheme();
   return (
     <View style={{ gap: 4 }}>
       <Text style={textStyles.heading}>{getGreeting()}</Text>

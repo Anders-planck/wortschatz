@@ -1,9 +1,10 @@
 import { Text, View } from "react-native";
 
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 export function SearchHint() {
+  const { colors, textStyles } = useAppTheme();
+
   return (
     <View style={{ paddingTop: 32, alignItems: "center" }}>
       <Text

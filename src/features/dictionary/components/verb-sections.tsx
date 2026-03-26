@@ -2,8 +2,7 @@ import { useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { SectionTitle } from "@/features/shared/components/section-title";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { CasePill } from "./case-pill";
 import { PronounGrid } from "./pronoun-grid";
 import { HighlightedForm } from "./highlighted-form";
@@ -33,6 +32,7 @@ function isVerbForms(forms: Record<string, unknown>): forms is VerbForms {
 }
 
 export function VerbSections({ word }: VerbSectionsProps) {
+  const { colors, textStyles } = useAppTheme();
   const router = useRouter();
   const forms = word.forms as VerbForms | null;
   const hasVerb = !!forms && isVerbForms(forms as Record<string, unknown>);

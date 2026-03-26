@@ -2,7 +2,7 @@ import { useState } from "react";
 import { View, Text } from "react-native";
 import Slider from "@react-native-community/slider";
 import { fonts } from "@/features/shared/theme/typography";
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 
 interface SettingsSliderRowProps {
   label: string;
@@ -23,6 +23,7 @@ export function SettingsSliderRow({
   formatValue = (v) => `${v.toFixed(1)}x`,
   onValueChange,
 }: SettingsSliderRowProps) {
+  const colors = useThemeColors();
   const [localValue, setLocalValue] = useState(value);
   return (
     <View style={{ paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>

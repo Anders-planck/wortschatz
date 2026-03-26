@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { View, Text } from "react-native";
 import { fonts } from "@/features/shared/theme/typography";
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 
 interface SettingsSectionProps {
   title: string;
@@ -14,6 +14,7 @@ export function SettingsSection({
   footer,
   children,
 }: SettingsSectionProps) {
+  const colors = useThemeColors();
   return (
     <View style={{ gap: 8 }}>
       <Text

@@ -3,8 +3,7 @@ import { useRouter } from "expo-router";
 
 import type { Word } from "@/features/dictionary/types";
 import { SectionTitle } from "@/features/shared/components/section-title";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { getWordTypeColor } from "@/features/shared/utils/word-colors";
 
 function getTrickyReason(word: Word): string {
@@ -20,6 +19,7 @@ interface TrickyWordsListProps {
 }
 
 export function TrickyWordsList({ words }: TrickyWordsListProps) {
+  const { colors, textStyles } = useAppTheme();
   const router = useRouter();
 
   if (words.length === 0) return null;
@@ -30,7 +30,7 @@ export function TrickyWordsList({ words }: TrickyWordsListProps) {
 
       <View style={{ gap: 6 }}>
         {words.map((word) => {
-          const typeColor = getWordTypeColor(word);
+          const typeColor = getWordTypeColor(word, colors);
           return (
             <Pressable
               key={word.term}

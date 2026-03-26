@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { Image } from "expo-image";
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { fonts } from "@/features/shared/theme/typography";
 import { hapticLight } from "@/features/shared/hooks/use-haptics";
 
@@ -9,6 +9,7 @@ interface VoicePreviewCardProps {
 }
 
 export function VoicePreviewCard({ onPress }: VoicePreviewCardProps) {
+  const colors = useThemeColors();
   return (
     <View
       style={{

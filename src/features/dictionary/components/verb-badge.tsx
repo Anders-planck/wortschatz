@@ -1,12 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
-
-const variantStyles = {
-  warning: { bg: colors.genBg, text: colors.genText },
-  info: { bg: colors.nomBg, text: colors.nomText },
-} as const;
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface VerbBadgeProps {
   label: string;
@@ -17,6 +11,13 @@ export const VerbBadge = React.memo(function VerbBadge({
   label,
   variant,
 }: VerbBadgeProps) {
+  const { colors, textStyles } = useAppTheme();
+
+  const variantStyles = {
+    warning: { bg: colors.genBg, text: colors.genText },
+    info: { bg: colors.nomBg, text: colors.nomText },
+  } as const;
+
   const style = variantStyles[variant];
 
   return (

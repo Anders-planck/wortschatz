@@ -1,6 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { hapticMedium } from "@/features/shared/hooks/use-haptics";
 
 type Response = 0 | 1 | 2 | 3;
@@ -11,22 +10,24 @@ interface ButtonConfig {
   textColor: string;
 }
 
-const BUTTONS: Record<Response, ButtonConfig> = {
-  0: { label: "Again", borderColor: colors.die, textColor: colors.againText },
-  1: {
-    label: "Hard",
-    borderColor: colors.border,
-    textColor: colors.textTertiary,
-  },
-  2: { label: "Good", borderColor: colors.der, textColor: colors.akkText },
-  3: { label: "Easy", borderColor: colors.das, textColor: colors.datText },
-};
-
 interface ResponseButtonsProps {
   onRespond: (response: Response) => void;
 }
 
 export function ResponseButtons({ onRespond }: ResponseButtonsProps) {
+  const { colors, textStyles } = useAppTheme();
+
+  const BUTTONS: Record<Response, ButtonConfig> = {
+    0: { label: "Again", borderColor: colors.die, textColor: colors.againText },
+    1: {
+      label: "Hard",
+      borderColor: colors.border,
+      textColor: colors.textTertiary,
+    },
+    2: { label: "Good", borderColor: colors.der, textColor: colors.akkText },
+    3: { label: "Easy", borderColor: colors.das, textColor: colors.datText },
+  };
+
   return (
     <View
       style={{

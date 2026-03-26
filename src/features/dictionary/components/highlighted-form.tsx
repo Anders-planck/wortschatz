@@ -1,7 +1,6 @@
 import React from "react";
 import { Text } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 const standardEndings: Record<string, string> = {
   ich: "e",
@@ -41,6 +40,7 @@ export const HighlightedForm = React.memo(function HighlightedForm({
   referenceForm,
   highlightEnding,
 }: HighlightedFormProps) {
+  const { colors, textStyles } = useAppTheme();
   const { stem, ending } = highlightEnding
     ? splitEnding(form, person)
     : { stem: form, ending: "" };

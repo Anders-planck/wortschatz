@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Stack, useRouter } from "expo-router";
 import { View } from "react-native";
 
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { useReviewSession } from "@/features/review/hooks/use-review-session";
 import { SessionProgress } from "@/features/review/components/session-progress";
 import { ReviewCard } from "@/features/review/components/review-card";
@@ -11,6 +11,7 @@ import { SessionComplete } from "@/features/review/components/session-complete";
 import { SessionEmpty } from "@/features/review/components/session-empty";
 
 export default function SessionScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const {
     words,

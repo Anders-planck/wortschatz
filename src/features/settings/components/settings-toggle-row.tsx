@@ -1,6 +1,6 @@
 import { View, Text, Switch } from "react-native";
 import { fonts } from "@/features/shared/theme/typography";
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 
 interface SettingsToggleRowProps {
   label: string;
@@ -13,6 +13,7 @@ export function SettingsToggleRow({
   value,
   onValueChange,
 }: SettingsToggleRowProps) {
+  const colors = useThemeColors();
   return (
     <View
       style={{

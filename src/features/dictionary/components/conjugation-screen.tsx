@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, View, Text } from "react-native";
 import { Stack } from "expo-router";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import { useSpeech } from "@/features/shared/hooks/use-speech";
@@ -48,6 +47,7 @@ function TenseTable({
   isIrregular: boolean;
   highlightEnding: boolean;
 }) {
+  const { colors, textStyles } = useAppTheme();
   const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
   const referenceForm = data.wir;
 
@@ -102,6 +102,7 @@ function PerfektForm({
   form: string;
   partizipII: string;
 }) {
+  const { colors, textStyles } = useAppTheme();
   const parts = form.split(partizipII);
   if (parts.length < 2) {
     return (
@@ -135,6 +136,7 @@ function PerfektTable({
   data: ConjugationTenseData;
   partizipII: string;
 }) {
+  const { colors, textStyles } = useAppTheme();
   const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
 
   const forms = useMemo(() => buildSpokenForms(data), [data]);
@@ -209,6 +211,7 @@ function buildPerfektData(
 }
 
 export function ConjugationScreen({ term }: ConjugationScreenProps) {
+  const { colors, textStyles } = useAppTheme();
   const [word, setWord] = useState<Word | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

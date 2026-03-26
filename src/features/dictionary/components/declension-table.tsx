@@ -1,57 +1,82 @@
 import { View, Text } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
-
-interface DeclensionData {
-  nominativ?: { singular?: string; plural?: string };
-  akkusativ?: { singular?: string; plural?: string };
-  dativ?: { singular?: string; plural?: string };
-  genitiv?: { singular?: string; plural?: string };
-}
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
+import {
+  CASE_CONFIG,
+  type DeclensionForms,
+} from "@/features/dictionary/utils/declension-data";
 
 interface DeclensionTableProps {
-  data: DeclensionData;
+  data: DeclensionForms;
 }
 
-const cases = [
-  { key: "nominativ" as const, label: "NOM" },
-  { key: "akkusativ" as const, label: "AKK" },
-  { key: "dativ" as const, label: "DAT" },
-  { key: "genitiv" as const, label: "GEN" },
-];
-
 export function DeclensionTable({ data }: DeclensionTableProps) {
+  const { colors, textStyles } = useAppTheme();
+
   return (
-    <View style={{ gap: 6 }}>
-      {/* Header row */}
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        <View style={{ width: 36 }} />
-        <Text style={[textStyles.monoLabel, { flex: 1, marginBottom: 0 }]}>
-          SG
+    <View
+      style={{
+        gap: 2,
+        borderRadius: 10,
+        borderCurve: "continuous",
+        overflow: "hidden",
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          paddingVertical: 8,
+          paddingHorizontal: 10,
+          backgroundColor: colors.cream,
+        }}
+      >
+        <View style={{ width: 40 }} />
+        <Text style={[textStyles.monoLabel, { flex: 1, textAlign: "center" }]}>
+          SINGULAR
         </Text>
-        <Text style={[textStyles.monoLabel, { flex: 1, marginBottom: 0 }]}>
-          PL
+        <Text style={[textStyles.monoLabel, { flex: 1, textAlign: "center" }]}>
+          PLURAL
         </Text>
       </View>
-      {/* Case rows */}
-      {cases.map(({ key, label }) => {
-        const row = data[key];
+
+      {CASE_CONFIG.map(({ full, abbr, bgKey, textKey }) => {
+        const row = data[full];
         if (!row) return null;
+
         return (
           <View
-            key={key}
-            style={{ flexDirection: "row", gap: 8, alignItems: "center" }}
+            key={full}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: colors[bgKey],
+              paddingVertical: 10,
+              paddingHorizontal: 10,
+            }}
           >
-            <Text
-              style={[textStyles.monoLabel, { width: 36, marginBottom: 0 }]}
-            >
-              {label}
-            </Text>
+            <View style={{ width: 40, alignItems: "center" }}>
+              <Text
+                style={{
+                  fontFamily: textStyles.mono.fontFamily,
+                  fontSize: 9,
+                  fontWeight: "700",
+                  color: colors[textKey],
+                  letterSpacing: 1,
+                }}
+              >
+                {abbr}
+              </Text>
+            </View>
             <Text
               selectable
               style={[
-                textStyles.bodyLight,
-                { flex: 1, color: colors.textSecondary },
+                textStyles.body,
+                {
+                  flex: 1,
+                  textAlign: "center",
+                  fontSize: 14,
+                  color: colors.textPrimary,
+                  fontWeight: "500",
+                },
               ]}
             >
               {row.singular ?? "—"}
@@ -59,8 +84,13 @@ export function DeclensionTable({ data }: DeclensionTableProps) {
             <Text
               selectable
               style={[
-                textStyles.bodyLight,
-                { flex: 1, color: colors.textSecondary },
+                textStyles.body,
+                {
+                  flex: 1,
+                  textAlign: "center",
+                  fontSize: 14,
+                  color: colors.textSecondary,
+                },
               ]}
             >
               {row.plural ?? "—"}

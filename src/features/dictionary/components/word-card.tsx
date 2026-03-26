@@ -1,7 +1,6 @@
 import { View, Text, ActivityIndicator } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { Divider } from "@/features/shared/components/divider";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { GenderStrip } from "./gender-strip";
@@ -20,6 +19,7 @@ interface WordCardProps {
 }
 
 export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
+  const { colors, textStyles } = useAppTheme();
   const isNoun = word.type === "noun";
   const isVerb = word.type === "verb";
   const isPreposition = word.type === "preposition";

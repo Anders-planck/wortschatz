@@ -30,7 +30,7 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Label>Ripasso</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="(settings)">
+      <NativeTabs.Trigger name="(settings)" role="search">
         <NativeTabs.Trigger.Icon
           sf={{ default: "gearshape", selected: "gearshape.fill" }}
         />

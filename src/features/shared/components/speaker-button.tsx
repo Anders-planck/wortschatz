@@ -9,7 +9,7 @@ import Animated, {
   cancelAnimation,
 } from "react-native-reanimated";
 import { useEffect } from "react";
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { useSpeech } from "@/features/shared/hooks/use-speech";
 
 interface SpeakerButtonProps {
@@ -30,6 +30,7 @@ export function SpeakerButton({
   onSpeakAll,
   isHighlighted,
 }: SpeakerButtonProps) {
+  const colors = useThemeColors();
   const { speak, stop, isSpeaking, isAvailable } = useSpeech();
   const scale = useSharedValue(1);
 

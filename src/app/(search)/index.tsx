@@ -1,12 +1,13 @@
 import { Stack } from "expo-router";
 import { ScrollView } from "react-native";
 
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { useSearchScreen } from "@/features/search/hooks/use-search-screen";
 import { RecentSearches } from "@/features/search/components/recent-searches";
 import { SearchHint } from "@/features/search/components/search-hint";
 
 export default function SearchScreen() {
+  const colors = useThemeColors();
   const { query, setQuery, recentWords, submitSearch } = useSearchScreen();
 
   return (

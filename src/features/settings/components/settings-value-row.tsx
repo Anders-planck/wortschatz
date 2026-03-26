@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import { fonts } from "@/features/shared/theme/typography";
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 
 interface SettingsValueRowProps {
   label: string;
@@ -8,6 +8,7 @@ interface SettingsValueRowProps {
 }
 
 export function SettingsValueRow({ label, value }: SettingsValueRowProps) {
+  const colors = useThemeColors();
   return (
     <View
       style={{

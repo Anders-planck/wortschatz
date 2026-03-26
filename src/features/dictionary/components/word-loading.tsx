@@ -1,13 +1,14 @@
 import { View, Text, ActivityIndicator } from "react-native";
 
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface WordLoadingProps {
   term: string;
 }
 
 export function WordLoading({ term }: WordLoadingProps) {
+  const { colors, textStyles } = useAppTheme();
+
   return (
     <View
       style={{

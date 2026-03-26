@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { fonts } from "@/features/shared/theme/typography";
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { hapticLight } from "@/features/shared/hooks/use-haptics";
 import { TTS_VOICES } from "../types";
 
@@ -18,6 +18,7 @@ export function SettingsVoiceRow({
   onValueChange,
   onPreview,
 }: SettingsVoiceRowProps) {
+  const colors = useThemeColors();
   const handleSelect = (voiceId: string) => {
     hapticLight();
     onValueChange(voiceId);

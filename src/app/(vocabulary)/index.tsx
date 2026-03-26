@@ -1,13 +1,14 @@
 import { Stack } from "expo-router";
 import { FlatList } from "react-native";
 
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { useVocabulary } from "@/features/vocabulary/hooks/use-vocabulary";
 import { FilterChips } from "@/features/vocabulary/components/filter-chips";
 import { VocabularyItem } from "@/features/vocabulary/components/vocabulary-item";
 import { VocabularyEmpty } from "@/features/vocabulary/components/vocabulary-empty";
 
 export default function VocabularyScreen() {
+  const colors = useThemeColors();
   const { words, filter, setFilter, isRefreshing, refresh } = useVocabulary();
 
   return (

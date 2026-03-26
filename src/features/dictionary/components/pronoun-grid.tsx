@@ -1,8 +1,7 @@
 import React from "react";
 import type { ReactNode } from "react";
 import { View, Text } from "react-native";
-import { textStyles } from "@/features/shared/theme/typography";
-import { colors } from "@/features/shared/theme/colors";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
 
 interface PronounData {
@@ -43,6 +42,8 @@ function PronounColumn({
   renderForm: (pronoun: string, form: string) => ReactNode;
   highlightedIndex?: number | null;
 }) {
+  const { colors, textStyles } = useAppTheme();
+
   return (
     <View style={{ flex: 1, gap: 6 }}>
       {pronouns.map(({ key, label, index }) => {
