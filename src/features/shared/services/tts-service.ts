@@ -79,11 +79,12 @@ async function fetchAndCacheAudio(
 export async function getAudio(
   text: string,
   speakingRate = 1.0,
+  voiceOverride?: string,
 ): Promise<string | null> {
   if (!GOOGLE_API_KEY) return null;
 
   try {
-    const voice = await getTtsVoice();
+    const voice = voiceOverride ?? (await getTtsVoice());
 
     const filePath = getAudioFilePath(text, voice);
     if (await fileExists(filePath)) {

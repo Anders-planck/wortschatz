@@ -18,6 +18,7 @@ export function useSpeech(options?: UseSpeechOptions) {
   const sequenceRef = useRef<{ cancelled: boolean }>({ cancelled: false });
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listenerRef = useRef<{ remove: () => void } | null>(null);
+  const isSpeakingRef = useRef(false);
 
   const player = useAudioPlayer(null);
 
@@ -47,13 +48,22 @@ export function useSpeech(options?: UseSpeechOptions) {
         if (listenerRef.current) listenerRef.current.remove();
 
         player.replace({ uri: path });
-        setIsSpeaking(true);
 
         return new Promise<void>((resolve) => {
           const subscription = player.addListener(
             "playbackStatusUpdate",
             (status) => {
+              if (
+                status.isLoaded &&
+                !status.playing &&
+                !isSpeakingRef.current
+              ) {
+                isSpeakingRef.current = true;
+                setIsSpeaking(true);
+                player.play();
+              }
               if (status.didJustFinish) {
+                isSpeakingRef.current = false;
                 setIsSpeaking(false);
                 subscription.remove();
                 listenerRef.current = null;
@@ -62,7 +72,6 @@ export function useSpeech(options?: UseSpeechOptions) {
             },
           );
           listenerRef.current = subscription;
-          player.play();
         });
       }
 
