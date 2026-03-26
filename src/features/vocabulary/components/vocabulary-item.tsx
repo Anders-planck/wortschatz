@@ -2,6 +2,8 @@ import React from "react";
 import { Pressable, Share, Text, View } from "react-native";
 import { Link } from "expo-router";
 import * as Speech from "expo-speech";
+import { createAudioPlayer } from "expo-audio";
+import { getAudio } from "@/features/shared/services/tts-service";
 
 import { getSpeechRate } from "@/features/settings/services/settings-repository";
 import Animated, { FadeInUp, FadeOutLeft } from "react-native-reanimated";
@@ -78,7 +80,13 @@ export const VocabularyItem = React.memo(function VocabularyItem({
             icon="speaker.wave.2"
             onPress={async () => {
               const rate = await getSpeechRate();
-              Speech.speak(word.term, { language: "de-DE", rate });
+              const path = await getAudio(word.term, rate);
+              if (path) {
+                const player = createAudioPlayer({ uri: path });
+                player.play();
+              } else {
+                Speech.speak(word.term, { language: "de-DE", rate });
+              }
             }}
           />
           <Link.MenuAction
