@@ -1,13 +1,14 @@
 import { Text, View } from "react-native";
 
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface VocabularyEmptyProps {
   isLoading: boolean;
 }
 
 export function VocabularyEmpty({ isLoading }: VocabularyEmptyProps) {
+  const { colors, textStyles } = useAppTheme();
+
   if (isLoading) return null;
 
   return (

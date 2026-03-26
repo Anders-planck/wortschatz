@@ -1,11 +1,15 @@
 import React from "react";
 import { Pressable, Share, Text, View } from "react-native";
 import { Link } from "expo-router";
+import * as Speech from "expo-speech";
+import { createAudioPlayer } from "expo-audio";
+import { getAudio } from "@/features/shared/services/tts-service";
+
+import { getSpeechRate } from "@/features/settings/services/settings-repository";
 import Animated, { FadeInUp, FadeOutLeft } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { getWordTypeColor } from "@/features/shared/utils/word-colors";
 import { deleteWord } from "@/features/shared/db/words-repository";
 import { formatWordForSharing } from "@/features/shared/utils/format-word";
@@ -21,6 +25,8 @@ export const VocabularyItem = React.memo(function VocabularyItem({
   index,
   onDeleted,
 }: VocabularyItemProps) {
+  const { colors, textStyles } = useAppTheme();
+
   return (
     <Animated.View
       entering={FadeInUp.delay(index * 30).duration(300)}
@@ -43,7 +49,7 @@ export const VocabularyItem = React.memo(function VocabularyItem({
                 width: 4,
                 height: 28,
                 borderRadius: 2,
-                backgroundColor: getWordTypeColor(word),
+                backgroundColor: getWordTypeColor(word, colors),
               }}
             />
 
@@ -70,6 +76,20 @@ export const VocabularyItem = React.memo(function VocabularyItem({
         <Link.Preview />
 
         <Link.Menu>
+          <Link.MenuAction
+            title="Pronuncia"
+            icon="speaker.wave.2"
+            onPress={async () => {
+              const rate = await getSpeechRate();
+              const path = await getAudio(word.term, rate);
+              if (path) {
+                const player = createAudioPlayer({ uri: path });
+                player.play();
+              } else {
+                Speech.speak(word.term, { language: "de-DE", rate });
+              }
+            }}
+          />
           <Link.MenuAction
             title="Share"
             icon="square.and.arrow.up"

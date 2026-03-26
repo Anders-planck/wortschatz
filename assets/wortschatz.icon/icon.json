@@ -9,7 +9,7 @@
           "image-name": "wortschatz-symbol.svg",
           "name": "wortschatz-symbol",
           "position": {
-            "scale": 0.85,
+            "scale": 1.1,
             "translation-in-points": [0, -5]
           }
         }

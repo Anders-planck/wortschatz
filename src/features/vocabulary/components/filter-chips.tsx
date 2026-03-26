@@ -1,8 +1,4 @@
-import { Pressable, Text, View } from "react-native";
-
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
-import { hapticLight } from "@/features/shared/hooks/use-haptics";
+import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import type { WordFilter } from "@/features/dictionary/types";
 
 interface FilterChipsProps {
@@ -11,7 +7,7 @@ interface FilterChipsProps {
   totalCount: number;
 }
 
-const CHIPS: { label: string; value: WordFilter }[] = [
+const FILTERS: { label: string; value: WordFilter }[] = [
   { label: "All", value: undefined },
   { label: "Nouns", value: "noun" },
   { label: "Verbs", value: "verb" },
@@ -23,51 +19,19 @@ export function FilterChips({
   setFilter,
   totalCount,
 }: FilterChipsProps) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        gap: 6,
-        flexWrap: "wrap",
-        paddingBottom: 12,
-      }}
-    >
-      {CHIPS.map((chip) => {
-        const isActive = chip.value === filter;
-        const label =
-          chip.value === undefined ? `All (${totalCount})` : chip.label;
+  const labels = FILTERS.map((f) =>
+    f.value === undefined ? `All (${totalCount})` : f.label,
+  );
+  const selectedIndex = FILTERS.findIndex((f) => f.value === filter);
 
-        return (
-          <Pressable
-            key={chip.label}
-            onPress={() => {
-              hapticLight();
-              setFilter(chip.value);
-            }}
-            style={{
-              backgroundColor: isActive
-                ? colors.textPrimary
-                : colors.chipInactive,
-              borderRadius: 4,
-              borderCurve: "continuous",
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-            }}
-          >
-            <Text
-              style={[
-                textStyles.mono,
-                {
-                  fontSize: 10,
-                  color: isActive ? colors.card : colors.textTertiary,
-                },
-              ]}
-            >
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
+  return (
+    <SegmentedControl
+      values={labels}
+      selectedIndex={selectedIndex === -1 ? 0 : selectedIndex}
+      onChange={({ nativeEvent }) =>
+        setFilter(FILTERS[nativeEvent.selectedSegmentIndex].value)
+      }
+      style={{ marginBottom: 8 }}
+    />
   );
 }

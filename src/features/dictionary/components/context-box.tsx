@@ -1,12 +1,13 @@
 import { View, Text } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface ContextBoxProps {
   text: string;
 }
 
 export function ContextBox({ text }: ContextBoxProps) {
+  const { colors, textStyles } = useAppTheme();
+
   return (
     <View
       style={{

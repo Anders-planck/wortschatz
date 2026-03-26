@@ -50,7 +50,7 @@ Requirements:
 - "examples": 2-3 real-world example sentences in practical everyday German (B1 level). Each sentence must have an Italian translation. For each sentence, provide word-by-word breakdown: every word with its Italian meaning (for clickable word exploration).
 - "usageContext": Brief explanation in Italian of when and how to use the German word, common mistakes, similar words.
 - "category": Semantic category (e.g., "Alltag", "Arbeit", "Reisen", "Essen", "Gefuhle", "Wohnung", etc.)
-- "conjugation": For verbs ONLY, provide full conjugation data. Include:
+- "conjugation": For verbs, provide full conjugation data. Include:
   - isIrregular: true if this is a strong/irregular verb
   - hilfsverb: "haben" or "sein" (auxiliary for Perfekt)
   - partizipII: past participle (e.g. "gegessen" for essen)
@@ -58,7 +58,12 @@ Requirements:
   - present: all 6 persons in Prasens
   - pastSimple: all 6 persons in Prateritum
   - konjunktivII: all 6 persons in Konjunktiv II
-  For non-verbs, return null.
+  For nouns, provide full declension data with article + noun for all 4 cases:
+  - nominativ: { singular: "der Tisch", plural: "die Tische" }
+  - akkusativ: { singular: "den Tisch", plural: "die Tische" }
+  - dativ: { singular: "dem Tisch", plural: "den Tischen" }
+  - genitiv: { singular: "des Tisches", plural: "der Tische" }
+  For other types, return null.
 
 Keep sentences natural and useful for daily life in Germany/Austria/Switzerland.`;
 }

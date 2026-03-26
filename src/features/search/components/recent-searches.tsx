@@ -3,17 +3,19 @@ import { Link } from "expo-router";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { Divider } from "@/features/shared/components/divider";
 import { SectionTitle } from "@/features/shared/components/section-title";
-import { GENDER_COLORS } from "@/features/shared/utils/word-colors";
+import { getGenderColors } from "@/features/shared/utils/word-colors";
 
 interface RecentSearchesProps {
   words: Word[];
 }
 
 export function RecentSearches({ words }: RecentSearchesProps) {
+  const { colors, textStyles } = useAppTheme();
+  const GENDER_COLORS = getGenderColors(colors);
+
   if (words.length === 0) {
     return (
       <View style={{ paddingTop: 8 }}>

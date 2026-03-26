@@ -262,3 +262,23 @@ export async function getStreak(): Promise<number> {
 
   return streak;
 }
+
+export async function updateAudioUrl(
+  term: string,
+  audioUrl: string,
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    "UPDATE words SET audio_url = ? WHERE term = ? COLLATE NOCASE",
+    [audioUrl, term],
+  );
+}
+
+export async function getAudioUrl(term: string): Promise<string | null> {
+  const db = await getDatabase();
+  const row = await db.getFirstAsync<{ audio_url: string | null }>(
+    "SELECT audio_url FROM words WHERE term = ? COLLATE NOCASE",
+    [term],
+  );
+  return row?.audio_url ?? null;
+}

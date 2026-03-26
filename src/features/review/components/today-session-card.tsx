@@ -1,6 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface TodaySessionCardProps {
   wordCount: number;
@@ -11,6 +10,7 @@ export function TodaySessionCard({
   wordCount,
   onStart,
 }: TodaySessionCardProps) {
+  const { colors, textStyles } = useAppTheme();
   const dots = Array.from({ length: Math.max(wordCount, 0) }, (_, i) => i);
 
   return (
