@@ -1,0 +1,31 @@
+{
+  "fill": {
+    "automatic-gradient": "extended-srgb:0.76863,0.66275,0.41569,1.00000"
+  },
+  "groups": [
+    {
+      "layers": [
+        {
+          "image-name": "wortschatz-symbol.svg",
+          "name": "wortschatz-symbol",
+          "position": {
+            "scale": 1,
+            "translation-in-points": [0, 0]
+          }
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.3
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.4
+      }
+    }
+  ],
+  "supported-platforms": {
+    "circles": ["watchOS"],
+    "squares": "shared"
+  }
+}
