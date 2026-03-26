@@ -10,6 +10,7 @@ import { VerbSections } from "./verb-sections";
 import { PrepositionSections } from "./preposition-sections";
 import { ExampleSentence } from "./example-sentence";
 import { ContextBox } from "./context-box";
+import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import type { Word } from "@/features/dictionary/types";
 
 interface WordCardProps {
@@ -35,9 +36,18 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
     >
       {isNoun && word.gender && <GenderStrip gender={word.gender} />}
 
-      <Text selectable style={textStyles.word}>
-        {word.term}
-      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text selectable style={[textStyles.word, { flex: 1 }]}>
+          {word.term}
+        </Text>
+        <SpeakerButton text={word.term} size="md" />
+      </View>
 
       <Text style={[textStyles.mono, { marginTop: 4 }]}>
         {word.type}
