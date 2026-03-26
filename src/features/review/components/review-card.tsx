@@ -1,8 +1,12 @@
+import { useEffect, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
+import { getSetting } from "@/features/settings/services/settings-repository";
+import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import { Divider } from "@/features/shared/components/divider";
+import { useSpeech } from "@/features/shared/hooks/use-speech";
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
 import { GENDER_COLORS } from "@/features/shared/utils/word-colors";
@@ -14,6 +18,24 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
+  const { speak } = useSpeech();
+  const hasAutoPlayed = useRef(false);
+
+  useEffect(() => {
+    if (isRevealed && !hasAutoPlayed.current) {
+      hasAutoPlayed.current = true;
+      getSetting("autoPlayOnReveal").then((raw) => {
+        const enabled = raw ? JSON.parse(raw) === true : false;
+        if (enabled) {
+          speak(word.term);
+        }
+      });
+    }
+    if (!isRevealed) {
+      hasAutoPlayed.current = false;
+    }
+  }, [isRevealed, speak, word.term]);
+
   if (!isRevealed) {
     return (
       <Animated.View
@@ -39,15 +61,18 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
           />
         )}
 
-        <Text
-          selectable
-          style={[
-            textStyles.word,
-            { fontSize: 42, letterSpacing: -1.5, textAlign: "center" },
-          ]}
-        >
-          {word.term}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <Text
+            selectable
+            style={[
+              textStyles.word,
+              { fontSize: 42, letterSpacing: -1.5, textAlign: "center" },
+            ]}
+          >
+            {word.term}
+          </Text>
+          <SpeakerButton text={word.term} size="md" />
+        </View>
 
         {word.type === "noun" && (
           <Text style={textStyles.mono}>
@@ -105,9 +130,12 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
         />
       )}
 
-      <Text selectable style={[textStyles.word, { textAlign: "center" }]}>
-        {word.term}
-      </Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <Text selectable style={[textStyles.word, { textAlign: "center" }]}>
+          {word.term}
+        </Text>
+        <SpeakerButton text={word.term} size="md" />
+      </View>
 
       {word.type === "noun" && (
         <Text style={textStyles.mono}>
