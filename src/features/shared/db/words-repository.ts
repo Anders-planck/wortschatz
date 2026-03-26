@@ -237,7 +237,7 @@ export async function getWeeklyActivity(): Promise<number[]> {
 export async function getStreak(): Promise<number> {
   const db = await getDatabase();
   const rows = await db.getAllAsync<{ day: string }>(
-    `SELECT DISTINCT DATE(searched_at) as day
+    `SELECT DISTINCT DATE(searched_at, 'localtime') as day
      FROM words
      ORDER BY day DESC`,
   );

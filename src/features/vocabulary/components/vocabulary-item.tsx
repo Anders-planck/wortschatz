@@ -1,3 +1,4 @@
+import React from "react";
 import { Share, Text, View } from "react-native";
 import { Link } from "expo-router";
 import * as Clipboard from "expo-clipboard";
@@ -17,7 +18,7 @@ interface VocabularyItemProps {
   onDeleted?: () => void;
 }
 
-export function VocabularyItem({
+export const VocabularyItem = React.memo(function VocabularyItem({
   word,
   index,
   onDeleted,
@@ -71,7 +72,6 @@ export function VocabularyItem({
         <Link.Preview />
 
         <Link.Menu>
-          <Link.MenuAction title="Open" icon="book.fill" onPress={() => {}} />
           <Link.MenuAction
             title="Share"
             icon="square.and.arrow.up"
@@ -100,4 +100,4 @@ export function VocabularyItem({
       </Link>
     </Animated.View>
   );
-}
+});
