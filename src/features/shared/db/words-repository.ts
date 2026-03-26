@@ -190,16 +190,22 @@ export async function getRecentWords(limit = 10): Promise<Word[]> {
   return rows.map(rowToWord);
 }
 
+function toLocalDateStr(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export async function getWeeklyActivity(): Promise<number[]> {
   const db = await getDatabase();
 
-  // Find Monday of current week (local time)
   const now = new Date();
   const dayOfWeek = (now.getDay() + 6) % 7; // Monday=0, Sunday=6
   const monday = new Date(now);
   monday.setDate(now.getDate() - dayOfWeek);
   monday.setHours(0, 0, 0, 0);
-  const mondayStr = monday.toISOString().split("T")[0];
+  const mondayStr = toLocalDateStr(monday);
 
   const rows = await db.getAllAsync<{ day: string; count: number }>(
     `SELECT DATE(searched_at, 'localtime') as day, COUNT(*) as count
@@ -215,8 +221,7 @@ export async function getWeeklyActivity(): Promise<number[]> {
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    const key = d.toISOString().split("T")[0];
-    result.push(countByDay.get(key) ?? 0);
+    result.push(countByDay.get(toLocalDateStr(d)) ?? 0);
   }
 
   return result; // [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
@@ -239,7 +244,7 @@ export async function getStreak(): Promise<number> {
   for (let i = 0; i < rows.length; i++) {
     const expected = new Date(today);
     expected.setDate(expected.getDate() - i);
-    const expectedStr = expected.toISOString().split("T")[0];
+    const expectedStr = toLocalDateStr(expected);
 
     if (rows[i].day === expectedStr) {
       streak++;
