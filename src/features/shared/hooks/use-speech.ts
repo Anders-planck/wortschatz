@@ -23,7 +23,9 @@ export function useSpeech(options?: UseSpeechOptions) {
 
   useEffect(() => {
     return () => {
-      player.pause();
+      try {
+        player.pause();
+      } catch {}
       Speech.stop();
       sequenceRef.current.cancelled = true;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -93,7 +95,9 @@ export function useSpeech(options?: UseSpeechOptions) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setCurrentSpeakingIndex(null);
 
-      player.pause();
+      try {
+        player.pause();
+      } catch {}
       Speech.stop();
 
       hapticLight();
@@ -143,7 +147,9 @@ export function useSpeech(options?: UseSpeechOptions) {
       listenerRef.current.remove();
       listenerRef.current = null;
     }
-    player.pause();
+    try {
+      player.pause();
+    } catch {}
     Speech.stop();
     setIsSpeaking(false);
     setCurrentSpeakingIndex(null);
