@@ -1,6 +1,6 @@
 import React from "react";
-import { Share, Text, View } from "react-native";
-import { Link } from "expo-router";
+import { Pressable, Share, Text, View } from "react-native";
+import { Link, useRouter } from "expo-router";
 import Animated, { FadeInUp, FadeOutLeft } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
@@ -21,72 +21,84 @@ export const VocabularyItem = React.memo(function VocabularyItem({
   index,
   onDeleted,
 }: VocabularyItemProps) {
+  const router = useRouter();
+
   return (
     <Animated.View
       entering={FadeInUp.delay(index * 30).duration(300)}
       exiting={FadeOutLeft.duration(200)}
     >
       <Link href={`/word/${encodeURIComponent(word.term)}`} asChild>
-        <Link.Trigger>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingVertical: 14,
-              borderBottomWidth: 1,
-              borderBottomColor: colors.borderLight,
-              gap: 12,
-            }}
-          >
+        <Pressable
+          onPress={() => router.push(`/word/${encodeURIComponent(word.term)}`)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingVertical: 14,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.borderLight,
+            gap: 12,
+          }}
+        >
+          <Link.Trigger>
             <View
               style={{
-                width: 4,
-                height: 28,
-                borderRadius: 2,
-                backgroundColor: getWordTypeColor(word),
+                flexDirection: "row",
+                alignItems: "center",
+                flex: 1,
+                gap: 12,
+              }}
+            >
+              <View
+                style={{
+                  width: 4,
+                  height: 28,
+                  borderRadius: 2,
+                  backgroundColor: getWordTypeColor(word),
+                }}
+              />
+
+              <Text
+                style={[
+                  textStyles.heading,
+                  { flex: 1, fontSize: 14, letterSpacing: 0 },
+                ]}
+              >
+                {word.term}
+              </Text>
+
+              <Text
+                style={[
+                  textStyles.bodyLight,
+                  { fontSize: 11, color: colors.textHint },
+                ]}
+              >
+                {word.translations[0] ?? ""}
+              </Text>
+            </View>
+          </Link.Trigger>
+
+          <Link.Preview />
+
+          <Link.Menu>
+            <Link.MenuAction
+              title="Share"
+              icon="square.and.arrow.up"
+              onPress={() => {
+                Share.share({ message: formatWordForSharing(word) });
               }}
             />
-
-            <Text
-              style={[
-                textStyles.heading,
-                { flex: 1, fontSize: 14, letterSpacing: 0 },
-              ]}
-            >
-              {word.term}
-            </Text>
-
-            <Text
-              style={[
-                textStyles.bodyLight,
-                { fontSize: 11, color: colors.textHint },
-              ]}
-            >
-              {word.translations[0] ?? ""}
-            </Text>
-          </View>
-        </Link.Trigger>
-
-        <Link.Preview />
-
-        <Link.Menu>
-          <Link.MenuAction
-            title="Share"
-            icon="square.and.arrow.up"
-            onPress={() => {
-              Share.share({ message: formatWordForSharing(word) });
-            }}
-          />
-          <Link.MenuAction
-            title="Delete"
-            icon="trash"
-            destructive
-            onPress={async () => {
-              await deleteWord(word.term);
-              onDeleted?.();
-            }}
-          />
-        </Link.Menu>
+            <Link.MenuAction
+              title="Delete"
+              icon="trash"
+              destructive
+              onPress={async () => {
+                await deleteWord(word.term);
+                onDeleted?.();
+              }}
+            />
+          </Link.Menu>
+        </Pressable>
       </Link>
     </Animated.View>
   );
