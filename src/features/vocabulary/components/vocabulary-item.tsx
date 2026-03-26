@@ -1,6 +1,9 @@
 import React from "react";
 import { Pressable, Share, Text, View } from "react-native";
 import { Link } from "expo-router";
+import * as Speech from "expo-speech";
+
+import { getSpeechRate } from "@/features/settings/services/settings-repository";
 import Animated, { FadeInUp, FadeOutLeft } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
@@ -70,6 +73,14 @@ export const VocabularyItem = React.memo(function VocabularyItem({
         <Link.Preview />
 
         <Link.Menu>
+          <Link.MenuAction
+            title="Pronuncia"
+            icon="speaker.wave.2"
+            onPress={async () => {
+              const rate = await getSpeechRate();
+              Speech.speak(word.term, { language: "de-DE", rate });
+            }}
+          />
           <Link.MenuAction
             title="Share"
             icon="square.and.arrow.up"
