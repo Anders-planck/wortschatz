@@ -10,8 +10,16 @@ import {
 } from "@/features/shared/config/google";
 import { getTtsVoice } from "@/features/settings/services/settings-repository";
 
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
 function getAudioFileName(term: string, voice: string): string {
-  return `${encodeURIComponent(term)}_${voice}.mp3`;
+  return `${simpleHash(term)}_${voice}.mp3`;
 }
 
 function ensureCacheDir(): Directory {
@@ -80,9 +88,11 @@ export async function getAudio(
     const file = getAudioFile(text, voice);
 
     if (file.exists) {
+      console.log("[TTS] Cache hit:", file.uri);
       return file.uri;
     }
 
+    console.log("[TTS] Cache miss, fetching:", text, voice);
     return fetchAndCacheAudio(text, file, speakingRate, voice);
   } catch (e) {
     console.log("[TTS] Error in getAudio:", e);
