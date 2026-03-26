@@ -7,6 +7,8 @@ export default function SearchLayout() {
         headerTransparent: true,
         headerBackButtonDisplayMode: "minimal",
       }}
-    />
+    >
+      <Stack.Screen name="conjugation/[term]" />
+    </Stack>
   );
 }

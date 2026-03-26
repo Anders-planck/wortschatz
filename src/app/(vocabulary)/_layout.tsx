@@ -7,6 +7,8 @@ export default function VocabularyLayout() {
         headerTransparent: true,
         headerBackButtonDisplayMode: "minimal",
       }}
-    />
+    >
+      <Stack.Screen name="conjugation/[term]" />
+    </Stack>
   );
 }

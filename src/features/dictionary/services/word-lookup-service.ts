@@ -49,7 +49,9 @@ export async function lookupFromAI(term: string): Promise<Word> {
     gender: context.gender,
     plural: context.plural,
     translations: context.translationsIt,
-    forms: null,
+    forms: context.conjugation
+      ? (context.conjugation as unknown as Record<string, unknown>)
+      : null,
     examples: context.examples,
     usageContext: context.usageContext,
     audioUrl: null,
@@ -75,6 +77,9 @@ export async function enrichWithAI(word: Word): Promise<Word> {
     gender: context.gender,
     plural: context.plural,
     translationsIt: context.translationsIt,
+    forms: context.conjugation
+      ? (context.conjugation as unknown as Record<string, unknown>)
+      : undefined,
   });
 
   return {
@@ -85,6 +90,9 @@ export async function enrichWithAI(word: Word): Promise<Word> {
       context.translationsIt.length > 0
         ? context.translationsIt
         : word.translations,
+    forms: context.conjugation
+      ? (context.conjugation as unknown as Record<string, unknown>)
+      : word.forms,
     examples: context.examples,
     usageContext: context.usageContext,
     category: context.category,

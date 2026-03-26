@@ -49,7 +49,16 @@ Requirements:
 - "translationsIt": 2-4 Italian translations of the German word, most common first.
 - "examples": 2-3 real-world example sentences in practical everyday German (B1 level). Each sentence must have an Italian translation. For each sentence, provide word-by-word breakdown: every word with its Italian meaning (for clickable word exploration).
 - "usageContext": Brief explanation in Italian of when and how to use the German word, common mistakes, similar words.
-- "category": Semantic category (e.g., "Alltag", "Arbeit", "Reisen", "Essen", "Gefühle", "Wohnung", etc.)
+- "category": Semantic category (e.g., "Alltag", "Arbeit", "Reisen", "Essen", "Gefuhle", "Wohnung", etc.)
+- "conjugation": For verbs ONLY, provide full conjugation data. Include:
+  - isIrregular: true if this is a strong/irregular verb
+  - hilfsverb: "haben" or "sein" (auxiliary for Perfekt)
+  - partizipII: past participle (e.g. "gegessen" for essen)
+  - prateritum: 3rd person Prateritum (e.g. "ass" for essen)
+  - present: all 6 persons in Prasens
+  - pastSimple: all 6 persons in Prateritum
+  - konjunktivII: all 6 persons in Konjunktiv II
+  For non-verbs, return null.
 
 Keep sentences natural and useful for daily life in Germany/Austria/Switzerland.`;
 }

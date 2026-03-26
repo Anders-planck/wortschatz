@@ -20,6 +20,27 @@ export const ExampleSchema = z.object({
   words: z.array(ClickableWordSchema),
 });
 
+export const ConjugationTenseSchema = z.object({
+  ich: z.string(),
+  du: z.string(),
+  er: z.string(), // er/sie/es
+  wir: z.string(),
+  ihr: z.string(),
+  sie: z.string(), // sie/Sie
+});
+
+export const VerbConjugationSchema = z.object({
+  isIrregular: z
+    .boolean()
+    .describe("true if this is an irregular (strong) verb"),
+  hilfsverb: z.enum(["haben", "sein"]).describe("Auxiliary verb for Perfekt"),
+  partizipII: z.string().describe("Past participle, e.g. 'gegessen'"),
+  prateritum: z.string().describe("Prateritum 3rd person, e.g. 'ass'"),
+  present: ConjugationTenseSchema.describe("Prasens conjugation"),
+  pastSimple: ConjugationTenseSchema.describe("Prateritum conjugation"),
+  konjunktivII: ConjugationTenseSchema.describe("Konjunktiv II conjugation"),
+});
+
 export const WordContextSchema = z.object({
   germanTerm: z
     .string()
@@ -42,6 +63,9 @@ export const WordContextSchema = z.object({
   examples: z.array(ExampleSchema),
   usageContext: z.string(),
   category: z.string(),
+  conjugation: VerbConjugationSchema.nullable().describe(
+    "Full conjugation data for verbs, null for non-verbs",
+  ),
 });
 
 export const WordSchema = z.object({

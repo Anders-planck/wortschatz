@@ -100,11 +100,12 @@ export async function updateWordAIContent(
     gender?: string | null;
     plural?: string | null;
     translationsIt?: string[];
+    forms?: Record<string, unknown>;
   },
 ): Promise<void> {
   const db = await getDatabase();
   await db.runAsync(
-    `UPDATE words SET examples = ?, usage_context = ?, category = ?, gender = COALESCE(?, gender), plural = COALESCE(?, plural), translations = COALESCE(?, translations) WHERE term = ? COLLATE NOCASE`,
+    `UPDATE words SET examples = ?, usage_context = ?, category = ?, gender = COALESCE(?, gender), plural = COALESCE(?, plural), translations = COALESCE(?, translations), forms = COALESCE(?, forms) WHERE term = ? COLLATE NOCASE`,
     [
       JSON.stringify(data.examples),
       data.usageContext,
@@ -112,6 +113,7 @@ export async function updateWordAIContent(
       data.gender ?? null,
       data.plural ?? null,
       data.translationsIt ? JSON.stringify(data.translationsIt) : null,
+      data.forms ? JSON.stringify(data.forms) : null,
       term,
     ],
   );
