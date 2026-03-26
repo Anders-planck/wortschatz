@@ -1,16 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { getRecentWords } from "@/features/shared/db/words-repository";
-import { useDebouncedSearch } from "@/features/search/hooks/use-debounced-search";
 import type { Word } from "@/features/dictionary/types";
 
 export function useSearchScreen() {
   const [query, setQuery] = useState("");
   const [recentWords, setRecentWords] = useState<Word[]>([]);
   const router = useRouter();
-  const debouncedQuery = useDebouncedSearch(query, 400);
   const hasNavigated = useRef(false);
 
   const loadRecent = useCallback(async () => {
@@ -18,7 +16,7 @@ export function useSearchScreen() {
       const words = await getRecentWords(20);
       setRecentWords(words);
     } catch {
-      // Empty list is acceptable — no user-facing error needed
+      // Empty list on error
     }
   }, []);
 
@@ -29,12 +27,15 @@ export function useSearchScreen() {
     }, [loadRecent]),
   );
 
-  useEffect(() => {
-    if (debouncedQuery.length >= 2 && !hasNavigated.current) {
+  const submitSearch = useCallback(
+    (term: string) => {
+      const normalized = term.trim();
+      if (normalized.length < 2 || hasNavigated.current) return;
       hasNavigated.current = true;
-      router.push(`/word/${encodeURIComponent(debouncedQuery)}`);
-    }
-  }, [debouncedQuery, router]);
+      router.push(`/word/${encodeURIComponent(normalized)}`);
+    },
+    [router],
+  );
 
-  return { query, setQuery, recentWords };
+  return { query, setQuery, recentWords, submitSearch };
 }

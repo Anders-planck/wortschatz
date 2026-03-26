@@ -7,7 +7,7 @@ import { RecentSearches } from "@/features/search/components/recent-searches";
 import { SearchHint } from "@/features/search/components/search-hint";
 
 export default function SearchScreen() {
-  const { query, setQuery, recentWords } = useSearchScreen();
+  const { query, setQuery, recentWords, submitSearch } = useSearchScreen();
 
   return (
     <>
@@ -24,6 +24,7 @@ export default function SearchScreen() {
       <Stack.SearchBar
         placeholder="Scrivi una parola..."
         onChangeText={(e) => setQuery(e.nativeEvent.text)}
+        onSearchButtonPress={(e) => submitSearch(e.nativeEvent.text)}
       />
     </>
   );
