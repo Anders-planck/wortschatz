@@ -1,4 +1,4 @@
-import { File, Paths } from "expo-file-system";
+import { File, Directory, Paths } from "expo-file-system";
 import {
   getAudioUrl,
   updateAudioUrl,
@@ -10,33 +10,25 @@ import {
 } from "@/features/shared/config/google";
 import { getTtsVoice } from "@/features/settings/services/settings-repository";
 
-function getTtsCacheDir(): string {
-  return `${Paths.cache}/tts`;
+function getAudioFileName(term: string, voice: string): string {
+  return `${encodeURIComponent(term)}_${voice}.mp3`;
 }
 
-function getAudioFilePath(term: string, voice: string): string {
-  return `${getTtsCacheDir()}/${encodeURIComponent(term)}_${voice}.mp3`;
-}
-
-function ensureCacheDir(): void {
-  const dir = new File(getTtsCacheDir());
+function ensureCacheDir(): Directory {
+  const dir = new Directory(Paths.cache, "tts");
   if (!dir.exists) {
     dir.create();
   }
+  return dir;
 }
 
-async function fileExists(path: string): Promise<boolean> {
-  try {
-    const file = new File(path);
-    return file.exists;
-  } catch {
-    return false;
-  }
+function getAudioFile(term: string, voice: string): File {
+  return new File(Paths.cache, "tts", getAudioFileName(term, voice));
 }
 
 async function fetchAndCacheAudio(
   text: string,
-  filePath: string,
+  file: File,
   speakingRate: number,
   voice: string,
 ): Promise<string | null> {
@@ -64,14 +56,14 @@ async function fetchAndCacheAudio(
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    const file = new File(filePath);
     file.create({ overwrite: true });
     file.write(bytes);
 
-    updateAudioUrl(text, filePath).catch(() => {});
+    updateAudioUrl(text, file.uri).catch(() => {});
 
-    return filePath;
-  } catch {
+    return file.uri;
+  } catch (e) {
+    console.log("[TTS] fetchAndCacheAudio error:", e);
     return null;
   }
 }
@@ -85,14 +77,15 @@ export async function getAudio(
 
   try {
     const voice = voiceOverride ?? (await getTtsVoice());
+    const file = getAudioFile(text, voice);
 
-    const filePath = getAudioFilePath(text, voice);
-    if (await fileExists(filePath)) {
-      return filePath;
+    if (file.exists) {
+      return file.uri;
     }
 
-    return fetchAndCacheAudio(text, filePath, speakingRate, voice);
-  } catch {
+    return fetchAndCacheAudio(text, file, speakingRate, voice);
+  } catch (e) {
+    console.log("[TTS] Error in getAudio:", e);
     return null;
   }
 }
