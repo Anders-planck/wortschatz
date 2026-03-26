@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAudioPlayer } from "expo-audio";
+import { createAudioPlayer, type AudioPlayer } from "expo-audio";
 import * as Speech from "expo-speech";
 import { getSpeechRate } from "@/features/settings/services/settings-repository";
 import { getAudio } from "@/features/shared/services/tts-service";
@@ -17,22 +17,31 @@ export function useSpeech(options?: UseSpeechOptions) {
 
   const sequenceRef = useRef<{ cancelled: boolean }>({ cancelled: false });
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const playerRef = useRef<AudioPlayer | null>(null);
   const listenerRef = useRef<{ remove: () => void } | null>(null);
-  const isSpeakingRef = useRef(false);
 
-  const player = useAudioPlayer(null);
+  const cleanup = useCallback(() => {
+    if (listenerRef.current) {
+      listenerRef.current.remove();
+      listenerRef.current = null;
+    }
+    if (playerRef.current) {
+      try {
+        playerRef.current.pause();
+        playerRef.current.remove();
+      } catch {}
+      playerRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
-      try {
-        player.pause();
-      } catch {}
+      cleanup();
       Speech.stop();
       sequenceRef.current.cancelled = true;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (listenerRef.current) listenerRef.current.remove();
     };
-  }, [player]);
+  }, [cleanup]);
 
   const getRate = useCallback(async () => {
     if (options?.speechRate !== undefined) return options.speechRate;
@@ -45,33 +54,30 @@ export function useSpeech(options?: UseSpeechOptions) {
       const path = await getAudio(text, rate);
 
       if (path) {
-        if (listenerRef.current) listenerRef.current.remove();
+        cleanup();
 
-        player.replace({ uri: path });
+        const newPlayer = createAudioPlayer({ uri: path });
+        playerRef.current = newPlayer;
 
         return new Promise<void>((resolve) => {
-          const subscription = player.addListener(
+          const subscription = newPlayer.addListener(
             "playbackStatusUpdate",
             (status) => {
-              if (
-                status.isLoaded &&
-                !status.playing &&
-                !isSpeakingRef.current
-              ) {
-                isSpeakingRef.current = true;
-                setIsSpeaking(true);
-                player.play();
-              }
               if (status.didJustFinish) {
-                isSpeakingRef.current = false;
                 setIsSpeaking(false);
                 subscription.remove();
                 listenerRef.current = null;
+                try {
+                  newPlayer.remove();
+                } catch {}
+                if (playerRef.current === newPlayer) playerRef.current = null;
                 resolve();
               }
             },
           );
           listenerRef.current = subscription;
+          setIsSpeaking(true);
+          newPlayer.play();
         });
       }
 
@@ -95,7 +101,7 @@ export function useSpeech(options?: UseSpeechOptions) {
         });
       });
     },
-    [player, getRate],
+    [getRate, cleanup],
   );
 
   const speak = useCallback(
@@ -104,15 +110,13 @@ export function useSpeech(options?: UseSpeechOptions) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setCurrentSpeakingIndex(null);
 
-      try {
-        player.pause();
-      } catch {}
+      cleanup();
       Speech.stop();
 
       hapticLight();
       await playAudio(text);
     },
-    [player, playAudio],
+    [playAudio, cleanup],
   );
 
   const speakAll = useCallback(
@@ -121,7 +125,7 @@ export function useSpeech(options?: UseSpeechOptions) {
 
       sequenceRef.current.cancelled = true;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      player.pause();
+      cleanup();
       Speech.stop();
 
       const sequence = { cancelled: false };
@@ -146,23 +150,17 @@ export function useSpeech(options?: UseSpeechOptions) {
         setCurrentSpeakingIndex(null);
       }
     },
-    [player, playAudio],
+    [playAudio, cleanup],
   );
 
   const stop = useCallback(() => {
     sequenceRef.current.cancelled = true;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    if (listenerRef.current) {
-      listenerRef.current.remove();
-      listenerRef.current = null;
-    }
-    try {
-      player.pause();
-    } catch {}
+    cleanup();
     Speech.stop();
     setIsSpeaking(false);
     setCurrentSpeakingIndex(null);
-  }, [player]);
+  }, [cleanup]);
 
   return {
     speak,
