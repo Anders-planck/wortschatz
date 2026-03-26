@@ -21,6 +21,11 @@ export const ExampleSchema = z.object({
 });
 
 export const WordContextSchema = z.object({
+  germanTerm: z
+    .string()
+    .describe(
+      "The German word. If the user searched in Italian, this is the German equivalent (e.g. 'essen' for 'mangiare'). If already German, same as input.",
+    ),
   wordType: WordTypeSchema.describe(
     "Part of speech: noun, verb, preposition, adjective, or adverb",
   ),

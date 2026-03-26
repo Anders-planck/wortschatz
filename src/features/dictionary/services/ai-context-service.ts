@@ -32,17 +32,23 @@ function buildPrompt(word: Partial<Word>): string {
 
   return `You are a German language tutor for an Italian-speaking B1 student.
 
-Generate contextual learning data for the German word: "${term}" (${type})
+The user searched for: "${term}"
 
+IMPORTANT: The user may search in German OR Italian. If "${term}" is an Italian word (not German), identify the correct German equivalent and generate data for THAT German word. For example, if the user searches "mangiare", generate data for "essen". If the user searches "casa", generate data for "Haus". Always return the GERMAN word in your response.
+
+If "${term}" is already a German word, use it directly.
+
+${type !== "noun" ? `Likely type: ${type}.` : ""}
 ${typeSpecificInstruction}
 
 Requirements:
+- All data must be about the GERMAN word (not the Italian input).
 - "wordType": The part of speech (noun, verb, preposition, adjective, adverb). Determine it accurately.
 - "gender": For nouns, provide the correct article (der/die/das). For non-nouns, return null.
 - "plural": For nouns, provide the plural form (e.g. "Tische" for Tisch). For non-nouns, return null.
-- "translationsIt": 2-4 Italian translations of the word, most common first.
+- "translationsIt": 2-4 Italian translations of the German word, most common first.
 - "examples": 2-3 real-world example sentences in practical everyday German (B1 level). Each sentence must have an Italian translation. For each sentence, provide word-by-word breakdown: every word with its Italian meaning (for clickable word exploration).
-- "usageContext": Brief explanation in Italian of when and how to use this word, common mistakes, similar words.
+- "usageContext": Brief explanation in Italian of when and how to use the German word, common mistakes, similar words.
 - "category": Semantic category (e.g., "Alltag", "Arbeit", "Reisen", "Essen", "Gefühle", "Wohnung", etc.)
 
 Keep sentences natural and useful for daily life in Germany/Austria/Switzerland.`;

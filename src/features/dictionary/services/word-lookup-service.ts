@@ -40,10 +40,11 @@ export async function lookupFromWiktionary(term: string): Promise<Word | null> {
 
 export async function lookupFromAI(term: string): Promise<Word> {
   const context = await generateWordContext({ term });
+  const germanTerm = context.germanTerm || term;
 
   const now = new Date().toISOString();
   const word: Omit<Word, "id"> = {
-    term,
+    term: germanTerm,
     type: context.wordType,
     gender: context.gender,
     plural: context.plural,
