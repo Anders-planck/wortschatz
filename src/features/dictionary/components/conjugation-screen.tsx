@@ -4,6 +4,8 @@ import { Stack } from "expo-router";
 import { colors } from "@/features/shared/theme/colors";
 import { textStyles } from "@/features/shared/theme/typography";
 import { SectionTitle } from "@/features/shared/components/section-title";
+import { SpeakerButton } from "@/features/shared/components/speaker-button";
+import { useSpeech } from "@/features/shared/hooks/use-speech";
 import { getWordByTerm } from "@/features/shared/db/words-repository";
 import type { Word, VerbConjugation } from "@/features/dictionary/types";
 import { isVerbConjugation } from "@/features/dictionary/types";
@@ -35,7 +37,28 @@ function TenseTable({
   isIrregular: boolean;
   highlightEnding: boolean;
 }) {
+  const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
   const referenceForm = data.wir;
+
+  const forms = useMemo(
+    () => [
+      `ich ${data.ich}`,
+      `du ${data.du}`,
+      `er ${data.er}`,
+      `wir ${data.wir}`,
+      `ihr ${data.ihr}`,
+      `sie ${data.sie}`,
+    ],
+    [data],
+  );
+
+  const handleSpeakAll = useCallback(() => {
+    if (isSpeaking) {
+      stop();
+    } else {
+      speakAll(forms);
+    }
+  }, [isSpeaking, stop, speakAll, forms]);
 
   const renderForm = useCallback(
     (pronoun: string, form: string) => (
@@ -52,7 +75,10 @@ function TenseTable({
 
   return (
     <View style={{ gap: 8 }}>
-      <SectionTitle>{title}</SectionTitle>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <SectionTitle>{title}</SectionTitle>
+        <SpeakerButton onSpeakAll={handleSpeakAll} size="md" />
+      </View>
       <View
         style={{
           backgroundColor: colors.card,
@@ -62,7 +88,11 @@ function TenseTable({
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
         }}
       >
-        <PronounGrid data={data} renderForm={renderForm} />
+        <PronounGrid
+          data={data}
+          renderForm={renderForm}
+          highlightedIndex={currentSpeakingIndex}
+        />
       </View>
     </View>
   );
@@ -108,6 +138,28 @@ function PerfektTable({
   data: ConjugationTenseData;
   partizipII: string;
 }) {
+  const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
+
+  const forms = useMemo(
+    () => [
+      `ich ${data.ich}`,
+      `du ${data.du}`,
+      `er ${data.er}`,
+      `wir ${data.wir}`,
+      `ihr ${data.ihr}`,
+      `sie ${data.sie}`,
+    ],
+    [data],
+  );
+
+  const handleSpeakAll = useCallback(() => {
+    if (isSpeaking) {
+      stop();
+    } else {
+      speakAll(forms);
+    }
+  }, [isSpeaking, stop, speakAll, forms]);
+
   const renderForm = useCallback(
     (_pronoun: string, form: string) => (
       <PerfektForm form={form} partizipII={partizipII} />
@@ -117,7 +169,10 @@ function PerfektTable({
 
   return (
     <View style={{ gap: 8 }}>
-      <SectionTitle>Perfekt</SectionTitle>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <SectionTitle>Perfekt</SectionTitle>
+        <SpeakerButton onSpeakAll={handleSpeakAll} size="md" />
+      </View>
       <View
         style={{
           backgroundColor: colors.card,
@@ -127,7 +182,11 @@ function PerfektTable({
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
         }}
       >
-        <PronounGrid data={data} renderForm={renderForm} />
+        <PronounGrid
+          data={data}
+          renderForm={renderForm}
+          highlightedIndex={currentSpeakingIndex}
+        />
       </View>
     </View>
   );
