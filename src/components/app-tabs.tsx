@@ -2,9 +2,9 @@ import { NativeTabs } from "expo-router/unstable-native-tabs";
 
 export default function AppTabs() {
   return (
-    <NativeTabs 
-    disableTransparentOnScrollEdge={true}
-    minimizeBehavior="onScrollDown"
+    <NativeTabs
+      disableTransparentOnScrollEdge={true}
+      minimizeBehavior="onScrollDown"
     >
       <NativeTabs.Trigger name="(search)">
         <NativeTabs.Trigger.Icon
@@ -28,6 +28,13 @@ export default function AppTabs() {
           }}
         />
         <NativeTabs.Trigger.Label>Ripasso</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="(settings)">
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "gearshape", selected: "gearshape.fill" }}
+        />
+        <NativeTabs.Trigger.Label>Impostazioni</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
