@@ -43,12 +43,19 @@ function PronounColumn({
       {pronouns.map(({ key, label }) => (
         <View
           key={key}
-          style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
+          style={{ flexDirection: "row", gap: 6, alignItems: "baseline" }}
         >
-          <Text style={[textStyles.monoLabel, { width: 52, marginBottom: 0 }]}>
+          <Text
+            style={[
+              textStyles.monoLabel,
+              { width: 42, marginBottom: 0, flexShrink: 0 },
+            ]}
+          >
             {label}
           </Text>
-          {renderForm(key, data[key] ?? "\u2014")}
+          <View style={{ flex: 1, flexShrink: 1 }}>
+            {renderForm(key, data[key] ?? "\u2014")}
+          </View>
         </View>
       ))}
     </View>
