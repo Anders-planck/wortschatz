@@ -103,13 +103,14 @@ function buildPerfektData(
 
 export function ConjugationScreen({ term }: ConjugationScreenProps) {
   const [word, setWord] = useState<Word | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (term) {
-      getWordByTerm(term).then((w) => {
-        if (w) setWord(w);
-      });
-    }
+    if (!term) return;
+    setIsLoading(true);
+    getWordByTerm(term)
+      .then((w) => setWord(w))
+      .finally(() => setIsLoading(false));
   }, [term]);
 
   const conjugation = useMemo<VerbConjugation | null>(
@@ -228,9 +229,15 @@ export function ConjugationScreen({ term }: ConjugationScreenProps) {
           </View>
         )}
 
-        {!word && (
+        {isLoading && (
           <View style={{ padding: 20, alignItems: "center" }}>
-            <Text style={textStyles.body}>Loading...</Text>
+            <Text style={textStyles.mono}>Loading...</Text>
+          </View>
+        )}
+
+        {!isLoading && !word && (
+          <View style={{ padding: 20, alignItems: "center" }}>
+            <Text style={textStyles.body}>Word not found.</Text>
           </View>
         )}
       </ScrollView>

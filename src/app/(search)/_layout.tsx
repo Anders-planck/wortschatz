@@ -8,7 +8,10 @@ export default function SearchLayout() {
         headerBackButtonDisplayMode: "minimal",
       }}
     >
-      <Stack.Screen name="conjugation/[term]" />
+      <Stack.Screen
+        name="conjugation/[term]"
+        options={{ title: "Konjugation" }}
+      />
     </Stack>
   );
 }
