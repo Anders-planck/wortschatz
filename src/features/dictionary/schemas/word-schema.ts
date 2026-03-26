@@ -21,6 +21,16 @@ export const ExampleSchema = z.object({
 });
 
 export const WordContextSchema = z.object({
+  gender: GenderSchema.nullable().describe(
+    "Article for nouns (der/die/das), null for non-nouns",
+  ),
+  plural: z
+    .string()
+    .nullable()
+    .describe("Plural form for nouns, null for non-nouns"),
+  translationsIt: z
+    .array(z.string())
+    .describe("Italian translations, 2-4 options"),
   examples: z.array(ExampleSchema),
   usageContext: z.string(),
   category: z.string(),

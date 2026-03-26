@@ -46,15 +46,23 @@ export async function lookupFromWiktionary(term: string): Promise<Word | null> {
 export async function enrichWithAI(word: Word): Promise<Word> {
   const context = await generateWordContext(word);
 
-  await updateWordAIContent(
-    word.term,
-    context.examples,
-    context.usageContext,
-    context.category,
-  );
+  await updateWordAIContent(word.term, {
+    examples: context.examples,
+    usageContext: context.usageContext,
+    category: context.category,
+    gender: context.gender,
+    plural: context.plural,
+    translationsIt: context.translationsIt,
+  });
 
   return {
     ...word,
+    gender: context.gender ?? word.gender,
+    plural: context.plural ?? word.plural,
+    translations:
+      context.translationsIt.length > 0
+        ? context.translationsIt
+        : word.translations,
     examples: context.examples,
     usageContext: context.usageContext,
     category: context.category,

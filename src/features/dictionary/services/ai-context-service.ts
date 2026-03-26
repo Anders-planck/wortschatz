@@ -37,11 +37,12 @@ Generate contextual learning data for the German word: "${term}" (${type})
 ${typeSpecificInstruction}
 
 Requirements:
-- Provide 2-3 real-world example sentences in practical everyday German (B1 level)
-- Each sentence must have an Italian translation
-- For each sentence, provide word-by-word breakdown: every word in the sentence with its Italian meaning (for clickable word exploration)
-- Provide a brief usage context explanation in Italian (when and how this word is typically used)
-- Assign a semantic category (e.g., "Alltag", "Arbeit", "Reisen", "Essen", "Gefühle", "Wohnung", etc.)
+- "gender": For nouns, provide the correct article (der/die/das). For non-nouns, return null.
+- "plural": For nouns, provide the plural form (e.g. "Tische" for Tisch). For non-nouns, return null.
+- "translationsIt": 2-4 Italian translations of the word, most common first.
+- "examples": 2-3 real-world example sentences in practical everyday German (B1 level). Each sentence must have an Italian translation. For each sentence, provide word-by-word breakdown: every word with its Italian meaning (for clickable word exploration).
+- "usageContext": Brief explanation in Italian of when and how to use this word, common mistakes, similar words.
+- "category": Semantic category (e.g., "Alltag", "Arbeit", "Reisen", "Essen", "Gefühle", "Wohnung", etc.)
 
 Keep sentences natural and useful for daily life in Germany/Austria/Switzerland.`;
 }

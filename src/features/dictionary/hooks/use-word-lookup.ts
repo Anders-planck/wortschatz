@@ -21,7 +21,7 @@ export function useWordLookup(): UseWordLookupReturn {
   const [error, setError] = useState<string | null>(null);
 
   const lookup = useCallback(async (term: string) => {
-    const normalized = term.trim().toLowerCase();
+    const normalized = term.trim();
     if (!normalized) return;
 
     setIsLoading(true);

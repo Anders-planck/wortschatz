@@ -93,14 +93,27 @@ export async function insertWord(word: Omit<Word, "id">): Promise<number> {
 
 export async function updateWordAIContent(
   term: string,
-  examples: unknown[],
-  usageContext: string,
-  category: string,
+  data: {
+    examples: unknown[];
+    usageContext: string;
+    category: string;
+    gender?: string | null;
+    plural?: string | null;
+    translationsIt?: string[];
+  },
 ): Promise<void> {
   const db = await getDatabase();
   await db.runAsync(
-    `UPDATE words SET examples = ?, usage_context = ?, category = ? WHERE term = ? COLLATE NOCASE`,
-    [JSON.stringify(examples), usageContext, category, term],
+    `UPDATE words SET examples = ?, usage_context = ?, category = ?, gender = COALESCE(?, gender), plural = COALESCE(?, plural), translations = COALESCE(?, translations) WHERE term = ? COLLATE NOCASE`,
+    [
+      JSON.stringify(data.examples),
+      data.usageContext,
+      data.category,
+      data.gender ?? null,
+      data.plural ?? null,
+      data.translationsIt ? JSON.stringify(data.translationsIt) : null,
+      term,
+    ],
   );
 }
 

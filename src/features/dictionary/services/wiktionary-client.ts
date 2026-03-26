@@ -1,101 +1,111 @@
 import type { Word } from "@/features/dictionary/types";
 
-const BASE_URL = "https://de.wiktionary.org/api/rest_v1";
+const BASE_URL = "https://en.wiktionary.org/api/rest_v1";
 
-interface WiktionarySummary {
-  title: string;
-  extract: string;
-  extract_html: string;
-  description?: string;
-  thumbnail?: { source: string };
+interface WiktionaryDefinition {
+  definition: string;
+  examples?: string[];
+  parsedExamples?: Array<{ example: string; translation?: string }>;
 }
 
-function detectWordType(extract: string): Word["type"] {
-  const lower = extract.toLowerCase();
+interface WiktionaryEntry {
+  partOfSpeech: string;
+  language: string;
+  definitions: WiktionaryDefinition[];
+}
 
-  if (/\bsubstantiv\b/.test(lower) || /\bnomen\b/.test(lower)) return "noun";
-  if (/\bverb\b/.test(lower)) return "verb";
-  if (/\bpräposition\b/.test(lower) || /\bpreposition\b/.test(lower))
-    return "preposition";
-  if (/\badjektiv\b/.test(lower)) return "adjective";
-  if (/\badverb\b/.test(lower)) return "adverb";
-
+function mapPartOfSpeech(pos: string): Word["type"] {
+  const lower = pos.toLowerCase();
+  if (lower === "noun" || lower === "proper noun") return "noun";
+  if (lower === "verb") return "verb";
+  if (lower === "preposition" || lower === "postposition") return "preposition";
+  if (lower === "adjective") return "adjective";
+  if (lower === "adverb") return "adverb";
   return "noun";
 }
 
-function detectGender(extract: string): Word["gender"] {
-  // Look for article patterns in the extract
-  const genderPatterns: Array<{
-    pattern: RegExp;
-    gender: NonNullable<Word["gender"]>;
-  }> = [
-    { pattern: /\bder\s+\w+/i, gender: "der" },
-    { pattern: /\bdie\s+\w+/i, gender: "die" },
-    { pattern: /\bdas\s+\w+/i, gender: "das" },
-    { pattern: /\bmaskulinum\b/i, gender: "der" },
-    { pattern: /\bfemininum\b/i, gender: "die" },
-    { pattern: /\bneutrum\b/i, gender: "das" },
-    { pattern: /\bmännlich\b/i, gender: "der" },
-    { pattern: /\bweiblich\b/i, gender: "die" },
-    { pattern: /\bsächlich\b/i, gender: "das" },
-    { pattern: /\bGenus:\s*m\b/i, gender: "der" },
-    { pattern: /\bGenus:\s*f\b/i, gender: "die" },
-    { pattern: /\bGenus:\s*n\b/i, gender: "das" },
-  ];
-
-  for (const { pattern, gender } of genderPatterns) {
-    if (pattern.test(extract)) return gender;
-  }
-
-  return null;
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, "").trim();
 }
 
-function detectPlural(extract: string): string | null {
-  // Common patterns: "Plural: Häuser", "Plural 1: ...", "Mehrzahl: ..."
-  const pluralMatch =
-    extract.match(/Plural(?:\s*\d)?:\s*([^\n,;]+)/i) ??
-    extract.match(/Mehrzahl:\s*([^\n,;]+)/i);
+async function fetchDefinitions(
+  term: string,
+): Promise<WiktionaryEntry[] | null> {
+  const encoded = encodeURIComponent(term);
+  const response = await fetch(`${BASE_URL}/page/definition/${encoded}`);
 
-  if (pluralMatch?.[1]) {
-    const plural = pluralMatch[1].trim();
-    // Skip if it says "kein Plural" (no plural)
-    if (/kein\s+plural/i.test(plural)) return null;
-    return plural;
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new Error(`Wiktionary API error: ${response.status}`);
   }
 
-  return null;
+  const data = (await response.json()) as Record<string, WiktionaryEntry[]>;
+
+  // Get German entries only
+  return data.de ?? null;
 }
 
 export async function fetchFromWiktionary(
   term: string,
 ): Promise<Partial<Word> | null> {
   try {
-    const encoded = encodeURIComponent(term);
-    const response = await fetch(`${BASE_URL}/page/summary/${encoded}`);
+    // Try multiple cases — German nouns are capitalized
+    const attempts = [
+      term,
+      term.charAt(0).toUpperCase() + term.slice(1).toLowerCase(),
+      term.toLowerCase(),
+    ];
 
-    if (response.status === 404) return null;
+    // Deduplicate
+    const uniqueAttempts = [...new Set(attempts)];
 
-    if (!response.ok) {
-      throw new Error(`Wiktionary API error: ${response.status}`);
+    let entries: WiktionaryEntry[] | null = null;
+    let matchedTerm = term;
+
+    for (const attempt of uniqueAttempts) {
+      entries = await fetchDefinitions(attempt);
+      if (entries && entries.length > 0) {
+        matchedTerm = attempt;
+        break;
+      }
     }
 
-    const data = (await response.json()) as WiktionarySummary;
-    const extract = data.extract ?? "";
-    const wordType = detectWordType(extract);
+    if (!entries || entries.length === 0) return null;
+
+    const firstEntry = entries[0];
+    const wordType = mapPartOfSpeech(firstEntry.partOfSpeech);
+
+    // Extract definitions as translations (they're in English from en.wiktionary)
+    const definitions = firstEntry.definitions
+      .slice(0, 3)
+      .map((d) => stripHtml(d.definition));
+
+    // Extract examples
+    const examples = firstEntry.definitions
+      .flatMap(
+        (d) =>
+          d.parsedExamples?.map((e) => ({
+            german: stripHtml(e.example),
+            english: e.translation ? stripHtml(e.translation) : undefined,
+          })) ?? [],
+      )
+      .slice(0, 3);
 
     return {
-      term: data.title ?? term,
+      term: matchedTerm,
       type: wordType,
-      gender: wordType === "noun" ? detectGender(extract) : null,
-      plural: wordType === "noun" ? detectPlural(extract) : null,
-      translations: [],
-      rawWiktionary: data as unknown as Record<string, unknown>,
+      gender: null, // Wiktionary API doesn't provide gender — AI will
+      plural: null, // Same — AI will provide
+      translations: definitions,
+      rawWiktionary: {
+        entries: entries as unknown as Record<string, unknown>[],
+        examples,
+      } as unknown as Record<string, unknown>,
     };
   } catch (err) {
     if (err instanceof Error && err.message.startsWith("Wiktionary API")) {
       throw err;
     }
-    // Network error (timeout, DNS, etc.) — differentiate from "not found"
     throw new Error("Network error: could not reach Wiktionary");
   }
 }
