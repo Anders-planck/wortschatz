@@ -70,8 +70,7 @@ async function fetchAndCacheAudio(
     updateAudioUrl(text, file.uri).catch(() => {});
 
     return file.uri;
-  } catch (e) {
-    console.log("[TTS] fetchAndCacheAudio error:", e);
+  } catch {
     return null;
   }
 }
@@ -88,14 +87,11 @@ export async function getAudio(
     const file = getAudioFile(text, voice);
 
     if (file.exists) {
-      console.log("[TTS] Cache hit:", file.uri);
       return file.uri;
     }
 
-    console.log("[TTS] Cache miss, fetching:", text, voice);
     return fetchAndCacheAudio(text, file, speakingRate, voice);
-  } catch (e) {
-    console.log("[TTS] Error in getAudio:", e);
+  } catch {
     return null;
   }
 }
