@@ -1,6 +1,5 @@
 import { Pressable, Text, View } from "react-native";
 import { Image } from "expo-image";
-import Animated, { FadeIn } from "react-native-reanimated";
 import { fonts } from "@/features/shared/theme/typography";
 import { colors } from "@/features/shared/theme/colors";
 import { hapticLight } from "@/features/shared/hooks/use-haptics";
@@ -26,17 +25,61 @@ export function SettingsVoiceRow({
   };
 
   return (
-    <View style={{ paddingHorizontal: 16, paddingVertical: 14, gap: 10 }}>
-      <Text
+    <View style={{ paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
+      <View
         style={{
-          fontFamily: fonts.body,
-          fontSize: 16,
-          color: colors.textPrimary,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        Voce
-      </Text>
-      <View style={{ gap: 4 }}>
+        <Text
+          style={{
+            fontFamily: fonts.body,
+            fontSize: 16,
+            color: colors.textPrimary,
+          }}
+        >
+          Voce
+        </Text>
+        <Pressable
+          onPress={() => onPreview(PREVIEW_TEXT)}
+          hitSlop={8}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+            paddingHorizontal: 10,
+            paddingVertical: 4,
+            backgroundColor: colors.accentLight,
+            borderRadius: 12,
+            borderCurve: "continuous",
+          }}
+        >
+          <Image
+            source="sf:speaker.wave.2"
+            style={{ width: 14, height: 14 }}
+            tintColor={colors.accent}
+          />
+          <Text
+            style={{
+              fontFamily: fonts.mono,
+              fontSize: 11,
+              fontWeight: "600",
+              color: colors.accent,
+            }}
+          >
+            Prova
+          </Text>
+        </Pressable>
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 8,
+        }}
+      >
         {TTS_VOICES.map((voice) => {
           const isSelected = value === voice.id;
           return (
@@ -46,58 +89,31 @@ export function SettingsVoiceRow({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 10,
-                paddingVertical: 10,
+                gap: 6,
+                paddingVertical: 8,
                 paddingHorizontal: 12,
-                backgroundColor: isSelected
-                  ? colors.accentLight
-                  : "transparent",
-                borderRadius: 10,
+                backgroundColor: isSelected ? colors.accentLight : colors.cream,
+                borderRadius: 20,
                 borderCurve: "continuous",
+                borderWidth: isSelected ? 1.5 : 0,
+                borderColor: isSelected ? colors.accent : "transparent",
               }}
             >
               <Image
-                source={`sf:${isSelected ? "checkmark.circle.fill" : "circle"}`}
-                style={{ width: 20, height: 20 }}
-                tintColor={isSelected ? colors.accent : colors.textHint}
+                source={`sf:${voice.gender === "F" ? "person.crop.circle" : "person.crop.circle.fill"}`}
+                style={{ width: 16, height: 16 }}
+                tintColor={isSelected ? colors.accent : colors.textMuted}
               />
-              <View style={{ flex: 1, gap: 1 }}>
-                <Text
-                  style={{
-                    fontFamily: fonts.body,
-                    fontSize: 15,
-                    color: isSelected
-                      ? colors.textPrimary
-                      : colors.textSecondary,
-                    fontWeight: isSelected ? "600" : "400",
-                  }}
-                >
-                  {voice.label}
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: fonts.mono,
-                    fontSize: 10,
-                    color: colors.textHint,
-                  }}
-                >
-                  {voice.gender === "F" ? "Femminile" : "Maschile"}
-                </Text>
-              </View>
-              {isSelected && (
-                <Animated.View entering={FadeIn.duration(200)}>
-                  <Pressable
-                    onPress={() => onPreview(PREVIEW_TEXT)}
-                    hitSlop={8}
-                  >
-                    <Image
-                      source="sf:speaker.wave.2"
-                      style={{ width: 18, height: 18 }}
-                      tintColor={colors.accent}
-                    />
-                  </Pressable>
-                </Animated.View>
-              )}
+              <Text
+                style={{
+                  fontFamily: fonts.body,
+                  fontSize: 14,
+                  color: isSelected ? colors.textPrimary : colors.textSecondary,
+                  fontWeight: isSelected ? "600" : "400",
+                }}
+              >
+                {voice.label}
+              </Text>
             </Pressable>
           );
         })}
