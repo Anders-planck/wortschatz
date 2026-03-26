@@ -1,6 +1,5 @@
 import { Share, Text, View } from "react-native";
 import { Link } from "expo-router";
-import * as Clipboard from "expo-clipboard";
 import Animated, { FadeInUp, FadeOutLeft } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
@@ -9,7 +8,6 @@ import { textStyles } from "@/features/shared/theme/typography";
 import { getWordTypeColor } from "@/features/shared/utils/word-colors";
 import { deleteWord } from "@/features/shared/db/words-repository";
 import { formatWordForSharing } from "@/features/shared/utils/format-word";
-import { hapticSuccess } from "@/features/shared/hooks/use-haptics";
 
 interface VocabularyItemProps {
   word: Word;
@@ -82,9 +80,8 @@ export function VocabularyItem({
           <Link.MenuAction
             title="Copy"
             icon="doc.on.doc"
-            onPress={async () => {
-              await Clipboard.setStringAsync(formatWordForSharing(word));
-              hapticSuccess();
+            onPress={() => {
+              Share.share({ message: formatWordForSharing(word) });
             }}
           />
           <Link.MenuAction
