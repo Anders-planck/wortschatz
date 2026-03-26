@@ -141,8 +141,8 @@ export async function getWordsForReview(limit = 20): Promise<Word[]> {
   const now = new Date().toISOString();
   const rows = await db.getAllAsync<WordRow>(
     `SELECT * FROM words
-     WHERE next_review IS NOT NULL AND next_review <= ?
-     ORDER BY next_review ASC
+     WHERE next_review IS NULL OR next_review <= ?
+     ORDER BY review_score ASC, searched_at DESC
      LIMIT ?`,
     [now, limit],
   );
@@ -192,25 +192,34 @@ export async function getRecentWords(limit = 10): Promise<Word[]> {
 
 export async function getWeeklyActivity(): Promise<number[]> {
   const db = await getDatabase();
+
+  // Find Monday of current week (local time)
+  const now = new Date();
+  const dayOfWeek = (now.getDay() + 6) % 7; // Monday=0, Sunday=6
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - dayOfWeek);
+  monday.setHours(0, 0, 0, 0);
+  const mondayStr = monday.toISOString().split("T")[0];
+
   const rows = await db.getAllAsync<{ day: string; count: number }>(
-    `SELECT DATE(searched_at) as day, COUNT(*) as count
+    `SELECT DATE(searched_at, 'localtime') as day, COUNT(*) as count
      FROM words
-     WHERE DATE(searched_at) >= DATE('now', '-6 days')
+     WHERE DATE(searched_at, 'localtime') >= ?
      GROUP BY day`,
+    [mondayStr],
   );
 
   const countByDay = new Map(rows.map((r) => [r.day, r.count]));
   const result: number[] = [];
-  const today = new Date();
 
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
     const key = d.toISOString().split("T")[0];
     result.push(countByDay.get(key) ?? 0);
   }
 
-  return result;
+  return result; // [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
 }
 
 export async function getStreak(): Promise<number> {
