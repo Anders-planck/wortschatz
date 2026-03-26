@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "app-2",
-    "slug": "app-2",
+    "name": "WortSchatz",
+    "slug": "wortschatz",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "app2",
+    "scheme": "wortschatz",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
@@ -18,7 +18,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.acubeexpo.app2"
     },
     "web": {
       "output": "static",
