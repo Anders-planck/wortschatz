@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text } from "react-native";
 import Slider from "@react-native-community/slider";
 import { fonts } from "@/features/shared/theme/typography";
@@ -22,6 +23,7 @@ export function SettingsSliderRow({
   formatValue = (v) => `${v.toFixed(1)}x`,
   onValueChange,
 }: SettingsSliderRowProps) {
+  const [localValue, setLocalValue] = useState(value);
   return (
     <View style={{ paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
       <View
@@ -57,7 +59,7 @@ export function SettingsSliderRow({
               color: colors.accent,
             }}
           >
-            {formatValue(value)}
+            {formatValue(localValue)}
           </Text>
         </View>
       </View>
@@ -80,7 +82,8 @@ export function SettingsSliderRow({
             minimumValue={min}
             maximumValue={max}
             step={step}
-            onValueChange={onValueChange}
+            onValueChange={setLocalValue}
+            onSlidingComplete={(v) => onValueChange(v)}
             minimumTrackTintColor={colors.accent}
           />
         </View>

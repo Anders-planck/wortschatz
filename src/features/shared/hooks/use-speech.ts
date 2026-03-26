@@ -3,7 +3,6 @@ import * as Speech from "expo-speech";
 import { getSpeechRate } from "@/features/settings/services/settings-repository";
 import { hapticLight, hapticMedium } from "./use-haptics";
 
-// Module-level cache for voice availability check
 let voiceCheckPromise: Promise<boolean> | null = null;
 
 function checkGermanVoice(): Promise<boolean> {
@@ -29,12 +28,10 @@ export function useSpeech(options?: UseSpeechOptions) {
   const sequenceRef = useRef<{ cancelled: boolean }>({ cancelled: false });
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Check voice availability on mount
   useEffect(() => {
     checkGermanVoice().then(setIsAvailable);
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       Speech.stop();
@@ -55,7 +52,6 @@ export function useSpeech(options?: UseSpeechOptions) {
         return;
       }
 
-      // Cancel any running sequence
       sequenceRef.current.cancelled = true;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setCurrentSpeakingIndex(null);
@@ -87,7 +83,6 @@ export function useSpeech(options?: UseSpeechOptions) {
         return;
       }
 
-      // Cancel previous sequence
       sequenceRef.current.cancelled = true;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       Speech.stop();
@@ -126,7 +121,6 @@ export function useSpeech(options?: UseSpeechOptions) {
 
         if (sequence.cancelled || i === forms.length - 1) break;
 
-        // Delay between forms
         await new Promise<void>((resolve) => {
           timeoutRef.current = setTimeout(resolve, delayMs);
         });

@@ -1,4 +1,4 @@
-import { ScrollView, View } from "react-native";
+import { ScrollView } from "react-native";
 import { Stack } from "expo-router";
 import * as Speech from "expo-speech";
 import Constants from "expo-constants";
@@ -15,6 +15,7 @@ import { SettingsToggleRow } from "@/features/settings/components/settings-toggl
 import { SettingsSliderRow } from "@/features/settings/components/settings-slider-row";
 import { SettingsValueRow } from "@/features/settings/components/settings-value-row";
 import { VoicePreviewCard } from "@/features/settings/components/voice-preview-card";
+import { Divider } from "@/features/shared/components/divider";
 
 export default function SettingsScreen() {
   const { settings, updateSetting } = useSettings();
@@ -47,13 +48,7 @@ export default function SettingsScreen() {
             value={settings.autoPlayOnReveal}
             onValueChange={(v) => updateSetting("autoPlayOnReveal", v)}
           />
-          <View
-            style={{
-              height: 0.5,
-              backgroundColor: colors.border,
-              marginLeft: 16,
-            }}
-          />
+          <Divider />
           <SettingsSliderRow
             label="Velocità voce"
             value={settings.speechRate}

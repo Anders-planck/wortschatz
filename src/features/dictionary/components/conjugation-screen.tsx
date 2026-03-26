@@ -26,6 +26,17 @@ interface ConjugationTenseData {
   sie: string;
 }
 
+function buildSpokenForms(data: ConjugationTenseData): string[] {
+  return [
+    `ich ${data.ich}`,
+    `du ${data.du}`,
+    `er ${data.er}`,
+    `wir ${data.wir}`,
+    `ihr ${data.ihr}`,
+    `sie ${data.sie}`,
+  ];
+}
+
 function TenseTable({
   title,
   data,
@@ -40,24 +51,10 @@ function TenseTable({
   const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
   const referenceForm = data.wir;
 
-  const forms = useMemo(
-    () => [
-      `ich ${data.ich}`,
-      `du ${data.du}`,
-      `er ${data.er}`,
-      `wir ${data.wir}`,
-      `ihr ${data.ihr}`,
-      `sie ${data.sie}`,
-    ],
-    [data],
-  );
+  const forms = useMemo(() => buildSpokenForms(data), [data]);
 
   const handleSpeakAll = useCallback(() => {
-    if (isSpeaking) {
-      stop();
-    } else {
-      speakAll(forms);
-    }
+    isSpeaking ? stop() : speakAll(forms);
   }, [isSpeaking, stop, speakAll, forms]);
 
   const renderForm = useCallback(
@@ -140,24 +137,10 @@ function PerfektTable({
 }) {
   const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
 
-  const forms = useMemo(
-    () => [
-      `ich ${data.ich}`,
-      `du ${data.du}`,
-      `er ${data.er}`,
-      `wir ${data.wir}`,
-      `ihr ${data.ihr}`,
-      `sie ${data.sie}`,
-    ],
-    [data],
-  );
+  const forms = useMemo(() => buildSpokenForms(data), [data]);
 
   const handleSpeakAll = useCallback(() => {
-    if (isSpeaking) {
-      stop();
-    } else {
-      speakAll(forms);
-    }
+    isSpeaking ? stop() : speakAll(forms);
   }, [isSpeaking, stop, speakAll, forms]);
 
   const renderForm = useCallback(
