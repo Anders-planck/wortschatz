@@ -59,6 +59,7 @@ export default function SettingsScreen() {
           <SettingsVoiceRow
             value={settings.ttsVoice}
             onValueChange={(v) => updateSetting("ttsVoice", v)}
+            onPreview={(text) => speak(text)}
           />
         </SettingsSection>
 
