@@ -3,12 +3,12 @@ import {
   getAudioUrl,
   updateAudioUrl,
 } from "@/features/shared/db/words-repository";
-
-const TTS_API_URL = "https://texttospeech.googleapis.com/v1/text:synthesize";
-const TTS_VOICE = "de-DE-WaveNet-D";
-const TTS_LANGUAGE = "de-DE";
-
-const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_AI_KEY ?? "";
+import {
+  GOOGLE_API_KEY,
+  TTS_API_URL,
+  TTS_VOICE,
+  TTS_LANGUAGE,
+} from "@/features/shared/config/google";
 
 function getTtsCacheDir(): string {
   return `${Paths.cache}/tts`;
@@ -40,7 +40,7 @@ async function fetchAndCacheAudio(
   speakingRate: number,
 ): Promise<string | null> {
   try {
-    const response = await fetch(`${TTS_API_URL}?key=${API_KEY}`, {
+    const response = await fetch(`${TTS_API_URL}?key=${GOOGLE_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -79,7 +79,7 @@ export async function getAudio(
   text: string,
   speakingRate = 1.0,
 ): Promise<string | null> {
-  if (!API_KEY) return null;
+  if (!GOOGLE_API_KEY) return null;
 
   try {
     const dbPath = await getAudioUrl(text);
