@@ -18,6 +18,8 @@ export const colors = {
   das: "#8DB58A",
   verb: "#B0A8D0",
   prep: "#A8C0D0",
+  accent: "#C4943A",
+  accentLight: "#F5E6C8",
 
   akkBg: "#F0E8D8",
   akkText: "#8A7A5A",
