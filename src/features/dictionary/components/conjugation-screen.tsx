@@ -68,6 +68,71 @@ function TenseTable({
   );
 }
 
+function PerfektForm({
+  form,
+  partizipII,
+}: {
+  form: string;
+  partizipII: string;
+}) {
+  const parts = form.split(partizipII);
+  if (parts.length < 2) {
+    return (
+      <Text
+        selectable
+        style={[textStyles.body, { color: colors.textSecondary }]}
+      >
+        {form}
+      </Text>
+    );
+  }
+
+  const hilfsverb = parts[0].trim();
+
+  return (
+    <Text selectable style={[textStyles.body, { color: colors.textSecondary }]}>
+      <Text style={{ backgroundColor: colors.akkBg, color: colors.akkText }}>
+        {hilfsverb}
+      </Text>{" "}
+      <Text style={{ backgroundColor: colors.datBg, color: colors.datText }}>
+        {partizipII}
+      </Text>
+    </Text>
+  );
+}
+
+function PerfektTable({
+  data,
+  partizipII,
+}: {
+  data: ConjugationTenseData;
+  partizipII: string;
+}) {
+  const renderForm = useCallback(
+    (_pronoun: string, form: string) => (
+      <PerfektForm form={form} partizipII={partizipII} />
+    ),
+    [partizipII],
+  );
+
+  return (
+    <View style={{ gap: 8 }}>
+      <SectionTitle>Perfekt</SectionTitle>
+      <View
+        style={{
+          backgroundColor: colors.card,
+          borderRadius: 10,
+          borderCurve: "continuous",
+          padding: 16,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+        }}
+      >
+        <PronounGrid data={data} renderForm={renderForm} />
+      </View>
+    </View>
+  );
+}
+
 function buildPerfektData(
   hilfsverb: string,
   partizipII: string,
@@ -204,11 +269,9 @@ export function ConjugationScreen({ term }: ConjugationScreenProps) {
             />
 
             {perfektData && (
-              <TenseTable
-                title="Perfekt"
+              <PerfektTable
                 data={perfektData}
-                isIrregular={false}
-                highlightEnding={false}
+                partizipII={conjugation.partizipII}
               />
             )}
 
