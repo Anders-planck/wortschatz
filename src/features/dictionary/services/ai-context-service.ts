@@ -1,5 +1,5 @@
 import { generateText, Output } from "ai";
-import { google } from "@ai-sdk/google";
+import { google } from "@/features/shared/config/ai-provider";
 import { WordContextSchema } from "@/features/dictionary/schemas/word-schema";
 import type { Word, WordContext } from "@/features/dictionary/types";
 
