@@ -1,5 +1,5 @@
 import React from "react";
-import { Share, Text, View } from "react-native";
+import { Pressable, Share, Text, View } from "react-native";
 import { Link } from "expo-router";
 import Animated, { FadeInUp, FadeOutLeft } from "react-native-reanimated";
 
@@ -26,9 +26,9 @@ export const VocabularyItem = React.memo(function VocabularyItem({
       entering={FadeInUp.delay(index * 30).duration(300)}
       exiting={FadeOutLeft.duration(200)}
     >
-      <Link href={`/word/${encodeURIComponent(word.term)}`}>
+      <Link href={`/word/${encodeURIComponent(word.term)}`} asChild>
         <Link.Trigger>
-          <View
+          <Pressable
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -64,7 +64,7 @@ export const VocabularyItem = React.memo(function VocabularyItem({
             >
               {word.translations[0] ?? ""}
             </Text>
-          </View>
+          </Pressable>
         </Link.Trigger>
 
         <Link.Preview />

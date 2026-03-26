@@ -29,7 +29,7 @@ export default function WordDetailScreen() {
         )}
       </ScrollView>
 
-      <Stack.Screen.Title>{term ?? ""}</Stack.Screen.Title>
+      <Stack.Screen options={{ title: term ?? "" }} />
     </>
   );
 }

@@ -305,9 +305,7 @@ export function ConjugationScreen({ term }: ConjugationScreenProps) {
         )}
       </ScrollView>
 
-      <Stack.Screen.Title>
-        {term} {"\u2014"} Konjugation
-      </Stack.Screen.Title>
+      <Stack.Screen options={{ title: `${term} \u2014 Konjugation` }} />
     </>
   );
 }
