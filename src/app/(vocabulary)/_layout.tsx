@@ -8,6 +8,8 @@ export default function VocabularyLayout() {
         headerBackButtonDisplayMode: "minimal",
       }}
     >
+      <Stack.Screen name="index" />
+      <Stack.Screen name="word/[term]" />
       <Stack.Screen
         name="conjugation/[term]"
         options={{ title: "Konjugation" }}
