@@ -52,7 +52,7 @@ export async function generateWordContext(
   word: Partial<Word>,
 ): Promise<WordContext> {
   const result = await generateText({
-    model: google("gemini-2.0-flash"),
+    model: google("gemini-2.5-flash-lite"),
     output: Output.object({
       schema: WordContextSchema,
     }),
