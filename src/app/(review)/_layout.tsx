@@ -9,6 +9,15 @@ export default function ReviewLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="stats" />
       <Stack.Screen name="session" options={{ presentation: "modal" }} />
+      <Stack.Screen name="exercises" />
+      <Stack.Screen
+        name="exercise-session"
+        options={{
+          presentation: "formSheet",
+          sheetGrabberVisible: true,
+          sheetAllowedDetents: [1.0],
+        }}
+      />
     </Stack>
   );
 }

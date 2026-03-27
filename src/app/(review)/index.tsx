@@ -33,6 +33,10 @@ export default function ReviewScreen() {
       <Stack.Screen.Title large>Ripasso</Stack.Screen.Title>
       <Stack.Toolbar placement="right">
         <Stack.Toolbar.Button
+          icon="pencil.and.list.clipboard"
+          onPress={() => router.push("/(review)/exercises")}
+        />
+        <Stack.Toolbar.Button
           icon="chart.bar.xaxis"
           onPress={() => router.push("/(review)/stats")}
         />
