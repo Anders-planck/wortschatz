@@ -130,6 +130,7 @@ export default function ExerciseSessionScreen() {
           total={session.exercises.length}
           current={session.currentIndex}
           results={session.results}
+          startTime={session.startTime}
         />
 
         {exercise.type === "fill" && (
