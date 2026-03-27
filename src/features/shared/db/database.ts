@@ -43,5 +43,35 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
     );
   `);
 
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS collections (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      icon TEXT NOT NULL DEFAULT 'folder.fill',
+      color TEXT NOT NULL DEFAULT '#D4A44A',
+      is_ai_generated INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS collection_words (
+      collection_id INTEGER NOT NULL,
+      word_id INTEGER NOT NULL,
+      added_at TEXT NOT NULL,
+      PRIMARY KEY (collection_id, word_id),
+      FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE,
+      FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE
+    );
+  `);
+
+  await db.execAsync(
+    `CREATE INDEX IF NOT EXISTS idx_cw_collection ON collection_words(collection_id);`,
+  );
+  await db.execAsync(
+    `CREATE INDEX IF NOT EXISTS idx_cw_word ON collection_words(word_id);`,
+  );
+
   return db;
 }
