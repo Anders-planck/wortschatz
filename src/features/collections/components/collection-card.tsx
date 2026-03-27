@@ -9,7 +9,6 @@ import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface CollectionCardProps {
   collection: CollectionWithStats;
-  featured?: boolean;
   index?: number;
   onReview: (id: number) => void;
   onRename: (id: number) => void;
@@ -18,118 +17,144 @@ interface CollectionCardProps {
 
 export const CollectionCard = React.memo(function CollectionCard({
   collection,
-  featured = false,
   index = 0,
   onReview,
   onRename,
   onDelete,
 }: CollectionCardProps) {
   const { colors, textStyles } = useAppTheme();
-
-  const iconSize = featured ? 36 : 28;
-  const iconContainerSize = featured ? 56 : 44;
+  const isDark = colors.bg === "#1A1816";
 
   return (
-    <Animated.View
-      entering={FadeInUp.delay(index * 40).duration(300)}
-      style={{ flex: featured ? undefined : 1 }}
-    >
+    <Animated.View entering={FadeInUp.delay(index * 50).duration(350)}>
       <Link href={`/collection/${collection.id}` as Href} asChild>
         <Link.Trigger>
           <Pressable
-            style={{
-              backgroundColor: colors.card,
-              borderRadius: 16,
-              borderCurve: "continuous",
-              padding: 16,
-              flexDirection: featured ? "row" : "column",
-              alignItems: featured ? "center" : "flex-start",
-              gap: 12,
-            }}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.9 : 1,
+            })}
           >
+            {/* Folder tab */}
             <View
               style={{
-                width: iconContainerSize,
-                height: iconContainerSize,
-                borderRadius: iconContainerSize / 2,
-                backgroundColor: collection.color + "20",
+                alignSelf: "flex-start",
+                backgroundColor: collection.color,
+                borderTopLeftRadius: 8,
+                borderTopRightRadius: 8,
+                paddingHorizontal: 14,
+                paddingTop: 5,
+                paddingBottom: 3,
+                flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
+                gap: 5,
               }}
             >
-              <Image
-                source={`sf:${collection.icon}`}
-                style={{ width: iconSize, height: iconSize }}
-                tintColor={collection.color}
-              />
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: "700",
+                  color: "#1A1816",
+                  letterSpacing: 0.5,
+                  textTransform: "uppercase",
+                }}
+                numberOfLines={1}
+              >
+                {collection.name}
+              </Text>
+              {collection.isAiGenerated && (
+                <Image
+                  source="sf:sparkles"
+                  style={{ width: 10, height: 10 }}
+                  tintColor="#1A1816"
+                />
+              )}
             </View>
 
-            <View style={{ flex: featured ? 1 : undefined, gap: 4 }}>
+            {/* Folder body */}
+            <View
+              style={{
+                backgroundColor: colors.card,
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 14,
+                borderBottomLeftRadius: 14,
+                borderBottomRightRadius: 14,
+                borderCurve: "continuous",
+                borderTopWidth: 3,
+                borderTopColor: collection.color,
+                padding: 16,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 14,
+                boxShadow: isDark
+                  ? "0 1px 4px rgba(0,0,0,0.3)"
+                  : "0 1px 4px rgba(0,0,0,0.06)",
+              }}
+            >
+              {/* Icon */}
               <View
                 style={{
-                  flexDirection: "row",
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  borderCurve: "continuous",
+                  backgroundColor: collection.color + "18",
                   alignItems: "center",
-                  gap: 6,
+                  justifyContent: "center",
                 }}
               >
-                <Text
-                  style={[textStyles.heading, { fontSize: featured ? 16 : 14 }]}
-                  numberOfLines={1}
-                >
-                  {collection.name}
-                </Text>
-                {collection.isAiGenerated && (
-                  <View
-                    style={{
-                      backgroundColor: colors.accentLight,
-                      paddingHorizontal: 6,
-                      paddingVertical: 2,
-                      borderRadius: 6,
-                      borderCurve: "continuous",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        fontWeight: "600",
-                        color: colors.accent,
-                      }}
-                    >
-                      AI
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              <Text
-                style={[
-                  textStyles.bodyLight,
-                  { fontSize: 12, color: colors.textHint },
-                ]}
-              >
-                {collection.wordCount}{" "}
-                {collection.wordCount === 1 ? "parola" : "parole"}
-              </Text>
-
-              {/* Progress bar */}
-              <View
-                style={{
-                  height: 4,
-                  backgroundColor: colors.borderLight,
-                  borderRadius: 2,
-                  marginTop: 4,
-                  width: featured ? "60%" : "100%",
-                }}
-              >
-                <View
-                  style={{
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: colors.accent,
-                    width: `${collection.masteryPercent}%`,
-                  }}
+                <Image
+                  source={`sf:${collection.icon}`}
+                  style={{ width: 24, height: 24 }}
+                  tintColor={collection.color}
                 />
               </View>
+
+              <View style={{ flex: 1, gap: 4 }}>
+                {/* Word count */}
+                <Text
+                  style={{
+                    fontFamily: textStyles.mono.fontFamily,
+                    fontSize: 11,
+                    color: colors.textHint,
+                  }}
+                >
+                  {collection.wordCount}{" "}
+                  {collection.wordCount === 1 ? "parola" : "parole"}
+                </Text>
+
+                {/* Progress bar */}
+                <View
+                  style={{
+                    height: 3,
+                    backgroundColor: colors.borderLight,
+                    borderRadius: 1.5,
+                    width: "60%",
+                  }}
+                >
+                  <View
+                    style={{
+                      height: 3,
+                      borderRadius: 1.5,
+                      backgroundColor: collection.color,
+                      width: `${Math.max(collection.masteryPercent, 2)}%`,
+                    }}
+                  />
+                </View>
+              </View>
+
+              {/* Mastery % */}
+              {collection.masteryPercent > 0 && (
+                <Text
+                  style={{
+                    fontFamily: textStyles.heading.fontFamily,
+                    fontSize: 20,
+                    fontWeight: "700",
+                    color: collection.color,
+                  }}
+                >
+                  {collection.masteryPercent}%
+                </Text>
+              )}
             </View>
           </Pressable>
         </Link.Trigger>

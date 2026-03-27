@@ -10,29 +10,37 @@ import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 interface CollectionGridProps {
   collections: CollectionWithStats[];
   onCreateNew: () => void;
+  onOrganizeAI: () => void;
   onReview: (id: number) => void;
   onRename: (id: number) => void;
   onDelete: (id: number) => void;
 }
 
-function EmptyState({ onCreateNew }: { onCreateNew: () => void }) {
+function EmptyState({
+  onCreateNew,
+  onOrganizeAI,
+}: {
+  onCreateNew: () => void;
+  onOrganizeAI: () => void;
+}) {
   const { colors, textStyles } = useAppTheme();
 
   return (
     <Animated.View
-      entering={FadeInUp.duration(300)}
+      entering={FadeInUp.duration(350)}
       style={{
         alignItems: "center",
-        paddingTop: 48,
+        paddingTop: 56,
         paddingBottom: 40,
-        gap: 16,
+        gap: 20,
       }}
     >
       <View
         style={{
-          width: 64,
-          height: 64,
-          borderRadius: 32,
+          width: 72,
+          height: 72,
+          borderRadius: 20,
+          borderCurve: "continuous",
           backgroundColor: colors.accentLight,
           alignItems: "center",
           justifyContent: "center",
@@ -40,58 +48,94 @@ function EmptyState({ onCreateNew }: { onCreateNew: () => void }) {
       >
         <Image
           source="sf:folder.fill"
-          style={{ width: 28, height: 28 }}
+          style={{ width: 32, height: 32 }}
           tintColor={colors.accent}
         />
       </View>
-      <View style={{ alignItems: "center", gap: 4 }}>
-        <Text style={[textStyles.heading, { fontSize: 17 }]}>
-          Nessuna collezione
+
+      <View style={{ alignItems: "center", gap: 6 }}>
+        <Text style={[textStyles.heading, { fontSize: 18 }]}>
+          Nessuna lista
         </Text>
         <Text
           style={[
-            textStyles.body,
+            textStyles.bodyLight,
             {
-              fontSize: 13,
+              fontSize: 14,
               color: colors.textMuted,
               textAlign: "center",
-              paddingHorizontal: 40,
+              paddingHorizontal: 48,
+              lineHeight: 20,
             },
           ]}
         >
-          Crea liste tematiche per organizzare il tuo vocabolario
+          Organizza il vocabolario in liste tematiche per un ripasso mirato
         </Text>
       </View>
-      <Pressable
-        onPress={onCreateNew}
-        style={({ pressed }) => ({
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 6,
-          paddingHorizontal: 20,
-          paddingVertical: 12,
-          backgroundColor: colors.accent,
-          borderRadius: 12,
-          borderCurve: "continuous",
-          opacity: pressed ? 0.85 : 1,
-        })}
-      >
-        <Image
-          source="sf:plus"
-          style={{ width: 16, height: 16 }}
-          tintColor={colors.bg}
-        />
-        <Text
-          style={{
-            fontFamily: textStyles.heading.fontFamily,
-            fontSize: 15,
-            fontWeight: "600",
-            color: colors.bg,
-          }}
+
+      <View style={{ gap: 10, alignItems: "center" }}>
+        <Pressable
+          onPress={onCreateNew}
+          style={({ pressed }) => ({
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            paddingHorizontal: 24,
+            paddingVertical: 12,
+            backgroundColor: colors.accent,
+            borderRadius: 12,
+            borderCurve: "continuous",
+            opacity: pressed ? 0.85 : 1,
+          })}
         >
-          Crea la prima lista
-        </Text>
-      </Pressable>
+          <Image
+            source="sf:plus"
+            style={{ width: 14, height: 14 }}
+            tintColor="#FFFFFF"
+          />
+          <Text
+            style={{
+              fontFamily: textStyles.heading.fontFamily,
+              fontSize: 15,
+              fontWeight: "600",
+              color: "#FFFFFF",
+            }}
+          >
+            Crea la prima lista
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={onOrganizeAI}
+          style={({ pressed }) => ({
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            paddingHorizontal: 24,
+            paddingVertical: 12,
+            backgroundColor: colors.card,
+            borderRadius: 12,
+            borderCurve: "continuous",
+            opacity: pressed ? 0.85 : 1,
+          })}
+        >
+          <Image
+            source="sf:sparkles"
+            style={{ width: 14, height: 14 }}
+            tintColor={colors.accent}
+          />
+          <Text
+            style={{
+              fontFamily: textStyles.heading.fontFamily,
+              fontSize: 15,
+              fontWeight: "600",
+              color: colors.accent,
+            }}
+          >
+            Organizza con AI
+          </Text>
+        </Pressable>
+      </View>
     </Animated.View>
   );
 }
@@ -103,11 +147,11 @@ function CreateNewButton({
   onPress: () => void;
   index: number;
 }) {
-  const { colors } = useAppTheme();
+  const { colors, textStyles } = useAppTheme();
 
   return (
     <Animated.View
-      entering={FadeInUp.delay(index * 40).duration(300)}
+      entering={FadeInUp.delay(index * 50).duration(350)}
       style={{ flex: 1 }}
     >
       <Pressable
@@ -117,24 +161,40 @@ function CreateNewButton({
           borderWidth: 1.5,
           borderStyle: "dashed",
           borderColor: pressed ? colors.accent : colors.border,
-          borderRadius: 16,
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 12,
+          borderBottomLeftRadius: 12,
+          borderBottomRightRadius: 12,
           borderCurve: "continuous",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: 100,
-          gap: 6,
+          marginTop: 18,
+          minHeight: 90,
+          gap: 5,
         })}
       >
-        <Image
-          source="sf:plus"
-          style={{ width: 20, height: 20 }}
-          tintColor={colors.textMuted}
-        />
+        <View
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 10,
+            borderCurve: "continuous",
+            backgroundColor: colors.borderLight,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Image
+            source="sf:plus"
+            style={{ width: 14, height: 14 }}
+            tintColor={colors.textMuted}
+          />
+        </View>
         <Text
           style={{
-            fontFamily: "Ubuntu Sans Mono",
+            fontFamily: textStyles.mono.fontFamily,
             fontSize: 10,
-            color: colors.textMuted,
+            color: colors.textGhost,
             letterSpacing: 1,
             textTransform: "uppercase",
           }}
@@ -149,74 +209,28 @@ function CreateNewButton({
 export const CollectionGrid = React.memo(function CollectionGrid({
   collections,
   onCreateNew,
+  onOrganizeAI,
   onReview,
   onRename,
   onDelete,
 }: CollectionGridProps) {
   if (collections.length === 0) {
-    return <EmptyState onCreateNew={onCreateNew} />;
+    return <EmptyState onCreateNew={onCreateNew} onOrganizeAI={onOrganizeAI} />;
   }
-
-  const [featured, ...rest] = collections;
-
-  const rows: Array<[CollectionWithStats, CollectionWithStats | undefined]> =
-    [];
-  for (let i = 0; i < rest.length; i += 2) {
-    rows.push([rest[i], rest[i + 1]]);
-  }
-
-  const lastRow = rows[rows.length - 1];
-  const lastRowHasSpace = lastRow && lastRow[1] === undefined;
 
   return (
-    <View style={{ gap: 8 }}>
-      {featured && (
+    <View style={{ gap: 14 }}>
+      {collections.map((collection, i) => (
         <CollectionCard
-          collection={featured}
-          featured
-          index={0}
+          key={collection.id}
+          collection={collection}
+          index={i}
           onReview={onReview}
           onRename={onRename}
           onDelete={onDelete}
         />
-      )}
-
-      {rows.map((row, rowIndex) => {
-        const isLastRow = rowIndex === rows.length - 1;
-        const baseIndex = rowIndex * 2 + 1;
-
-        return (
-          <View key={row[0].id} style={{ flexDirection: "row", gap: 8 }}>
-            <CollectionCard
-              collection={row[0]}
-              index={baseIndex}
-              onReview={onReview}
-              onRename={onRename}
-              onDelete={onDelete}
-            />
-            {row[1] ? (
-              <CollectionCard
-                collection={row[1]}
-                index={baseIndex + 1}
-                onReview={onReview}
-                onRename={onRename}
-                onDelete={onDelete}
-              />
-            ) : isLastRow ? (
-              <CreateNewButton onPress={onCreateNew} index={baseIndex + 1} />
-            ) : (
-              <View style={{ flex: 1 }} />
-            )}
-          </View>
-        );
-      })}
-
-      {!lastRowHasSpace && (
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          <CreateNewButton onPress={onCreateNew} index={rest.length + 1} />
-          <View style={{ flex: 1 }} />
-        </View>
-      )}
+      ))}
+      <CreateNewButton onPress={onCreateNew} index={collections.length} />
     </View>
   );
 });

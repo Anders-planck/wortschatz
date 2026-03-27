@@ -1,13 +1,9 @@
-import { useState, useCallback } from "react";
-import { Alert, FlatList, ScrollView, View } from "react-native";
+import { useCallback } from "react";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import { Image } from "expo-image";
 
-import { useThemeColors } from "@/features/shared/theme/theme-context";
-import { useVocabulary } from "@/features/vocabulary/hooks/use-vocabulary";
-import { FilterChips } from "@/features/vocabulary/components/filter-chips";
-import { VocabularyItem } from "@/features/vocabulary/components/vocabulary-item";
-import { VocabularyEmpty } from "@/features/vocabulary/components/vocabulary-empty";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { CollectionGrid } from "@/features/collections/components/collection-grid";
 import { useCollections } from "@/features/collections/hooks/use-collections";
 import {
@@ -15,21 +11,14 @@ import {
   deleteCollection,
 } from "@/features/shared/db/collections-repository";
 
-export default function VocabularyScreen() {
-  const colors = useThemeColors();
+export default function ListeScreen() {
+  const { colors, textStyles } = useAppTheme();
   const router = useRouter();
-  const { words, filter, setFilter, isRefreshing, refresh } = useVocabulary();
-  const { collections, refresh: refreshCollections } = useCollections();
-  const [viewMode, setViewMode] = useState(0);
-
-  const segmentedControl = (
-    <SegmentedControl
-      values={[`Tutte (${words.length})`, "Collezioni"]}
-      selectedIndex={viewMode}
-      onChange={(e) => setViewMode(e.nativeEvent.selectedSegmentIndex)}
-      style={{ marginBottom: 12 }}
-    />
-  );
+  const {
+    collections,
+    unorganizedCount,
+    refresh: refreshCollections,
+  } = useCollections();
 
   const handleRename = useCallback(
     (id: number) => {
@@ -76,66 +65,83 @@ export default function VocabularyScreen() {
 
   return (
     <>
-      {viewMode === 0 ? (
-        <FlatList
-          contentInsetAdjustmentBehavior="automatic"
-          style={{ backgroundColor: colors.bg }}
-          contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
-          data={words}
-          renderItem={({ item, index }) => (
-            <VocabularyItem word={item} index={index} onDeleted={refresh} />
-          )}
-          keyExtractor={(item) => item.term}
-          ListHeaderComponent={
-            <View>
-              {segmentedControl}
-              <FilterChips
-                filter={filter}
-                setFilter={setFilter}
-                totalCount={words.length}
-              />
-            </View>
-          }
-          ListEmptyComponent={<VocabularyEmpty isLoading={isRefreshing} />}
-          onRefresh={refresh}
-          refreshing={isRefreshing}
-        />
-      ) : (
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={{ backgroundColor: colors.bg }}
-          contentContainerStyle={{ padding: 24, paddingBottom: 60 }}
-        >
-          {segmentedControl}
-          <CollectionGrid
-            collections={collections}
-            onCreateNew={() => router.push("/create-collection")}
-            onReview={(id) =>
-              router.push({
-                pathname: "/(review)/session",
-                params: { collectionId: String(id) },
-              })
-            }
-            onRename={handleRename}
-            onDelete={handleDelete}
-          />
-        </ScrollView>
-      )}
-
-      <Stack.Screen.Title large>Parole</Stack.Screen.Title>
-
-      {viewMode === 1 && (
-        <Stack.Toolbar placement="right">
-          <Stack.Toolbar.Button
-            icon="sparkles"
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={{ backgroundColor: colors.bg }}
+        contentContainerStyle={{ padding: 24, paddingBottom: 60, gap: 16 }}
+      >
+        {/* Unorganized words banner */}
+        {unorganizedCount > 0 && collections.length > 0 && (
+          <Pressable
             onPress={() => router.push("/organize")}
-          />
-          <Stack.Toolbar.Button
-            icon="plus"
-            onPress={() => router.push("/create-collection")}
-          />
-        </Stack.Toolbar>
-      )}
+            style={({ pressed }) => ({
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 12,
+              backgroundColor: colors.accentLight,
+              borderRadius: 14,
+              borderCurve: "continuous",
+              padding: 14,
+              opacity: pressed ? 0.85 : 1,
+            })}
+          >
+            <Image
+              source="sf:sparkles"
+              style={{ width: 20, height: 20 }}
+              tintColor={colors.accent}
+            />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={[textStyles.heading, { fontSize: 14 }]}>
+                {unorganizedCount}{" "}
+                {unorganizedCount === 1
+                  ? "parola non organizzata"
+                  : "parole non organizzate"}
+              </Text>
+              <Text
+                style={{
+                  fontFamily: textStyles.bodyLight.fontFamily,
+                  fontSize: 12,
+                  color: colors.textMuted,
+                }}
+              >
+                Organizza con AI
+              </Text>
+            </View>
+            <Image
+              source="sf:chevron.right"
+              style={{ width: 12, height: 12 }}
+              tintColor={colors.textMuted}
+            />
+          </Pressable>
+        )}
+
+        <CollectionGrid
+          collections={collections}
+          onCreateNew={() => router.push("/create-collection")}
+          onOrganizeAI={() => router.push("/organize")}
+          onReview={(id) =>
+            router.push({
+              pathname: "/(review)/session",
+              params: { collectionId: String(id) },
+            })
+          }
+          onRename={handleRename}
+          onDelete={handleDelete}
+        />
+      </ScrollView>
+
+      <Stack.Screen.Title large>Liste</Stack.Screen.Title>
+
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button
+          icon="sparkles"
+          onPress={() => router.push("/organize")}
+        />
+        <Stack.Toolbar.Button
+          icon="plus"
+          onPress={() => router.push("/create-collection")}
+        />
+      </Stack.Toolbar>
     </>
   );
 }

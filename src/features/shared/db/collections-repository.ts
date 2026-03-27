@@ -87,6 +87,15 @@ export async function getUnorganizedWords(): Promise<Word[]> {
   return rows.map(rowToWord);
 }
 
+export async function getUnorganizedCount(): Promise<number> {
+  const db = await getDatabase();
+  const row = await db.getFirstAsync<{ count: number }>(
+    `SELECT COUNT(*) as count FROM words
+     WHERE id NOT IN (SELECT word_id FROM collection_words)`,
+  );
+  return row?.count ?? 0;
+}
+
 export async function getWordsForReviewByCollection(
   collectionId: number,
   limit = 12,
