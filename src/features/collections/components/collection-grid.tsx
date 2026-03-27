@@ -15,6 +15,87 @@ interface CollectionGridProps {
   onDelete: (id: number) => void;
 }
 
+function EmptyState({ onCreateNew }: { onCreateNew: () => void }) {
+  const { colors, textStyles } = useAppTheme();
+
+  return (
+    <Animated.View
+      entering={FadeInUp.duration(300)}
+      style={{
+        alignItems: "center",
+        paddingTop: 48,
+        paddingBottom: 40,
+        gap: 16,
+      }}
+    >
+      <View
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 32,
+          backgroundColor: colors.accentLight,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Image
+          source="sf:folder.fill"
+          style={{ width: 28, height: 28 }}
+          tintColor={colors.accent}
+        />
+      </View>
+      <View style={{ alignItems: "center", gap: 4 }}>
+        <Text style={[textStyles.heading, { fontSize: 17 }]}>
+          Nessuna collezione
+        </Text>
+        <Text
+          style={[
+            textStyles.body,
+            {
+              fontSize: 13,
+              color: colors.textMuted,
+              textAlign: "center",
+              paddingHorizontal: 40,
+            },
+          ]}
+        >
+          Crea liste tematiche per organizzare il tuo vocabolario
+        </Text>
+      </View>
+      <Pressable
+        onPress={onCreateNew}
+        style={({ pressed }) => ({
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 6,
+          paddingHorizontal: 20,
+          paddingVertical: 12,
+          backgroundColor: colors.accent,
+          borderRadius: 12,
+          borderCurve: "continuous",
+          opacity: pressed ? 0.85 : 1,
+        })}
+      >
+        <Image
+          source="sf:plus"
+          style={{ width: 16, height: 16 }}
+          tintColor={colors.bg}
+        />
+        <Text
+          style={{
+            fontFamily: textStyles.heading.fontFamily,
+            fontSize: 15,
+            fontWeight: "600",
+            color: colors.bg,
+          }}
+        >
+          Crea la prima lista
+        </Text>
+      </Pressable>
+    </Animated.View>
+  );
+}
+
 function CreateNewButton({
   onPress,
   index,
@@ -22,7 +103,7 @@ function CreateNewButton({
   onPress: () => void;
   index: number;
 }) {
-  const { colors, textStyles } = useAppTheme();
+  const { colors } = useAppTheme();
 
   return (
     <Animated.View
@@ -31,30 +112,32 @@ function CreateNewButton({
     >
       <Pressable
         onPress={onPress}
-        style={{
+        style={({ pressed }) => ({
           flex: 1,
           borderWidth: 1.5,
           borderStyle: "dashed",
-          borderColor: colors.border,
+          borderColor: pressed ? colors.accent : colors.border,
           borderRadius: 16,
           borderCurve: "continuous",
-          padding: 16,
           alignItems: "center",
           justifyContent: "center",
-          minHeight: 120,
-          gap: 8,
-        }}
+          minHeight: 100,
+          gap: 6,
+        })}
       >
         <Image
           source="sf:plus"
-          style={{ width: 24, height: 24 }}
+          style={{ width: 20, height: 20 }}
           tintColor={colors.textMuted}
         />
         <Text
-          style={[
-            textStyles.bodyLight,
-            { fontSize: 13, color: colors.textMuted },
-          ]}
+          style={{
+            fontFamily: "Ubuntu Sans Mono",
+            fontSize: 10,
+            color: colors.textMuted,
+            letterSpacing: 1,
+            textTransform: "uppercase",
+          }}
         >
           Nuova
         </Text>
@@ -70,23 +153,23 @@ export const CollectionGrid = React.memo(function CollectionGrid({
   onRename,
   onDelete,
 }: CollectionGridProps) {
+  if (collections.length === 0) {
+    return <EmptyState onCreateNew={onCreateNew} />;
+  }
+
   const [featured, ...rest] = collections;
 
-  // Build rows of 2 from the remaining collections
   const rows: Array<[CollectionWithStats, CollectionWithStats | undefined]> =
     [];
   for (let i = 0; i < rest.length; i += 2) {
     rows.push([rest[i], rest[i + 1]]);
   }
 
-  // Determine if we need the "+" button and where it goes
-  const needsCreateButton = true;
   const lastRow = rows[rows.length - 1];
   const lastRowHasSpace = lastRow && lastRow[1] === undefined;
 
   return (
     <View style={{ gap: 8 }}>
-      {/* Featured card (first collection, full width) */}
       {featured && (
         <CollectionCard
           collection={featured}
@@ -98,7 +181,6 @@ export const CollectionGrid = React.memo(function CollectionGrid({
         />
       )}
 
-      {/* Grid rows */}
       {rows.map((row, rowIndex) => {
         const isLastRow = rowIndex === rows.length - 1;
         const baseIndex = rowIndex * 2 + 1;
@@ -120,7 +202,7 @@ export const CollectionGrid = React.memo(function CollectionGrid({
                 onRename={onRename}
                 onDelete={onDelete}
               />
-            ) : needsCreateButton && isLastRow ? (
+            ) : isLastRow ? (
               <CreateNewButton onPress={onCreateNew} index={baseIndex + 1} />
             ) : (
               <View style={{ flex: 1 }} />
@@ -129,8 +211,7 @@ export const CollectionGrid = React.memo(function CollectionGrid({
         );
       })}
 
-      {/* If last row is full or no rows at all, add "+" as its own row */}
-      {needsCreateButton && !lastRowHasSpace && (
+      {!lastRowHasSpace && (
         <View style={{ flexDirection: "row", gap: 8 }}>
           <CreateNewButton onPress={onCreateNew} index={rest.length + 1} />
           <View style={{ flex: 1 }} />

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Alert, FlatList, View } from "react-native";
+import { Alert, FlatList, ScrollView, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
@@ -21,6 +21,15 @@ export default function VocabularyScreen() {
   const { words, filter, setFilter, isRefreshing, refresh } = useVocabulary();
   const { collections, refresh: refreshCollections } = useCollections();
   const [viewMode, setViewMode] = useState(0);
+
+  const segmentedControl = (
+    <SegmentedControl
+      values={[`Tutte (${words.length})`, "Collezioni"]}
+      selectedIndex={viewMode}
+      onChange={(e) => setViewMode(e.nativeEvent.selectedSegmentIndex)}
+      style={{ marginBottom: 12 }}
+    />
+  );
 
   const handleRename = useCallback(
     (id: number) => {
@@ -71,21 +80,15 @@ export default function VocabularyScreen() {
         <FlatList
           contentInsetAdjustmentBehavior="automatic"
           style={{ backgroundColor: colors.bg }}
-          contentContainerStyle={{ padding: 24 }}
+          contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
           data={words}
           renderItem={({ item, index }) => (
             <VocabularyItem word={item} index={index} onDeleted={refresh} />
           )}
           keyExtractor={(item) => item.term}
           ListHeaderComponent={
-            <View style={{ gap: 16 }}>
-              <SegmentedControl
-                values={[`Tutte (${words.length})`, "Collezioni"]}
-                selectedIndex={viewMode}
-                onChange={(e) =>
-                  setViewMode(e.nativeEvent.selectedSegmentIndex)
-                }
-              />
+            <View>
+              {segmentedControl}
               <FilterChips
                 filter={filter}
                 setFilter={setFilter}
@@ -98,44 +101,31 @@ export default function VocabularyScreen() {
           refreshing={isRefreshing}
         />
       ) : (
-        <FlatList
+        <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={{ backgroundColor: colors.bg }}
-          contentContainerStyle={{ padding: 24 }}
-          data={[]}
-          renderItem={() => null}
-          ListHeaderComponent={
-            <View style={{ gap: 16 }}>
-              <SegmentedControl
-                values={[`Tutte (${words.length})`, "Collezioni"]}
-                selectedIndex={viewMode}
-                onChange={(e) =>
-                  setViewMode(e.nativeEvent.selectedSegmentIndex)
-                }
-              />
-              <CollectionGrid
-                collections={collections}
-                onCreateNew={() => router.push("/create-collection")}
-                onReview={(id) =>
-                  router.push({
-                    pathname: "/(review)/session",
-                    params: { collectionId: String(id) },
-                  })
-                }
-                onRename={handleRename}
-                onDelete={handleDelete}
-              />
-            </View>
-          }
-          onRefresh={refreshCollections}
-          refreshing={false}
-        />
+          contentContainerStyle={{ padding: 24, paddingBottom: 60 }}
+        >
+          {segmentedControl}
+          <CollectionGrid
+            collections={collections}
+            onCreateNew={() => router.push("/create-collection")}
+            onReview={(id) =>
+              router.push({
+                pathname: "/(review)/session",
+                params: { collectionId: String(id) },
+              })
+            }
+            onRename={handleRename}
+            onDelete={handleDelete}
+          />
+        </ScrollView>
       )}
 
       <Stack.Screen.Title large>Parole</Stack.Screen.Title>
 
       {viewMode === 1 && (
-        <Stack.Toolbar>
+        <Stack.Toolbar placement="right">
           <Stack.Toolbar.Button
             icon="sparkles"
             onPress={() => router.push("/organize")}
