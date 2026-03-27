@@ -17,6 +17,14 @@ export default function SearchLayout() {
         options={{ title: "Deklination" }}
       />
       <Stack.Screen
+        name="add-to-collection"
+        options={{
+          presentation: "formSheet",
+          sheetGrabberVisible: true,
+          sheetAllowedDetents: [0.5, 1.0],
+        }}
+      />
+      <Stack.Screen
         name="settings"
         options={{
           presentation: "formSheet",

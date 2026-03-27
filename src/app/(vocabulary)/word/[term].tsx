@@ -34,8 +34,19 @@ export default function WordDetailScreen() {
       </ScrollView>
 
       <Stack.Screen options={{ title: term ?? "" }} />
-      {isNoun && (
-        <Stack.Toolbar placement="right">
+      <Stack.Toolbar placement="right">
+        {word && (
+          <Stack.Toolbar.Button
+            icon="folder.badge.plus"
+            onPress={() =>
+              router.push({
+                pathname: "/add-to-collection",
+                params: { wordId: String(word.id) },
+              })
+            }
+          />
+        )}
+        {isNoun && (
           <Stack.Toolbar.Button
             icon="tablecells"
             onPress={() =>
@@ -45,8 +56,8 @@ export default function WordDetailScreen() {
               })
             }
           />
-        </Stack.Toolbar>
-      )}
+        )}
+      </Stack.Toolbar>
     </>
   );
 }
