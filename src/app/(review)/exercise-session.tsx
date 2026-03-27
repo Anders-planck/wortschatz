@@ -159,16 +159,16 @@ export default function ExerciseSessionScreen() {
             disabled={showFeedback}
           />
         )}
-
-        {lastResult != null && (
-          <ExerciseFeedback
-            isCorrect={lastResult.isCorrect}
-            correctAnswer={correctAnswer}
-            hint={hint}
-            onContinue={handleContinue}
-          />
-        )}
       </ScrollView>
+
+      {lastResult != null && (
+        <ExerciseFeedback
+          isCorrect={lastResult.isCorrect}
+          correctAnswer={correctAnswer}
+          hint={hint}
+          onContinue={handleContinue}
+        />
+      )}
       <Stack.Screen options={{ title }} />
     </>
   );

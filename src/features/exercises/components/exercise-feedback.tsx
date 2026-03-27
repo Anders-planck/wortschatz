@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Image } from "expo-image";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
@@ -17,6 +18,7 @@ export function ExerciseFeedback({
   onContinue,
 }: ExerciseFeedbackProps) {
   const { colors, textStyles } = useAppTheme();
+  const { bottom } = useSafeAreaInsets();
 
   const bgColor = isCorrect ? "#1A3A1A" : "#3A1A1A";
   const iconName = isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill";
@@ -32,7 +34,7 @@ export function ExerciseFeedback({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 24,
-        paddingBottom: 36,
+        paddingBottom: Math.max(bottom, 24),
         gap: 12,
       }}
     >
