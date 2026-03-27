@@ -314,23 +314,23 @@ export function DeclensionScreen({ term }: DeclensionScreenProps) {
                 { fontSize: 10, color: colors.textMuted, lineHeight: 16 },
               ]}
             >
-              L'articolo cambia in base al caso grammaticale. Il{" "}
+              {"L'articolo cambia in base al caso grammaticale. Il "}
               <Text style={{ fontWeight: "700", color: colors.textTertiary }}>
                 Nominativ
-              </Text>{" "}
-              è il soggetto, l'
+              </Text>
+              {" è il soggetto, l'"}
               <Text style={{ fontWeight: "700", color: colors.textTertiary }}>
                 Akkusativ
-              </Text>{" "}
-              l'oggetto diretto, il{" "}
+              </Text>
+              {" l'oggetto diretto, il "}
               <Text style={{ fontWeight: "700", color: colors.textTertiary }}>
                 Dativ
-              </Text>{" "}
-              l'oggetto indiretto, e il{" "}
+              </Text>
+              {" l'oggetto indiretto, e il "}
               <Text style={{ fontWeight: "700", color: colors.textTertiary }}>
                 Genitiv
-              </Text>{" "}
-              indica possesso.
+              </Text>
+              {" indica possesso."}
             </Text>
           </Animated.View>
         )}

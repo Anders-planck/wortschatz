@@ -188,7 +188,7 @@ export default function OrganizeScreen() {
             }}
           >
             <Text style={[textStyles.heading, { fontSize: 16 }]}>
-              Errore nell'organizzazione
+              {"Errore nell'organizzazione"}
             </Text>
             <Text
               style={[
