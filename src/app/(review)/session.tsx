@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native";
 
 import { useThemeColors } from "@/features/shared/theme/theme-context";
@@ -13,6 +13,7 @@ import { SessionEmpty } from "@/features/review/components/session-empty";
 export default function SessionScreen() {
   const colors = useThemeColors();
   const router = useRouter();
+  const { collectionId } = useLocalSearchParams<{ collectionId?: string }>();
   const {
     words,
     currentIndex,
@@ -24,7 +25,7 @@ export default function SessionScreen() {
     startSession,
     reveal,
     respond,
-  } = useReviewSession();
+  } = useReviewSession(collectionId ? Number(collectionId) : undefined);
 
   useEffect(() => {
     startSession();

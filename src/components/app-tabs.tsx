@@ -15,9 +15,9 @@ export default function AppTabs() {
 
       <NativeTabs.Trigger name="(vocabulary)">
         <NativeTabs.Trigger.Icon
-          sf={{ default: "list.bullet", selected: "list.bullet" }}
+          sf={{ default: "folder", selected: "folder.fill" }}
         />
-        <NativeTabs.Trigger.Label>Parole</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Liste</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="(review)">

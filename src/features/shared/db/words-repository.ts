@@ -1,7 +1,7 @@
 import type { Word } from "@/features/dictionary/types";
 import { getDatabase } from "./database";
 
-interface WordRow {
+export interface WordRow {
   id: number;
   term: string;
   type: string;
@@ -29,7 +29,7 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
   }
 }
 
-function rowToWord(row: WordRow): Word {
+export function rowToWord(row: WordRow): Word {
   return {
     id: row.id,
     term: row.term,

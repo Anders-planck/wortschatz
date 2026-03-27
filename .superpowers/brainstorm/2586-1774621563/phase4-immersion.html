@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fase 4: Immersione</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500&family=Ubuntu+Mono:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #1A1816; --card: #262320; --cream: #201E1B;
+    --text-primary: #E8E2D8; --text-secondary: #B8AFA5; --text-tertiary: #8A8078;
+    --text-muted: #6A6258; --text-hint: #5A5248; --text-ghost: #4A4238;
+    --border: #3A3530; --accent: #D4A44A; --accent-light: #3A3020;
+    --der: #D4B97A; --die: #E0B8AE; --das: #9DC59A; --verb: #C0B8E0;
+    --correct: #6AAF6A; --correct-bg: #1a2a1a;
+  }
+  body { background: #111; color: var(--text-primary); font-family: 'IBM Plex Sans', sans-serif; padding: 32px 16px; }
+  .page-title { font-family: 'Outfit'; font-size: 28px; font-weight: 700; text-align: center; color: var(--accent); letter-spacing: -1px; margin-bottom: 4px; }
+  .page-sub { text-align: center; font-family: 'Ubuntu Mono'; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 40px; }
+  .flow { max-width: 400px; margin: 0 auto; }
+  .step-title { font-family: 'Outfit'; font-size: 17px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .step-desc { text-align: center; font-size: 12px; color: var(--text-tertiary); margin-bottom: 16px; line-height: 1.4; }
+  .native-badge { display: inline-block; font-family: 'Ubuntu Mono'; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; background: #1a3a2a; color: #6aaf6a; padding: 2px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+  .phone { background: var(--bg); border-radius: 28px; border: 2px solid #2a2826; overflow: hidden; margin-bottom: 40px; }
+  .status-bar { height: 54px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 24px 6px; font-size: 14px; font-weight: 600; }
+  .ios-header-small { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px 12px; }
+  .ios-back { font-size: 20px; color: var(--accent); }
+  .ios-header-center { font-family: 'Outfit'; font-size: 17px; font-weight: 600; }
+  .flow-arrow { text-align: center; padding: 12px 0; color: var(--accent); opacity: 0.4; font-size: 18px; }
+  .flow-note { text-align: center; font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-ghost); padding: 4px 0 16px; }
+
+  /* Word family tree */
+  .tree-root { text-align: center; padding: 20px; }
+  .tree-root .root-word { font-family: 'Outfit'; font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+  .tree-root .root-meaning { font-family: 'Ubuntu Mono'; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .tree-root .root-badge { font-family: 'Ubuntu Mono'; font-size: 9px; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; }
+
+  .tree-branches { padding: 0 16px; }
+  .tree-line { width: 1px; height: 20px; background: var(--border); margin: 0 auto; }
+  .tree-h-line { height: 1px; background: var(--border); margin: 0 40px; }
+
+  .branch-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 8px 0; }
+  .branch-card { background: var(--card); border-radius: 12px; padding: 12px 14px; min-width: 100px; text-align: center; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; }
+  .branch-card:hover { border-color: var(--border); }
+  .branch-card.saved { border-color: var(--accent); }
+  .branch-card .b-prefix { font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--accent); margin-bottom: 2px; }
+  .branch-card .b-word { font-family: 'Outfit'; font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .branch-card .b-trans { font-size: 11px; color: var(--text-muted); }
+  .branch-card .b-type { font-family: 'Ubuntu Mono'; font-size: 8px; color: var(--text-ghost); margin-top: 4px; }
+  .branch-card .saved-check { color: var(--accent); font-size: 12px; position: absolute; top: 6px; right: 8px; }
+
+  /* Synonyms / Antonyms */
+  .syn-section { padding: 0 20px; margin-bottom: 16px; }
+  .syn-label { font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .syn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .syn-chip { font-family: 'Outfit'; font-size: 14px; font-weight: 500; padding: 8px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+  .syn-chip:hover { border-color: var(--accent); }
+  .syn-chip .intensity { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+  .ant-chip { background: var(--cream); border-color: rgba(192,112,96,0.2); }
+
+  /* Reading section */
+  .reading-card { background: var(--card); border-radius: 16px; margin: 0 16px 10px; overflow: hidden; cursor: pointer; transition: transform 0.15s; }
+  .reading-card:hover { transform: scale(1.01); }
+  .reading-card .reading-img { height: 100px; background: linear-gradient(135deg, var(--accent-light), var(--cream)); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+  .reading-card .reading-body { padding: 14px 16px; }
+  .reading-card h4 { font-family: 'Outfit'; font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .reading-card .reading-meta { font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-muted); display: flex; gap: 8px; align-items: center; }
+  .reading-card .level-badge { padding: 2px 6px; border-radius: 4px; font-size: 9px; }
+
+  /* Reading view */
+  .reading-text { padding: 0 20px; font-size: 16px; line-height: 1.8; color: var(--text-secondary); }
+  .reading-text .highlight { background: rgba(212,164,74,0.15); padding: 1px 3px; border-radius: 3px; color: var(--text-primary); cursor: pointer; border-bottom: 1px dashed var(--accent); }
+  .reading-text .known { color: var(--text-primary); }
+
+  /* Inline translation popup */
+  .inline-popup { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin: 8px 0; display: inline-block; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+  .inline-popup .ip-word { font-family: 'Outfit'; font-weight: 600; font-size: 14px; }
+  .inline-popup .ip-trans { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .inline-popup .ip-actions { display: flex; gap: 6px; margin-top: 6px; }
+  .inline-popup .ip-btn { font-family: 'Ubuntu Mono'; font-size: 9px; padding: 3px 8px; border-radius: 4px; cursor: pointer; }
+  .inline-popup .ip-btn.save { background: var(--accent); color: var(--bg); }
+  .inline-popup .ip-btn.speak { background: var(--accent-light); color: var(--accent); }
+
+  /* Listening exercise */
+  .listen-card { background: var(--card); border-radius: 16px; margin: 0 16px; padding: 20px; text-align: center; }
+  .listen-speaker { width: 72px; height: 72px; border-radius: 36px; background: var(--accent); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 28px; color: var(--bg); cursor: pointer; }
+  .listen-text { font-family: 'Outfit'; font-size: 18px; line-height: 1.6; margin-bottom: 16px; }
+  .listen-options { display: flex; flex-direction: column; gap: 8px; text-align: left; }
+  .listen-opt { background: var(--cream); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.15s; }
+  .listen-opt:hover { border-color: var(--text-muted); }
+  .listen-opt.correct { border-color: var(--correct); background: var(--correct-bg); }
+  .listen-opt .opt-letter { font-family: 'Ubuntu Mono'; font-size: 12px; font-weight: 700; width: 24px; height: 24px; border-radius: 6px; background: var(--card); display: flex; align-items: center; justify-content: center; color: var(--text-muted); flex-shrink: 0; }
+  .listen-opt.correct .opt-letter { background: var(--correct); color: white; }
+  .listen-opt .opt-text { font-size: 14px; }
+
+  /* Speed controls */
+  .speed-controls { display: flex; gap: 10px; justify-content: center; margin: 12px 0; }
+  .speed-btn { width: 40px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+  .speed-btn.main { width: 56px; height: 56px; border-radius: 28px; background: var(--accent); color: var(--bg); font-size: 22px; }
+  .speed-btn.secondary { background: var(--accent-light); color: var(--accent); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="page-title">Fase 4: Immersione</div>
+<p class="page-sub">4 feature · 8 schermate</p>
+
+<div class="flow">
+
+<!-- ══════════════ FEATURE A: Word Families ══════════════ -->
+<div class="step-title">A1. Famiglie di Parole</div>
+<div class="step-desc">Dalla word card, tap su "🌳 Famiglia" → albero delle parole derivate dalla stessa radice. Tap per salvare.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>22:20</span><span style="font-size: 12px;">····</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Wortfamilie</span>
+    <span style="color: var(--accent);">🔊</span>
+  </div>
+
+  <div class="tree-root">
+    <div class="root-word">fahren</div>
+    <div class="root-meaning">guidare, andare (veicolo)</div>
+    <div class="root-badge">RADICE: fahr-</div>
+  </div>
+
+  <div class="tree-branches">
+    <div class="tree-line"></div>
+    <div class="tree-h-line"></div>
+
+    <div class="branch-row">
+      <div class="branch-card saved" style="position: relative;">
+        <div class="b-prefix">der</div>
+        <div class="b-word" style="color: var(--der);">Fahrer</div>
+        <div class="b-trans">autista</div>
+        <div class="b-type">noun · masc</div>
+      </div>
+      <div class="branch-card">
+        <div class="b-prefix">das</div>
+        <div class="b-word" style="color: var(--das);">Fahrrad</div>
+        <div class="b-trans">bicicletta</div>
+        <div class="b-type">noun · neut</div>
+      </div>
+    </div>
+
+    <div class="branch-row">
+      <div class="branch-card">
+        <div class="b-prefix">die</div>
+        <div class="b-word" style="color: var(--die);">Erfahrung</div>
+        <div class="b-trans">esperienza</div>
+        <div class="b-type">noun · fem</div>
+      </div>
+      <div class="branch-card">
+        <div class="b-prefix">die</div>
+        <div class="b-word" style="color: var(--die);">Abfahrt</div>
+        <div class="b-trans">partenza</div>
+        <div class="b-type">noun · fem</div>
+      </div>
+    </div>
+
+    <div class="branch-row">
+      <div class="branch-card">
+        <div class="b-word" style="color: var(--verb);">erfahren</div>
+        <div class="b-trans">scoprire, apprendere</div>
+        <div class="b-type">verb · irr.</div>
+      </div>
+      <div class="branch-card">
+        <div class="b-prefix">die</div>
+        <div class="b-word" style="color: var(--die);">Ausfahrt</div>
+        <div class="b-trans">uscita (autostrada)</div>
+        <div class="b-type">noun · fem</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 16px 20px;">
+    <div style="background: var(--accent-light); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 8px;">
+      <span style="color: var(--accent);">✦</span>
+      <div style="font-size: 12px; color: var(--text-secondary); flex: 1;">Tap su una parola per salvarla nel vocabolario</div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">dalla word card → sezione sinonimi</div>
+
+<!-- ══════════════ FEATURE B: Synonyms/Antonyms ══════════════ -->
+<div class="step-title">B1. Sinonimi & Contrari</div>
+<div class="step-desc">Nella word card, sotto le traduzioni. Sinonimi con "intensità" (quanto sono simili), contrari in rosato.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>22:21</span><span style="font-size: 12px;">····</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">groß</span>
+    <span style="color: var(--accent);">🔊</span>
+  </div>
+
+  <div style="padding: 16px 20px;">
+    <div style="font-family: 'Outfit'; font-size: 28px; font-weight: 700; margin-bottom: 4px;">groß</div>
+    <div style="font-family: 'Ubuntu Mono'; font-size: 11px; color: var(--text-muted);">adjective</div>
+    <div style="font-size: 15px; color: var(--text-secondary); margin-top: 8px;">grande, alto</div>
+  </div>
+
+  <div style="height: 1px; background: var(--border); margin: 0 20px;"></div>
+
+  <div style="padding-top: 16px;">
+    <div class="syn-section">
+      <div class="syn-label">≈ Sinonimi</div>
+      <div class="syn-row">
+        <div class="syn-chip"><span class="intensity" style="background: var(--correct);"></span> riesig <span style="font-size: 10px; color: var(--text-ghost);">enorme</span></div>
+        <div class="syn-chip"><span class="intensity" style="background: var(--correct); opacity: 0.7;"></span> enorm <span style="font-size: 10px; color: var(--text-ghost);">enorme</span></div>
+        <div class="syn-chip"><span class="intensity" style="background: var(--correct); opacity: 0.4;"></span> gewaltig <span style="font-size: 10px; color: var(--text-ghost);">immenso</span></div>
+      </div>
+    </div>
+
+    <div class="syn-section">
+      <div class="syn-label">↔ Contrari</div>
+      <div class="syn-row">
+        <div class="syn-chip ant-chip"><span class="intensity" style="background: #C07060;"></span> klein <span style="font-size: 10px; color: var(--text-ghost);">piccolo</span></div>
+        <div class="syn-chip ant-chip"><span class="intensity" style="background: #C07060; opacity: 0.6;"></span> winzig <span style="font-size: 10px; color: var(--text-ghost);">minuscolo</span></div>
+      </div>
+    </div>
+
+    <div class="syn-section">
+      <div class="syn-label">📐 Comparazione</div>
+      <div style="background: var(--card); border-radius: 12px; padding: 14px; display: flex; gap: 20px; justify-content: center;">
+        <div style="text-align: center;">
+          <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost); margin-bottom: 4px;">POSITIV</div>
+          <div style="font-family: 'Outfit'; font-size: 16px; font-weight: 600;">groß</div>
+        </div>
+        <div style="color: var(--text-ghost); align-self: center;">→</div>
+        <div style="text-align: center;">
+          <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost); margin-bottom: 4px;">KOMPARATIV</div>
+          <div style="font-family: 'Outfit'; font-size: 16px; font-weight: 600; color: var(--accent);">größer</div>
+        </div>
+        <div style="color: var(--text-ghost); align-self: center;">→</div>
+        <div style="text-align: center;">
+          <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost); margin-bottom: 4px;">SUPERLATIV</div>
+          <div style="font-family: 'Outfit'; font-size: 16px; font-weight: 600; color: var(--accent);">am größten</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">tab ripasso → sezione "leggi"</div>
+
+<!-- ══════════════ FEATURE C: Reading ══════════════ -->
+<div class="step-title">C1. Testi da Leggere — Lista</div>
+<div class="step-desc">Brevi articoli graduati per livello. Generati dall'AI usando le parole del tuo vocabolario.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>22:22</span><span style="font-size: 12px;">····</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Letture</span>
+    <span></span>
+  </div>
+
+  <div style="padding: 8px 20px 12px;">
+    <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-muted);">Storie con le tue parole · tap per leggere</div>
+  </div>
+
+  <div class="reading-card">
+    <div class="reading-img" style="background: linear-gradient(135deg, #2a2420, #3a3020);">📖</div>
+    <div class="reading-body">
+      <h4>Ein Tag im Supermarkt</h4>
+      <div class="reading-meta">
+        <span class="level-badge" style="background: var(--correct-bg); color: var(--correct);">A2</span>
+        <span>120 parole</span>
+        <span>·</span>
+        <span>8 parole note</span>
+        <span style="color: var(--accent);">✦ AI</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="reading-card">
+    <div class="reading-img" style="background: linear-gradient(135deg, #201a2a, #2a2030);">🏢</div>
+    <div class="reading-body">
+      <h4>Mein erster Arbeitstag</h4>
+      <div class="reading-meta">
+        <span class="level-badge" style="background: var(--accent-light); color: var(--accent);">B1</span>
+        <span>180 parole</span>
+        <span>·</span>
+        <span>12 parole note</span>
+        <span style="color: var(--accent);">✦ AI</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="reading-card">
+    <div class="reading-img" style="background: linear-gradient(135deg, #1a2a20, #203020);">✈️</div>
+    <div class="reading-body">
+      <h4>Reise nach Berlin</h4>
+      <div class="reading-meta">
+        <span class="level-badge" style="background: var(--correct-bg); color: var(--correct);">A2</span>
+        <span>100 parole</span>
+        <span>·</span>
+        <span>6 parole note</span>
+        <span style="color: var(--accent);">✦ AI</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">tap su storia</div>
+
+<!-- ══════════════ FEATURE C2: Reading View ══════════════ -->
+<div class="step-title">C2. Lettura con Tap-to-Translate</div>
+<div class="step-desc">Testo con parole note evidenziate. Tap su qualsiasi parola → popup con traduzione + salva nel vocabolario.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>22:23</span><span style="font-size: 12px;">····</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Ein Tag im Supermarkt</span>
+    <span style="color: var(--accent);">🔊</span>
+  </div>
+
+  <div style="padding: 4px 20px;">
+    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+      <span style="font-family: 'Ubuntu Mono'; font-size: 9px; padding: 2px 6px; border-radius: 4px; background: var(--correct-bg); color: var(--correct);">A2</span>
+      <span style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost);">120 Wörter · 2 min</span>
+    </div>
+  </div>
+
+  <div class="reading-text">
+    Heute <span class="known">gehe</span> ich in den <span class="highlight">Supermarkt</span>.
+
+    <div class="inline-popup">
+      <div class="ip-word"><span style="color: var(--der);">der</span> Supermarkt</div>
+      <div class="ip-trans">supermercato</div>
+      <div class="ip-actions">
+        <div class="ip-btn save">⊕ Salva</div>
+        <div class="ip-btn speak">🔊</div>
+      </div>
+    </div>
+
+    Ich <span class="known">brauche</span> <span class="highlight">Milch</span>, <span class="highlight">Brot</span> und <span class="highlight">Eier</span>. Der <span class="highlight">Laden</span> ist nicht weit von meiner <span class="highlight">Wohnung</span>.
+
+    <div style="margin: 12px 0;"></div>
+
+    An der <span class="highlight">Kasse</span> <span class="known">steht</span> eine lange <span class="highlight">Schlange</span>. Ich <span class="known">warte</span> <span class="highlight">geduldig</span>. Die <span class="highlight">Kassiererin</span> <span class="known">ist</span> sehr <span class="known">freundlich</span>.
+  </div>
+
+  <div style="padding: 16px 20px;">
+    <div style="background: var(--card); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost); text-transform: uppercase; letter-spacing: 1px;">Parole note</div>
+        <div style="font-family: 'Outfit'; font-size: 16px; font-weight: 700; color: var(--correct);">8 <span style="font-size: 12px; color: var(--text-muted);">/ 24</span></div>
+      </div>
+      <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--accent); cursor: pointer;">Salva tutte le nuove →</div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">sezione "ascolta"</div>
+
+<!-- ══════════════ FEATURE D: Listening ══════════════ -->
+<div class="step-title">D1. Ascolto Comprensione</div>
+<div class="step-desc">Ascolta un mini-dialogo o frase, poi rispondi a una domanda di comprensione. TTS con velocità regolabile.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>22:25</span><span style="font-size: 12px;">····</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Ascolto</span>
+    <span></span>
+  </div>
+
+  <div style="padding: 8px 20px;">
+    <div style="font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-ghost); text-align: center;">Ascolta e rispondi</div>
+  </div>
+
+  <div style="padding: 20px;">
+    <div class="listen-card">
+      <div class="speed-controls">
+        <div class="speed-btn secondary">🐢</div>
+        <div class="speed-btn main">🔊</div>
+        <div class="speed-btn secondary">1x</div>
+      </div>
+
+      <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-ghost); text-align: center; margin-bottom: 16px;">Tap per ascoltare di nuovo</div>
+
+      <div style="height: 1px; background: var(--border); margin: 0 0 16px;"></div>
+
+      <div style="font-family: 'Outfit'; font-size: 15px; font-weight: 600; margin-bottom: 12px; text-align: center;">Was hat die Frau im Supermarkt gekauft?</div>
+
+      <div class="listen-options">
+        <div class="listen-opt">
+          <div class="opt-letter">A</div>
+          <div class="opt-text">Milch und Brot</div>
+        </div>
+        <div class="listen-opt correct">
+          <div class="opt-letter">B</div>
+          <div class="opt-text">Äpfel und Wasser</div>
+        </div>
+        <div class="listen-opt">
+          <div class="opt-letter">C</div>
+          <div class="opt-text">Eier und Käse</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">dopo la risposta</div>
+
+<!-- ══════════════ FEATURE D2: Listening Transcript ══════════════ -->
+<div class="step-title">D2. Trascrizione Post-Ascolto</div>
+<div class="step-desc">Dopo aver risposto, mostra il testo completo con parole cliccabili. Replay rallentato disponibile.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>22:25</span><span style="font-size: 12px;">····</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Ascolto</span>
+    <span></span>
+  </div>
+
+  <div style="padding: 20px;">
+    <div style="background: var(--correct-bg); border: 1px solid rgba(106,175,106,0.3); border-radius: 14px; padding: 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+      <span style="font-size: 22px;">✓</span>
+      <div>
+        <div style="font-family: 'Outfit'; font-weight: 600; font-size: 15px; color: var(--correct);">Corretto!</div>
+        <div style="font-size: 12px; color: var(--text-muted);">La donna ha comprato mele e acqua.</div>
+      </div>
+    </div>
+
+    <div style="font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+      <span>Trascrizione</span>
+      <span style="color: var(--accent); cursor: pointer;">🔊 Riascolta</span>
+    </div>
+
+    <div style="background: var(--card); border-radius: 14px; padding: 16px;">
+      <div class="reading-text" style="padding: 0; font-size: 15px; line-height: 1.7;">
+        — Guten Tag, ich <span class="highlight">hätte</span> gerne ein Kilo <span class="highlight">Äpfel</span> und eine <span class="highlight">Flasche</span> Wasser, bitte.
+        <div style="margin: 8px 0;"></div>
+        — <span class="highlight">Selbstverständlich</span>! Das macht zusammen 4,20 Euro. <span class="highlight">Möchten</span> Sie eine <span class="highlight">Tüte</span>?
+        <div style="margin: 8px 0;"></div>
+        — Nein danke, ich habe meine <span class="highlight">eigene</span> Tasche dabei.
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; text-align: center;">
+      <div style="background: var(--accent); color: var(--bg); border-radius: 12px; padding: 12px; font-weight: 500; font-size: 15px; cursor: pointer;">Prossimo esercizio</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<div style="height: 60px;"></div>
+</body>
+</html>

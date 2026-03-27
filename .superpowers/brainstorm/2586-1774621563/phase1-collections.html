@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fase 1: Collezioni & Liste</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500&family=Ubuntu+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #1A1816;
+    --card: #262320;
+    --cream: #201E1B;
+    --text-primary: #E8E2D8;
+    --text-secondary: #B8AFA5;
+    --text-tertiary: #8A8078;
+    --text-muted: #6A6258;
+    --text-hint: #5A5248;
+    --text-ghost: #4A4238;
+    --border: #3A3530;
+    --accent: #D4A44A;
+    --accent-light: #3A3020;
+    --der: #D4B97A;
+    --die: #E0B8AE;
+    --das: #9DC59A;
+    --verb: #C0B8E0;
+    --nom-bg: #222830;
+    --akk-bg: #2E2820;
+    --dat-bg: #242E22;
+    --gen-bg: #2A2430;
+  }
+
+  body {
+    background: #111;
+    color: var(--text-primary);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.5;
+    padding: 40px 20px;
+  }
+
+  .page-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--accent);
+    letter-spacing: -1px;
+  }
+
+  .page-subtitle {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 14px;
+    margin-bottom: 48px;
+    font-family: 'Ubuntu Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .flow-label {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-align: center;
+    padding: 12px 0;
+    position: relative;
+  }
+
+  .flow-label::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 1px;
+    height: 12px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  .screen {
+    background: var(--bg);
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  .screen-header {
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .screen-header-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .screen-header-small {
+    font-family: 'Outfit', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .screen-header-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 14px;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 14px;
+  }
+
+  .screen-body {
+    padding: 0 20px 20px;
+  }
+
+  .screen-label {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    position: absolute;
+    top: 8px;
+    right: 12px;
+  }
+
+  /* Collection Cards */
+  .collection-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .collection-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .collection-card:hover { transform: scale(1.02); }
+
+  .collection-card .strip {
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+
+  .collection-card h4 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .collection-card .count {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .collection-card .ai-badge {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 8px;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Word list inside collection */
+  .word-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+
+  .word-row:last-child { border-bottom: none; }
+
+  .word-row .dot {
+    width: 4px;
+    height: 24px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .word-row .term {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    flex: 1;
+  }
+
+  .word-row .translation {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Add to collection modal */
+  .modal-overlay {
+    background: rgba(0,0,0,0.6);
+    border-radius: 24px;
+    padding: 20px;
+  }
+
+  .modal-sheet {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .modal-grabber {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--text-ghost);
+    margin: 0 auto 16px;
+  }
+
+  .modal-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .list-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .list-option:hover { background: var(--cream); }
+
+  .list-option .icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .list-option .name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    flex: 1;
+  }
+
+  .list-option .check {
+    color: var(--accent);
+    font-size: 18px;
+  }
+
+  .create-new {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1.5px dashed var(--border);
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .create-new .plus {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--accent-light);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 300;
+  }
+
+  .create-new .label {
+    color: var(--accent);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  /* AI suggestions */
+  .ai-suggestion {
+    background: var(--accent-light);
+    border: 1px solid rgba(212, 164, 74, 0.2);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 8px;
+  }
+
+  .ai-suggestion .ai-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .ai-suggestion .ai-icon {
+    font-size: 12px;
+  }
+
+  .ai-suggestion .ai-label {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .ai-suggestion .suggestion-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .ai-suggestion .word-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .word-chip {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .word-chip:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .word-chip.added {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Buttons */
+  .btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn:hover { opacity: 0.85; }
+
+  .btn-accent {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-tertiary);
+    border: 1px solid var(--border);
+  }
+
+  /* Segmented */
+  .segmented {
+    display: flex;
+    background: var(--cream);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .segmented .seg {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .segmented .seg.active {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Section divider */
+  .section-sep {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .section-sep .line {
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+    opacity: 0.3;
+  }
+
+  .section-title-bar {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    padding: 24px 0 8px;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  .section-desc {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin-bottom: 24px;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .screen-note {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 10px;
+    color: var(--text-ghost);
+    text-align: center;
+    padding: 8px;
+    background: var(--cream);
+    border-radius: 0 0 24px 24px;
+  }
+
+  /* Tab bar mock */
+  .tab-bar {
+    display: flex;
+    padding: 8px 0 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  .tab-bar .tab {
+    flex: 1;
+    text-align: center;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 9px;
+    color: var(--text-ghost);
+    padding: 4px 0;
+  }
+
+  .tab-bar .tab.active { color: var(--accent); }
+
+  .arrow-down {
+    text-align: center;
+    color: var(--accent);
+    font-size: 20px;
+    opacity: 0.5;
+    padding: 4px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">Fase 1: Collezioni & Liste</div>
+<p class="page-subtitle">Flusso completo · 6 schermate</p>
+
+<div class="flow">
+
+  <!-- SCREEN 1: Collections Tab -->
+  <div class="section-title-bar">1. Tab Collezioni</div>
+  <p class="section-desc">Nuova sezione nel tab Parole — griglia di collezioni con badge AI per quelle auto-generate</p>
+
+  <div class="screen">
+    <span class="screen-label">PAROLE</span>
+    <div class="screen-header">
+      <div class="screen-header-title">Parole</div>
+      <div class="screen-header-icon">+</div>
+    </div>
+    <div class="screen-body">
+      <div class="segmented">
+        <div class="seg">Tutte (24)</div>
+        <div class="seg active">Collezioni</div>
+      </div>
+
+      <div class="collection-grid">
+        <div class="collection-card">
+          <div class="strip" style="background: linear-gradient(90deg, var(--accent), #E8C06A);"></div>
+          <h4>Verbi d'azione</h4>
+          <div class="count">8 parole</div>
+        </div>
+        <div class="collection-card">
+          <div class="strip" style="background: linear-gradient(90deg, #7A9EC0, #A8C0D0);"></div>
+          <h4>Lavoro</h4>
+          <div class="count">12 parole</div>
+        </div>
+        <div class="collection-card">
+          <span class="ai-badge">AI</span>
+          <div class="strip" style="background: linear-gradient(90deg, var(--das), #B8D8A8);"></div>
+          <h4>Reisen</h4>
+          <div class="count">6 parole</div>
+        </div>
+        <div class="collection-card">
+          <span class="ai-badge">AI</span>
+          <div class="strip" style="background: linear-gradient(90deg, var(--die), #E8C0B8);"></div>
+          <h4>Alltag</h4>
+          <div class="count">15 parole</div>
+        </div>
+        <div class="collection-card">
+          <div class="strip" style="background: linear-gradient(90deg, var(--verb), #D0C8E8);"></div>
+          <h4>Modalverben</h4>
+          <div class="count">6 parole</div>
+        </div>
+        <div class="collection-card" style="border: 1.5px dashed var(--border); background: transparent; display: flex; align-items: center; justify-content: center; min-height: 80px;">
+          <div style="text-align: center;">
+            <div style="color: var(--accent); font-size: 24px; font-weight: 300;">+</div>
+            <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-muted); margin-top: 4px;">NUOVA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab">Cerca</div>
+      <div class="tab active">Parole</div>
+      <div class="tab">Ripasso</div>
+      <div class="tab">⚙</div>
+    </div>
+  </div>
+
+  <div class="flow-label">tap su collezione</div>
+
+  <!-- SCREEN 2: Inside Collection -->
+  <div class="section-title-bar">2. Dentro una Collezione</div>
+  <p class="section-desc">Lista parole con opzioni di gestione. Header mostra info + azioni rapide</p>
+
+  <div class="screen">
+    <span class="screen-label">COLLEZIONE</span>
+    <div class="screen-header">
+      <div style="font-size: 22px; cursor: pointer;">‹</div>
+      <div class="screen-header-small">Verbi d'azione</div>
+      <div style="display: flex; gap: 12px;">
+        <span style="color: var(--text-muted); font-size: 16px; cursor: pointer;">✎</span>
+        <span style="color: var(--accent); font-size: 14px; cursor: pointer;">▶</span>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div style="background: var(--accent-light); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase;">Progresso</div>
+          <div style="font-family: 'Outfit'; font-size: 20px; font-weight: 700; color: var(--accent);">5<span style="font-size: 14px; color: var(--text-muted);"> / 8</span></div>
+        </div>
+        <div class="btn btn-accent" style="font-size: 12px; padding: 8px 14px;">Ripassa questa lista</div>
+      </div>
+
+      <div class="word-row">
+        <div class="dot" style="background: var(--verb);"></div>
+        <div class="term">arbeiten</div>
+        <div class="translation">lavorare</div>
+      </div>
+      <div class="word-row">
+        <div class="dot" style="background: var(--verb);"></div>
+        <div class="term">laufen</div>
+        <div class="translation">correre</div>
+      </div>
+      <div class="word-row">
+        <div class="dot" style="background: var(--verb);"></div>
+        <div class="term">schreiben</div>
+        <div class="translation">scrivere</div>
+      </div>
+      <div class="word-row">
+        <div class="dot" style="background: var(--verb);"></div>
+        <div class="term">sprechen</div>
+        <div class="translation">parlare</div>
+      </div>
+      <div class="word-row">
+        <div class="dot" style="background: var(--verb);"></div>
+        <div class="term">fahren</div>
+        <div class="translation">guidare</div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <div class="ai-suggestion">
+          <div class="ai-header">
+            <span class="ai-icon">✦</span>
+            <span class="ai-label">Suggerimenti AI</span>
+          </div>
+          <div class="suggestion-text">Basandomi sulla tua lista "Verbi d'azione", potresti aggiungere:</div>
+          <div class="word-chips">
+            <div class="word-chip">schwimmen</div>
+            <div class="word-chip">kochen</div>
+            <div class="word-chip added">✓ spielen</div>
+            <div class="word-chip">tanzen</div>
+            <div class="word-chip">lesen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-label">long press su parola nella word card</div>
+
+  <!-- SCREEN 3: Add to Collection Sheet -->
+  <div class="section-title-bar">3. Aggiungi a Collezione</div>
+  <p class="section-desc">Sheet modale dal word detail — scegli la lista o creane una nuova</p>
+
+  <div class="screen">
+    <div class="modal-overlay">
+      <div class="modal-sheet">
+        <div class="modal-grabber"></div>
+        <div class="modal-title">Aggiungi "Tisch" a...</div>
+
+        <div class="list-option">
+          <div class="icon" style="background: var(--accent-light);">🏠</div>
+          <div class="name">Alltag</div>
+          <span class="check">✓</span>
+        </div>
+        <div class="list-option">
+          <div class="icon" style="background: var(--nom-bg);">💼</div>
+          <div class="name">Lavoro</div>
+        </div>
+        <div class="list-option">
+          <div class="icon" style="background: var(--dat-bg);">✈️</div>
+          <div class="name">Reisen</div>
+        </div>
+        <div class="list-option">
+          <div class="icon" style="background: var(--gen-bg);">📚</div>
+          <div class="name">Modalverben</div>
+        </div>
+
+        <div class="create-new">
+          <div class="plus">+</div>
+          <div class="label">Crea nuova lista</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-label">tap "crea nuova lista"</div>
+
+  <!-- SCREEN 4: Create Collection -->
+  <div class="section-title-bar">4. Crea Collezione</div>
+  <p class="section-desc">Nome + colore + opzione di popolamento AI automatico</p>
+
+  <div class="screen">
+    <div class="modal-overlay">
+      <div class="modal-sheet">
+        <div class="modal-grabber"></div>
+        <div class="modal-title">Nuova collezione</div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 6px;">NOME</div>
+          <div style="background: var(--cream); border-radius: 10px; padding: 12px 14px; color: var(--text-primary); font-family: 'Outfit'; font-size: 16px; border: 1px solid var(--border);">
+            Wohnung<span style="animation: blink 1s infinite; color: var(--accent);">|</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 6px;">COLORE</div>
+          <div style="display: flex; gap: 8px;">
+            <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--der); cursor: pointer;"></div>
+            <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--die); cursor: pointer;"></div>
+            <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--das); cursor: pointer; border: 2px solid var(--text-primary);"></div>
+            <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--verb); cursor: pointer;"></div>
+            <div style="width: 28px; height: 28px; border-radius: 14px; background: #A8C0D0; cursor: pointer;"></div>
+            <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--accent); cursor: pointer;"></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--accent-light); border-radius: 10px; border: 1px solid rgba(212,164,74,0.2);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 14px;">✦</span>
+              <div>
+                <div style="font-family: 'Outfit'; font-size: 13px; font-weight: 500; color: var(--text-primary);">Popola con AI</div>
+                <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-muted);">Suggerisce parole dal tuo vocabolario</div>
+              </div>
+            </div>
+            <div style="width: 42px; height: 24px; border-radius: 12px; background: var(--accent); position: relative;">
+              <div style="width: 20px; height: 20px; border-radius: 10px; background: white; position: absolute; top: 2px; right: 2px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <div class="btn btn-ghost" style="flex: 1; text-align: center;">Annulla</div>
+          <div class="btn btn-accent" style="flex: 1; text-align: center;">Crea</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-label">AI analizza il vocabolario</div>
+
+  <!-- SCREEN 5: AI Auto-triage -->
+  <div class="section-title-bar">5. Triage AI</div>
+  <p class="section-desc">L'AI suggerisce come organizzare le parole non ancora in nessuna lista</p>
+
+  <div class="screen">
+    <span class="screen-label">AI ORGANIZER</span>
+    <div class="screen-header">
+      <div style="font-size: 22px; cursor: pointer;">‹</div>
+      <div class="screen-header-small">Organizza con AI</div>
+      <div></div>
+    </div>
+    <div class="screen-body">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 32px; margin-bottom: 8px;">✦</div>
+        <div style="font-family: 'Outfit'; font-size: 15px; color: var(--text-secondary);">12 parole non sono in nessuna lista</div>
+        <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-muted); margin-top: 4px;">L'AI propone queste categorie</div>
+      </div>
+
+      <div class="ai-suggestion" style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="font-family: 'Outfit'; font-weight: 600; font-size: 14px;">🍽️ Essen & Trinken</div>
+          <div class="btn btn-accent" style="font-size: 10px; padding: 4px 10px;">Crea lista</div>
+        </div>
+        <div class="word-chips">
+          <div class="word-chip">Tisch</div>
+          <div class="word-chip">Küche</div>
+          <div class="word-chip">Wasser</div>
+          <div class="word-chip">Brot</div>
+        </div>
+      </div>
+
+      <div class="ai-suggestion" style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="font-family: 'Outfit'; font-weight: 600; font-size: 14px;">🏢 Arbeit</div>
+          <div class="btn btn-accent" style="font-size: 10px; padding: 4px 10px;">Crea lista</div>
+        </div>
+        <div class="word-chips">
+          <div class="word-chip">Prüfung</div>
+          <div class="word-chip">arbeiten</div>
+          <div class="word-chip">Büro</div>
+        </div>
+      </div>
+
+      <div class="ai-suggestion">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="font-family: 'Outfit'; font-weight: 600; font-size: 14px;">🚶 Bewegung</div>
+          <div class="btn btn-ghost" style="font-size: 10px; padding: 4px 10px;">Ignora</div>
+        </div>
+        <div class="word-chips">
+          <div class="word-chip">laufen</div>
+          <div class="word-chip">fahren</div>
+          <div class="word-chip">gehen</div>
+          <div class="word-chip">ausgehen</div>
+          <div class="word-chip">kommen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-label">risultato</div>
+
+  <!-- SCREEN 6: Collection with study mode -->
+  <div class="section-title-bar">6. Studio Collezione</div>
+  <p class="section-desc">Ripasso mirato — solo le parole di una lista specifica, con progresso dedicato</p>
+
+  <div class="screen">
+    <span class="screen-label">SESSIONE</span>
+    <div style="padding: 20px; text-align: center;">
+      <div style="font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 4px;">VERBI D'AZIONE · 3 / 8</div>
+
+      <div style="display: flex; gap: 3px; margin: 12px 0 32px; padding: 0 20px;">
+        <div style="flex: 1; height: 3px; border-radius: 2px; background: var(--verb);"></div>
+        <div style="flex: 1; height: 3px; border-radius: 2px; background: var(--verb);"></div>
+        <div style="flex: 1; height: 3px; border-radius: 2px; background: var(--verb);"></div>
+        <div style="flex: 1; height: 3px; border-radius: 2px; background: var(--text-ghost); opacity: 0.3;"></div>
+        <div style="flex: 1; height: 3px; border-radius: 2px; background: var(--text-ghost); opacity: 0.15;"></div>
+        <div style="flex: 1; height: 3px; border-radius: 2px; background: var(--text-ghost); opacity: 0.15;"></div>
+        <div style="flex: 1; height: 3px; border-radius: 2px; background: var(--text-ghost); opacity: 0.15;"></div>
+        <div style="flex: 1; height: 3px; border-radius: 2px; background: var(--text-ghost); opacity: 0.15;"></div>
+      </div>
+
+      <div style="margin: 40px 0;">
+        <div style="font-family: 'Outfit'; font-size: 42px; font-weight: 700; letter-spacing: -1.5px;">sprechen</div>
+        <div style="font-family: 'Ubuntu Mono'; font-size: 11px; color: var(--text-muted); margin-top: 8px;">verb</div>
+      </div>
+
+      <div style="border: 1.5px dashed var(--border); border-radius: 6px; padding: 10px 20px; display: inline-block; margin: 20px 0;">
+        <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-ghost);">tap to reveal</div>
+      </div>
+    </div>
+    <div class="screen-note">Sessione limitata alla collezione selezionata</div>
+  </div>
+
+</div>
+
+<div style="height: 60px;"></div>
+
+<style>
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
+
+</body>
+</html>
