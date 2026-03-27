@@ -16,6 +16,24 @@ export default function VocabularyLayout() {
         name="declension/[term]"
         options={{ title: "Deklination" }}
       />
+      <Stack.Screen name="collection/[id]" />
+      <Stack.Screen
+        name="add-to-collection"
+        options={{
+          presentation: "formSheet",
+          sheetGrabberVisible: true,
+          sheetAllowedDetents: [0.5, 1.0],
+        }}
+      />
+      <Stack.Screen
+        name="create-collection"
+        options={{
+          presentation: "formSheet",
+          sheetGrabberVisible: true,
+          sheetAllowedDetents: [0.75, 1.0],
+        }}
+      />
+      <Stack.Screen name="organize" />
     </Stack>
   );
 }
