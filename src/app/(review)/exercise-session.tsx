@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
@@ -54,20 +54,21 @@ export default function ExerciseSessionScreen() {
   if (session.phase === "loading") {
     return (
       <>
-        <View
-          style={{
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{ flex: 1, backgroundColor: colors.bg }}
+          contentContainerStyle={{
             flex: 1,
             alignItems: "center",
             justifyContent: "center",
             gap: 12,
-            backgroundColor: colors.bg,
           }}
         >
           <ActivityIndicator size="large" color={colors.accent} />
           <Text style={[textStyles.body, { color: colors.textSecondary }]}>
             Generazione esercizi...
           </Text>
-        </View>
+        </ScrollView>
         <Stack.Screen options={{ title }} />
       </>
     );
@@ -76,14 +77,20 @@ export default function ExerciseSessionScreen() {
   if (session.phase === "summary") {
     return (
       <>
-        <ExerciseSummary
-          results={session.results}
-          correctCount={session.correctCount}
-          errorCount={session.errorCount}
-          durationSeconds={session.durationSeconds}
-          onRetryErrors={session.retryErrors}
-          onClose={() => router.back()}
-        />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{ flex: 1, backgroundColor: colors.bg }}
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <ExerciseSummary
+            results={session.results}
+            correctCount={session.correctCount}
+            errorCount={session.errorCount}
+            durationSeconds={session.durationSeconds}
+            onRetryErrors={session.retryErrors}
+            onClose={() => router.back()}
+          />
+        </ScrollView>
         <Stack.Screen options={{ title }} />
       </>
     );
@@ -113,7 +120,12 @@ export default function ExerciseSessionScreen() {
 
   return (
     <>
-      <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={{ flex: 1, backgroundColor: colors.bg }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <ExerciseProgress
           total={session.exercises.length}
           current={session.currentIndex}
@@ -155,7 +167,7 @@ export default function ExerciseSessionScreen() {
             onContinue={handleContinue}
           />
         )}
-      </View>
+      </ScrollView>
       <Stack.Screen options={{ title }} />
     </>
   );
