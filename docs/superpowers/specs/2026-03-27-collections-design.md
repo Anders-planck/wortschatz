@@ -19,21 +19,29 @@ A collection system with three creation paths:
 
 ### New SQLite table: `collections`
 
+Tables are added to `getDatabase()` in `database.ts` alongside existing `CREATE TABLE IF NOT EXISTS` statements.
+
 ```sql
-CREATE TABLE collections (
+CREATE TABLE IF NOT EXISTS collections (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
-  icon TEXT NOT NULL DEFAULT 'folder.fill',  -- SF Symbol name
-  color TEXT NOT NULL DEFAULT '#D4A44A',      -- hex accent color
+  icon TEXT NOT NULL DEFAULT 'folder.fill',
+  color TEXT NOT NULL DEFAULT '#D4A44A',
   is_ai_generated INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
 ```
 
+- `name` is not unique — users can have multiple lists with the same name
+- `icon` stores an SF Symbol name (e.g., `bolt.fill`, `briefcase.fill`)
+- `is_ai_generated` is cosmetic — controls the "AI" badge display. AI-generated collections can be freely edited/renamed
+- `updated_at` is set on creation and updated when words are added/removed. Used to determine "recently active" for featured card
+
 ### New SQLite table: `collection_words` (junction)
 
 ```sql
-CREATE TABLE collection_words (
+CREATE TABLE IF NOT EXISTS collection_words (
   collection_id INTEGER NOT NULL,
   word_id INTEGER NOT NULL,
   added_at TEXT NOT NULL,
@@ -41,23 +49,63 @@ CREATE TABLE collection_words (
   FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE,
   FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE
 );
-CREATE INDEX idx_cw_collection ON collection_words(collection_id);
-CREATE INDEX idx_cw_word ON collection_words(word_id);
+CREATE INDEX IF NOT EXISTS idx_cw_collection ON collection_words(collection_id);
+CREATE INDEX IF NOT EXISTS idx_cw_word ON collection_words(word_id);
 ```
+
+Deleting a word from the vocabulary cascades to remove it from all collections (word counts update automatically).
+
+### Mastery % formula
+
+Mastery percentage for a collection = average of per-word mastery, where each word's mastery is:
+
+```
+wordMastery = clamp((review_score + 5) / 15 * 100, 0, 100)
+```
+
+Score range is -5 to 10. At -5 → 0%, at 10 → 100%. This is computed in the query via SQL `AVG()`.
 
 ### Queries needed
 
-- `getCollections()` — all collections with word count and mastery %
+- `getCollections()` — all collections with word count and mastery %, ordered by `updated_at DESC`
 - `getCollectionWords(collectionId)` — words in a collection with review data
 - `getCollectionsForWord(wordId)` — which collections a word belongs to
 - `getUnorganizedWords()` — words not in any collection
-- `addWordToCollection(collectionId, wordId)`
+- `getWordsForReviewByCollection(collectionId, limit)` — extends existing `getWordsForReview` for scoped sessions
+- `addWordToCollection(collectionId, wordId)` — also updates `collections.updated_at`
 - `removeWordFromCollection(collectionId, wordId)`
-- `createCollection(name, icon, color)`
+- `createCollection(name, icon, color, isAiGenerated?)`
 - `deleteCollection(collectionId)`
-- `updateCollection(collectionId, updates)`
+- `updateCollection(collectionId, { name?, icon?, color? })`
+
+Repository location: `src/features/shared/db/collections-repository.ts` (follows existing pattern where all repos live in `shared/db/`).
 
 ## Screens & Navigation
+
+### Layout changes
+
+Add to `(vocabulary)/_layout.tsx`:
+
+```tsx
+<Stack.Screen name="collection/[id]" />
+<Stack.Screen
+  name="add-to-collection"
+  options={{
+    presentation: "formSheet",
+    sheetGrabberVisible: true,
+    sheetAllowedDetents: [0.5, 1.0],
+  }}
+/>
+<Stack.Screen
+  name="create-collection"
+  options={{
+    presentation: "formSheet",
+    sheetGrabberVisible: true,
+    sheetAllowedDetents: [0.75, 1.0],
+  }}
+/>
+<Stack.Screen name="organize" />
+```
 
 ### 1. Vocabulary tab — Collections view
 
@@ -65,69 +113,62 @@ CREATE INDEX idx_cw_word ON collection_words(word_id);
 
 - Add `SegmentedControl` toggle: "Tutte (N)" | "Collezioni"
 - When "Collezioni" is active, show bento grid of collection cards
-- First card is `featured` (full width) if the user has a recently active collection
-- Each card shows: SF Symbol icon, name, word count, AI badge, progress bar (mastery %)
+- First card is `featured` (full width) = collection with most recent `updated_at`
+- Each card shows: SF Symbol icon, name, word count, AI badge (if `is_ai_generated`), progress bar (mastery %)
 - Last cell is dashed "+" to create new
-- `+` button in header toolbar opens create sheet
-
-**Native components**: `SegmentedControl`, `Stack.Toolbar`
+- Toolbar: `sparkles` button → AI triage, `plus` button → create collection
 
 ### 2. Collection detail
 
 **Route**: `(vocabulary)/collection/[id].tsx` (new)
 
-- Header: collection name + toolbar buttons (play=review, ellipsis=menu)
+- Header: collection name + toolbar buttons (`play.fill` = review, `ellipsis` = menu)
 - Mastery progress card (percentage + mini bar chart)
 - FlatList of words with type-color bar, term, translation
 - AI suggestion block at bottom with word chips (tap to add)
 - Swipe-to-delete on word rows
-
-**Native components**: `Stack.Toolbar`, `FlatList`, swipe actions
 
 ### 3. Add to collection sheet
 
 **Route**: `(vocabulary)/add-to-collection.tsx` (new, formSheet)
 
 - Triggered from word detail toolbar button `folder.badge.plus`
-- Shows list of existing collections with checkmarks for membership
-- "Crea nuova lista" dashed row at bottom
+- Passes `wordId` as route param
+- Shows list of existing collections with checkmarks for current membership
+- "Crea nuova lista" dashed row at bottom → pushes create-collection sheet
 - Multi-select: a word can belong to multiple collections
-
-**Native components**: `formSheet` presentation, `sheetAllowedDetents: [0.5, 1.0]`
 
 ### 4. Create collection sheet
 
 **Route**: `(vocabulary)/create-collection.tsx` (new, formSheet)
 
-- TextInput for name
-- SF Symbol picker grid (8-12 common icons)
-- Color picker (6 accent colors from theme)
-- Toggle "Popola con AI" (Switch)
+- `TextInput` for name
+- SF Symbol picker grid (preset icons: `bolt.fill`, `briefcase.fill`, `airplane`, `sun.max.fill`, `house.fill`, `fork.knife`, `book.fill`, `key.fill`, `heart.fill`, `star.fill`, `flag.fill`, `folder.fill`)
+- Color picker (6 colors from theme: accent, der, die, das, verb, prep)
+- `Switch` toggle "Popola con AI" — when enabled, after creation calls Gemini to suggest words from existing vocabulary
 - Cancel / Create buttons
-
-**Native components**: `formSheet`, `TextInput`, `Switch`
+- Loading state while AI populates (spinner on Create button)
 
 ### 5. AI triage screen
 
 **Route**: `(vocabulary)/organize.tsx` (new)
 
 - Accessible from vocabulary toolbar button `sparkles`
+- If zero unorganized words: show "Tutte le parole sono organizzate!" empty state with checkmark
+- Loading state: spinner while Gemini analyzes (3-5s)
 - Header: "N parole non organizzate"
-- AI analyzes unorganized words and proposes 3-5 category groupings
-- Each group shows: suggested name + icon, word chips
+- AI proposes 3-5 category groupings
+- Each group shows: suggested name + SF Symbol icon, word chips
 - Actions per group: "Crea lista" (accent) or "Ignora" (ghost)
-- Uses Gemini to generate groupings
-
-**Native components**: `Stack` screen
 
 ### 6. Collection-scoped review
 
 **Existing**: `(review)/session.tsx` (extended)
 
-- Accept optional `collectionId` param
-- When present, `getWordsForReview` filters to collection words only
+- `useReviewSession` hook refactored to accept optional `collectionId` parameter
+- When present, `getWordsForReviewByCollection(collectionId)` replaces `getWordsForReview()`
 - Session progress label shows collection name
-- Triggered from collection detail "Ripassa questa lista" button
+- Triggered from collection detail toolbar `play.fill` button via `router.push({ pathname: "/(review)/session", params: { collectionId } })`
 
 ## Context Menu (Long Press)
 
@@ -135,12 +176,13 @@ On collection cards in the bento grid:
 
 ```tsx
 <Link.Menu>
-  <Link.MenuAction title="Ripassa" icon="play.fill" onPress={...} />
-  <Link.MenuAction title="Rinomina" icon="pencil" onPress={...} />
-  <Link.MenuAction title="Condividi" icon="square.and.arrow.up" onPress={...} />
-  <Link.MenuAction title="Elimina" icon="trash" destructive onPress={...} />
+  <Link.MenuAction title="Ripassa" icon="play.fill" onPress={startReview} />
+  <Link.MenuAction title="Rinomina" icon="pencil" onPress={showRenameAlert} />
+  <Link.MenuAction title="Elimina" icon="trash" destructive onPress={confirmDelete} />
 </Link.Menu>
 ```
+
+"Condividi" removed from v1 scope — not enough value to justify the implementation.
 
 ## AI Integration
 
@@ -148,55 +190,66 @@ On collection cards in the bento grid:
 
 Input: list of unorganized words with type, gender, category, translations.
 
-Output: 3-5 groupings, each with:
+Output (structured via Zod schema): 3-5 groupings, each with:
 - `name`: suggested collection name (German)
-- `icon`: SF Symbol name suggestion
+- `icon`: SF Symbol name from the preset list
 - `words`: array of word terms that fit this group
 - `reason`: one-line explanation in Italian
 
 ### Auto-populate prompt (Gemini)
 
-Input: collection name + all user's saved words.
+Input: collection name + all user's saved words (term, type, category).
 
 Output: array of word terms from the user's vocabulary that fit the collection theme.
+
+Both prompts use `generateText` with `Output.object` and Zod schemas, matching the existing `ai-context-service.ts` pattern.
 
 ## Feature Directory Structure
 
 ```
 src/features/collections/
   components/
-    collection-card.tsx       — bento grid card
-    collection-grid.tsx       — bento grid layout
-    collection-word-list.tsx  — FlatList inside collection
-    ai-suggestion-block.tsx   — AI word chip suggestions
-    sf-icon-picker.tsx        — icon selector grid
-    color-picker.tsx          — color selector row
+    collection-card.tsx
+    collection-grid.tsx
+    collection-word-list.tsx
+    ai-suggestion-block.tsx
+    sf-icon-picker.tsx
+    color-picker.tsx
   hooks/
-    use-collections.ts        — CRUD + queries
-    use-ai-triage.ts          — Gemini triage logic
+    use-collections.ts
+    use-ai-triage.ts
   services/
-    collections-repository.ts — SQLite queries
-    ai-collections-service.ts — Gemini prompts
-  types.ts                    — Collection, CollectionWord interfaces
+    ai-collections-service.ts
+  types.ts
+
+src/features/shared/db/
+  collections-repository.ts  (follows existing repo pattern)
 ```
 
 ## Error Handling
 
-- AI triage fails (no network): show "Nessuna connessione" with retry button
-- Empty collections: show empty state with "Aggiungi parole" prompt
-- Delete collection: confirmation alert, words are NOT deleted (only the association)
-- Duplicate word in collection: silently ignore (PRIMARY KEY constraint)
+- AI triage/populate fails (no network): show "Nessuna connessione" with retry button, loading spinner stops
+- Empty collections: show empty state with "Cerca una parola e aggiungila qui" prompt
+- Delete collection: system Alert confirmation, words are NOT deleted (only the junction rows)
+- Duplicate word in collection: silently ignore (PRIMARY KEY constraint handles this)
+- Zero unorganized words: triage screen shows success empty state, not an error
+- Word deletion cascade: deleting a word from vocabulary automatically removes it from all collections
 
 ## Acceptance Criteria
 
 - [ ] SegmentedControl toggles between flat list and collection grid
 - [ ] Bento grid with featured card, progress bars, AI badges
-- [ ] Long press context menu on collection cards
-- [ ] Create collection with name, SF Symbol icon, color
-- [ ] "Popola con AI" toggle auto-suggests words from vocabulary
-- [ ] Add word to collection from word detail toolbar
+- [ ] Long press context menu on collection cards (Ripassa, Rinomina, Elimina)
+- [ ] Create collection with name, SF Symbol icon picker, color picker
+- [ ] "Popola con AI" toggle auto-suggests words from vocabulary on creation
+- [ ] Add word to collection(s) from word detail toolbar (`folder.badge.plus`)
 - [ ] AI triage proposes categories for unorganized words
-- [ ] Collection-scoped review sessions
-- [ ] Collections persist in SQLite across app restarts
-- [ ] All screens respect dark mode theme
-- [ ] All icons are SF Symbols via expo-image
+- [ ] AI triage shows empty state when all words are organized
+- [ ] Collection-scoped review sessions via `collectionId` param
+- [ ] `useReviewSession` accepts optional `collectionId` to filter words
+- [ ] Collections persist in SQLite with `updated_at` tracking
+- [ ] Deleting a word cascades to remove it from all collections
+- [ ] All screens respect dark/light mode theme
+- [ ] All icons are SF Symbols via `expo-image` with `source="sf:name"`
+- [ ] Loading states for AI operations (triage, auto-populate)
+- [ ] New routes registered in `(vocabulary)/_layout.tsx` with correct presentation options
