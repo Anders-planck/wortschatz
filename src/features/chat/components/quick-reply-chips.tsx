@@ -42,9 +42,10 @@ export function QuickReplyChips({
           })}
         >
           <Text
+            numberOfLines={1}
             style={[
               textStyles.body,
-              { fontSize: 13, color: colors.textPrimary },
+              { fontSize: 14, color: colors.textPrimary },
             ]}
           >
             {text}

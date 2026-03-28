@@ -37,6 +37,12 @@ interface ChatSessionActions {
 
 export type ChatSessionHook = ChatSessionState & ChatSessionActions;
 
+import { uuidv7 } from "uuidv7";
+
+function nextMsgId(): string {
+  return uuidv7();
+}
+
 export function useChatSession(): ChatSessionHook {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -82,7 +88,7 @@ export function useChatSession(): ChatSessionHook {
 
         let fullText = "";
         const assistantMsg: ChatMessage = {
-          id: Date.now().toString(),
+          id: nextMsgId(),
           role: "assistant",
           content: "",
           timestamp: new Date().toISOString(),
@@ -159,7 +165,7 @@ export function useChatSession(): ChatSessionHook {
       if (!currentScenario) return;
 
       const userMsg: ChatMessage = {
-        id: Date.now().toString(),
+        id: nextMsgId(),
         role: "user",
         content: text,
         timestamp: new Date().toISOString(),
