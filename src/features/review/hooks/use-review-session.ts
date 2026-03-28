@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import type { Word } from "@/features/dictionary/types";
 import { getWordsForReview } from "@/features/shared/db/words-repository";
 import { getWordsForReviewByCollection } from "@/features/shared/db/collections-repository";
-import { submitReview } from "./use-spaced-repetition";
+import { submitReview, type ActivityContext } from "./use-spaced-repetition";
 import {
   hapticMedium,
   hapticSuccess,
@@ -63,7 +63,14 @@ export function useReviewSession(collectionId?: number): ReviewSession {
       hapticMedium();
 
       try {
-        await submitReview(word.term, word.reviewScore, response);
+        await submitReview(
+          word.term,
+          word.reviewScore,
+          response,
+          word.id != null
+            ? { wordId: word.id, activityType: "review" }
+            : undefined,
+        );
       } catch {
         // Continue session even if DB update fails
       }

@@ -9,15 +9,20 @@ import {
   getDetailedStats,
   type WordStats,
 } from "@/features/review/services/stats-repository";
+import { getStudyStreak } from "@/features/review/services/activity-repository";
 
 export default function StatsScreen() {
   const colors = useThemeColors();
   const [stats, setStats] = useState<WordStats | null>(null);
+  const [streak, setStreak] = useState(0);
   const { settings } = useSettings();
 
   useFocusEffect(
     useCallback(() => {
-      getDetailedStats().then(setStats);
+      Promise.all([getDetailedStats(), getStudyStreak()]).then(([s, str]) => {
+        setStats(s);
+        setStreak(str);
+      });
     }, []),
   );
 
@@ -28,7 +33,13 @@ export default function StatsScreen() {
         contentContainerStyle={{ padding: 24, gap: 24, paddingBottom: 40 }}
         style={{ backgroundColor: colors.bg }}
       >
-        {stats && <StatsCard stats={stats} dailyGoal={settings.dailyGoal} />}
+        {stats && (
+          <StatsCard
+            stats={stats}
+            dailyGoal={settings.dailyGoal}
+            streak={streak}
+          />
+        )}
       </ScrollView>
 
       <Stack.Screen options={{ title: "Statistiche" }} />

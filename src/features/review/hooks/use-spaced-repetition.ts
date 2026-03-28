@@ -1,6 +1,13 @@
 import { updateReviewScore } from "@/features/shared/db/words-repository";
+import { logActivity } from "@/features/review/services/activity-repository";
 
 type Response = 0 | 1 | 2 | 3; // Again, Hard, Good, Easy
+
+export interface ActivityContext {
+  wordId: number;
+  activityType: "review" | "exercise";
+  exerciseType?: "fill" | "dictation" | "cases";
+}
 
 interface ReviewResult {
   newScore: number;
@@ -42,8 +49,26 @@ export async function submitReview(
   term: string,
   currentScore: number,
   response: Response,
+  activity?: ActivityContext,
 ): Promise<ReviewResult> {
   const result = calculateNextReview(currentScore, response);
   await updateReviewScore(term, result.newScore, result.nextReview);
+
+  if (activity) {
+    try {
+      await logActivity({
+        wordId: activity.wordId,
+        activityType: activity.activityType,
+        exerciseType: activity.exerciseType,
+        response,
+        isCorrect: response >= 2,
+        scoreBefore: currentScore,
+        scoreAfter: result.newScore,
+      });
+    } catch {
+      // Non-blocking: don't fail the review if logging fails
+    }
+  }
+
   return result;
 }

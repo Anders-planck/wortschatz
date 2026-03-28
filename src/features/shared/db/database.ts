@@ -73,5 +73,27 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
     `CREATE INDEX IF NOT EXISTS idx_cw_word ON collection_words(word_id);`,
   );
 
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS activity_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      word_id INTEGER NOT NULL,
+      activity_type TEXT NOT NULL,
+      exercise_type TEXT,
+      response INTEGER NOT NULL,
+      is_correct INTEGER NOT NULL,
+      score_before INTEGER NOT NULL,
+      score_after INTEGER NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE
+    );
+  `);
+
+  await db.execAsync(
+    `CREATE INDEX IF NOT EXISTS idx_activity_created ON activity_log(created_at);`,
+  );
+  await db.execAsync(
+    `CREATE INDEX IF NOT EXISTS idx_activity_word ON activity_log(word_id);`,
+  );
+
   return db;
 }
