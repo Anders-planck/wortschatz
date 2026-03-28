@@ -116,6 +116,7 @@ export function useExerciseSession(): ExerciseSession {
                   exerciseType: exercise.type as "fill" | "dictation" | "cases",
                 }
               : undefined,
+            word,
           );
         } catch {
           // Continue session even if DB update fails
@@ -162,6 +163,7 @@ export function useExerciseSession(): ExerciseSession {
                 exerciseType: exercise.type as "fill" | "dictation" | "cases",
               }
             : undefined,
+          word,
         );
       } catch {
         // Continue session even if DB update fails

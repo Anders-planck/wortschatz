@@ -1,5 +1,16 @@
-import { updateReviewScore } from "@/features/shared/db/words-repository";
+import {
+  fsrs,
+  generatorParameters,
+  Rating,
+  createEmptyCard,
+  type Grade,
+} from "ts-fsrs";
+import {
+  updateReviewScore,
+  updateFsrsCard,
+} from "@/features/shared/db/words-repository";
 import { logActivity } from "@/features/review/services/activity-repository";
+import type { Word } from "@/features/dictionary/types";
 
 type Response = 0 | 1 | 2 | 3; // Again, Hard, Good, Easy
 
@@ -14,35 +25,41 @@ interface ReviewResult {
   nextReview: string;
 }
 
-const BASE_INTERVALS_MS: Record<Response, number> = {
-  0: 1 * 60 * 60 * 1000, // Again: 1 hour
-  1: 8 * 60 * 60 * 1000, // Hard: 8 hours
-  2: 24 * 60 * 60 * 1000, // Good: 24 hours
-  3: 72 * 60 * 60 * 1000, // Easy: 72 hours
+const params = generatorParameters({ maximum_interval: 365 });
+const f = fsrs(params);
+
+const RESPONSE_TO_GRADE: Record<Response, Grade> = {
+  0: Rating.Again,
+  1: Rating.Hard,
+  2: Rating.Good,
+  3: Rating.Easy,
 };
 
-function getScoreMultiplier(score: number): number {
-  if (score <= 0) return 0.5;
-  if (score <= 2) return 1;
-  if (score <= 4) return 1.5;
-  return 2;
-}
+const SCORE_DELTA: Record<Response, number> = {
+  0: -2,
+  1: -1,
+  2: 1,
+  3: 2,
+};
 
-export function calculateNextReview(
-  currentScore: number,
-  response: Response,
-): ReviewResult {
-  const scoreDelta =
-    response === 0 ? -2 : response === 1 ? -1 : response === 2 ? 1 : 2;
-  const newScore = Math.max(-5, Math.min(10, currentScore + scoreDelta));
-
-  const baseInterval = BASE_INTERVALS_MS[response];
-  const multiplier = getScoreMultiplier(newScore);
-  const intervalMs = Math.round(baseInterval * multiplier);
-
-  const nextReview = new Date(Date.now() + intervalMs).toISOString();
-
-  return { newScore, nextReview };
+function wordToFsrsCardInput(word: Word) {
+  if (!word.srDue && word.srReps === 0) {
+    return createEmptyCard(new Date());
+  }
+  return createEmptyCard(
+    word.srDue ? new Date(word.srDue) : new Date(),
+    (card) => ({
+      ...card,
+      stability: word.srStability ?? 0,
+      difficulty: word.srDifficulty ?? 0,
+      elapsed_days: word.srElapsedDays ?? 0,
+      scheduled_days: word.srScheduledDays ?? 0,
+      reps: word.srReps ?? 0,
+      lapses: word.srLapses ?? 0,
+      state: word.srState ?? 0,
+      last_review: word.srLastReview ? new Date(word.srLastReview) : undefined,
+    }),
+  );
 }
 
 export async function submitReview(
@@ -50,9 +67,37 @@ export async function submitReview(
   currentScore: number,
   response: Response,
   activity?: ActivityContext,
+  word?: Word,
 ): Promise<ReviewResult> {
-  const result = calculateNextReview(currentScore, response);
-  await updateReviewScore(term, result.newScore, result.nextReview);
+  const now = new Date();
+  const grade = RESPONSE_TO_GRADE[response];
+
+  const card = word ? wordToFsrsCardInput(word) : createEmptyCard(now);
+  const scheduling = f.repeat(card, now);
+  const result = scheduling[grade];
+  const newCard = result.card;
+
+  const nextReview = newCard.due.toISOString();
+  const scoreDelta = SCORE_DELTA[response];
+  const newScore = Math.max(-5, Math.min(10, currentScore + scoreDelta));
+
+  // Update both legacy score and FSRS card
+  await updateReviewScore(term, newScore, nextReview);
+  await updateFsrsCard(term, {
+    due: nextReview,
+    stability: newCard.stability,
+    difficulty: newCard.difficulty,
+    elapsed_days: newCard.elapsed_days,
+    scheduled_days: newCard.scheduled_days,
+    reps: newCard.reps,
+    lapses: newCard.lapses,
+    state: newCard.state as number,
+    last_review: newCard.last_review
+      ? newCard.last_review instanceof Date
+        ? newCard.last_review.toISOString()
+        : String(newCard.last_review)
+      : null,
+  });
 
   if (activity) {
     try {
@@ -63,12 +108,12 @@ export async function submitReview(
         response,
         isCorrect: response >= 2,
         scoreBefore: currentScore,
-        scoreAfter: result.newScore,
+        scoreAfter: newScore,
       });
     } catch {
       // Non-blocking: don't fail the review if logging fails
     }
   }
 
-  return result;
+  return { newScore, nextReview };
 }
