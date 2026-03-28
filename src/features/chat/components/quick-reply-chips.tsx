@@ -31,13 +31,11 @@ export function QuickReplyChips({
           key={text}
           onPress={() => onSelect(text)}
           style={({ pressed }) => ({
-            backgroundColor: colors.card,
+            backgroundColor: colors.accentLight,
             borderRadius: 20,
             borderCurve: "continuous",
-            borderWidth: 1,
-            borderColor: colors.border,
-            paddingHorizontal: 14,
-            paddingVertical: 8,
+            paddingHorizontal: 16,
+            paddingVertical: 10,
             opacity: pressed ? 0.7 : 1,
           })}
         >
@@ -45,7 +43,7 @@ export function QuickReplyChips({
             numberOfLines={1}
             style={[
               textStyles.body,
-              { fontSize: 14, color: colors.textPrimary },
+              { fontSize: 14, color: colors.accent, fontWeight: "500" },
             ]}
           >
             {text}
