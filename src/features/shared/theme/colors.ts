@@ -32,6 +32,12 @@ export const lightColors = {
 
   againText: "#8A6058",
   chipInactive: "#F5F2EC",
+
+  danger: "#C05050",
+  dangerBg: "rgba(192, 80, 80, 0.08)",
+  success: "#4A9A4A",
+  successBg: "#EDF5ED",
+  onAccent: "#FFFFFF",
 } as const;
 
 export const darkColors = {
@@ -68,8 +74,14 @@ export const darkColors = {
 
   againText: "#D08878",
   chipInactive: "#2A2622",
+
+  danger: "#D07070",
+  dangerBg: "rgba(208, 112, 112, 0.12)",
+  success: "#6AAF6A",
+  successBg: "#1E2E1E",
+  onAccent: "#FFFFFF",
 } as const;
 
 export type ThemeColors = {
-  readonly [K in keyof typeof lightColors]: string;
+  readonly [K in keyof typeof lightColors & keyof typeof darkColors]: string;
 };

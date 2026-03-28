@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text, View, ActivityIndicator } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { fonts } from "@/features/shared/theme/typography";
 import { useThemeColors } from "@/features/shared/theme/theme-context";
 import {
@@ -60,10 +60,11 @@ export function SettingsExportRow() {
               <ActivityIndicator size="small" color={colors.accent} />
             ) : (
               <>
-                <Image
-                  source="sf:square.and.arrow.up"
-                  style={{ width: 14, height: 14 }}
+                <SymbolView
+                  name="square.and.arrow.up"
+                  size={14}
                   tintColor={colors.accent}
+                  resizeMode="scaleAspectFit"
                 />
                 <Text
                   style={{

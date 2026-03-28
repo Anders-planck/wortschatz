@@ -15,7 +15,7 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
 
   return (
     <View style={{ gap: 8 }}>
-      <SectionTitle>This week</SectionTitle>
+      <SectionTitle>Questa settimana</SectionTitle>
 
       <View
         style={{

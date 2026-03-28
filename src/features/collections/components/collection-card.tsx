@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { Link, type Href } from "expo-router";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 import type { CollectionWithStats } from "../types";
@@ -62,10 +62,11 @@ export const CollectionCard = React.memo(function CollectionCard({
                 {collection.name}
               </Text>
               {collection.isAiGenerated && (
-                <Image
-                  source="sf:sparkles"
-                  style={{ width: 10, height: 10 }}
+                <SymbolView
+                  name="sparkles"
+                  size={10}
                   tintColor="#1A1816"
+                  resizeMode="scaleAspectFit"
                 />
               )}
             </View>
@@ -102,10 +103,11 @@ export const CollectionCard = React.memo(function CollectionCard({
                   justifyContent: "center",
                 }}
               >
-                <Image
-                  source={`sf:${collection.icon}`}
-                  style={{ width: 24, height: 24 }}
+                <SymbolView
+                  name={collection.icon as SFSymbol}
+                  size={24}
                   tintColor={collection.color}
+                  resizeMode="scaleAspectFit"
                 />
               </View>
 

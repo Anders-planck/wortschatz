@@ -22,19 +22,31 @@ export default function ReviewScreen() {
         style={{ backgroundColor: colors.bg }}
       >
         <DashboardGreeting streak={streak} totalCount={totalCount} />
+        <WeeklyChart data={weeklyActivity} />
         <TodaySessionCard
           wordCount={wordsToReview.length}
           onStart={() => router.push("/(review)/session")}
         />
         <TrickyWordsList words={trickyWords} />
-        <WeeklyChart data={weeklyActivity} />
       </ScrollView>
 
       <Stack.Screen.Title large>Ripasso</Stack.Screen.Title>
       <Stack.Toolbar placement="right">
         <Stack.Toolbar.Button
+          icon="text.bubble"
+          onPress={() => router.push("/(review)/chat")}
+        />
+        <Stack.Toolbar.Button
           icon="pencil.and.list.clipboard"
           onPress={() => router.push("/(review)/exercises")}
+        />
+        <Stack.Toolbar.Button
+          icon="book"
+          onPress={() => router.push("/(review)/readings")}
+        />
+        <Stack.Toolbar.Button
+          icon="ear"
+          onPress={() => router.push("/(review)/listening")}
         />
         <Stack.Toolbar.Button
           icon="chart.bar.xaxis"

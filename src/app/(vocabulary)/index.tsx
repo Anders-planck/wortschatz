@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { CollectionGrid } from "@/features/collections/components/collection-grid";
@@ -85,10 +85,11 @@ export default function ListeScreen() {
               opacity: pressed ? 0.85 : 1,
             })}
           >
-            <Image
-              source="sf:sparkles"
-              style={{ width: 20, height: 20 }}
+            <SymbolView
+              name="sparkles"
+              size={20}
               tintColor={colors.accent}
+              resizeMode="scaleAspectFit"
             />
             <View style={{ flex: 1, gap: 2 }}>
               <Text style={[textStyles.heading, { fontSize: 14 }]}>
@@ -107,10 +108,11 @@ export default function ListeScreen() {
                 Organizza con AI
               </Text>
             </View>
-            <Image
-              source="sf:chevron.right"
-              style={{ width: 12, height: 12 }}
+            <SymbolView
+              name="chevron.right"
+              size={12}
               tintColor={colors.textMuted}
+              resizeMode="scaleAspectFit"
             />
           </Pressable>
         )}

@@ -1,7 +1,8 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
+import { formatDuration } from "@/features/shared/utils/format-duration";
 import type { ExerciseResult } from "@/features/exercises/types";
 
 interface ExerciseSummaryProps {
@@ -11,13 +12,6 @@ interface ExerciseSummaryProps {
   durationSeconds: number;
   onRetryErrors: () => void;
   onClose: () => void;
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  if (m === 0) return `${s}s`;
-  return `${m}m ${s}s`;
 }
 
 export function ExerciseSummary({
@@ -55,7 +49,7 @@ export function ExerciseSummary({
             fontFamily: textStyles.heading.fontFamily,
             fontSize: 56,
             fontWeight: "700",
-            color: isGood ? "#4A9A4A" : colors.accent,
+            color: isGood ? colors.success : colors.accent,
             letterSpacing: -2,
           }}
         >
@@ -84,17 +78,18 @@ export function ExerciseSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:checkmark.circle.fill"
-            style={{ width: 24, height: 24 }}
-            tintColor="#4A9A4A"
+          <SymbolView
+            name="checkmark.circle.fill"
+            size={24}
+            tintColor={colors.success}
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
               fontFamily: textStyles.heading.fontFamily,
               fontSize: 22,
               fontWeight: "700",
-              color: "#4A9A4A",
+              color: colors.success,
               letterSpacing: -0.5,
             }}
           >
@@ -118,17 +113,18 @@ export function ExerciseSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:xmark.circle.fill"
-            style={{ width: 24, height: 24 }}
-            tintColor="#C05050"
+          <SymbolView
+            name="xmark.circle.fill"
+            size={24}
+            tintColor={colors.danger}
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
               fontFamily: textStyles.heading.fontFamily,
               fontSize: 22,
               fontWeight: "700",
-              color: "#C05050",
+              color: colors.danger,
               letterSpacing: -0.5,
             }}
           >
@@ -152,10 +148,11 @@ export function ExerciseSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:clock.fill"
-            style={{ width: 24, height: 24 }}
+          <SymbolView
+            name="clock.fill"
+            size={24}
             tintColor={colors.accent}
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -234,7 +231,7 @@ export function ExerciseSummary({
             <Text
               style={[
                 textStyles.body,
-                { color: "#FFFFFF", fontWeight: "600", fontSize: 15 },
+                { color: colors.onAccent, fontWeight: "600", fontSize: 15 },
               ]}
             >
               Ripeti gli errori
