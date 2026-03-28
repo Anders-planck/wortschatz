@@ -6,7 +6,10 @@ import type {
   SessionPhase,
 } from "../types";
 import { generateExercises } from "../services/exercise-generator";
-import { submitReview } from "@/features/review/hooks/use-spaced-repetition";
+import {
+  submitReview,
+  type ActivityContext,
+} from "@/features/review/hooks/use-spaced-repetition";
 import { getAllWords } from "@/features/shared/db/words-repository";
 import type { Word } from "@/features/dictionary/types";
 import {
@@ -102,7 +105,18 @@ export function useExerciseSession(): ExerciseSession {
       const word = findWordForExercise(exercise, allWords);
       if (word) {
         try {
-          await submitReview(word.term, word.reviewScore, isCorrect ? 2 : 0);
+          await submitReview(
+            word.term,
+            word.reviewScore,
+            isCorrect ? 2 : 0,
+            word.id != null
+              ? {
+                  wordId: word.id,
+                  activityType: "exercise",
+                  exerciseType: exercise.type as "fill" | "dictation" | "cases",
+                }
+              : undefined,
+          );
         } catch {
           // Continue session even if DB update fails
         }
@@ -137,7 +151,18 @@ export function useExerciseSession(): ExerciseSession {
     const word = findWordForExercise(exercise, allWords);
     if (word) {
       try {
-        await submitReview(word.term, word.reviewScore, 0);
+        await submitReview(
+          word.term,
+          word.reviewScore,
+          0,
+          word.id != null
+            ? {
+                wordId: word.id,
+                activityType: "exercise",
+                exerciseType: exercise.type as "fill" | "dictation" | "cases",
+              }
+            : undefined,
+        );
       } catch {
         // Continue session even if DB update fails
       }
