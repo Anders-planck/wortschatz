@@ -86,7 +86,7 @@ export function StatsCard({ stats, dailyGoal }: StatsCardProps) {
       <View style={{ flexDirection: "row", gap: 8 }}>
         {[
           { label: "Parole", value: stats.totalWords },
-          { label: "Oggi", value: stats.wordsReviewedToday },
+          { label: "Oggi", value: stats.activitiesToday },
           { label: "Punteggio", value: stats.averageScore.toFixed(1) },
         ].map((item) => (
           <View
