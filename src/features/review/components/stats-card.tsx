@@ -715,20 +715,20 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
             {/* Center text */}
             <SvgText
               x={DONUT_CX}
-              y={DONUT_CY - 4}
+              y={DONUT_CY + 2}
               textAnchor="middle"
-              fontSize="14"
-              fontWeight="700"
+              fontSize="20"
+              fontWeight="800"
               fill={colors.textPrimary}
             >
               {masteryPct}%
             </SvgText>
             <SvgText
               x={DONUT_CX}
-              y={DONUT_CY + 10}
+              y={DONUT_CY + 16}
               textAnchor="middle"
               fontSize="7"
-              fill={colors.textMuted}
+              fill={colors.textHint}
               letterSpacing="1"
             >
               MEDIA
