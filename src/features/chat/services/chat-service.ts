@@ -27,7 +27,7 @@ export function streamChatResponse(
   messages: { role: "user" | "assistant"; content: string }[],
 ) {
   return streamText({
-    model: google("gemini-2.5-flash"),
+    model: google("gemini-2.5-flash-lite"),
     system: systemPrompt,
     messages,
   });
@@ -38,7 +38,6 @@ export function parseAIResponse(raw: string): ParsedAIResponse {
   const markedWords: string[] = [];
   const suggestions: string[] = [];
 
-  // Extract corrections
   const correctionRegex = /\[CORRECTION\]([\s\S]*?)\[\/CORRECTION\]/g;
   let corrMatch: RegExpExecArray | null;
   while ((corrMatch = correctionRegex.exec(raw)) !== null) {
@@ -55,14 +54,12 @@ export function parseAIResponse(raw: string): ParsedAIResponse {
     }
   }
 
-  // Extract marked words
   const wordRegex = /\[WORD\](.*?)\[\/WORD\]/g;
   let wordMatch: RegExpExecArray | null;
   while ((wordMatch = wordRegex.exec(raw)) !== null) {
     markedWords.push(wordMatch[1]);
   }
 
-  // Extract suggestions
   const suggestionsMatch = /\[SUGGESTIONS\]([\s\S]*?)\[\/SUGGESTIONS\]/.exec(
     raw,
   );
@@ -76,7 +73,6 @@ export function parseAIResponse(raw: string): ParsedAIResponse {
     }
   }
 
-  // Clean text: remove all markers
   const text = raw
     .replace(/\[CORRECTION\][\s\S]*?\[\/CORRECTION\]/g, "")
     .replace(/\[WORD\](.*?)\[\/WORD\]/g, "$1")

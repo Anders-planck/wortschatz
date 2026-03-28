@@ -19,6 +19,8 @@
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/elements": "^2.9.10",
     "@react-navigation/native": "^7.1.33",
+    "@stardazed/streams-text-encoding": "^1.0.2",
+    "@ungap/structured-clone": "^1.3.0",
     "ai": "^6.0.141",
     "expo": "~55.0.8",
     "expo-audio": "~55.0.9",
