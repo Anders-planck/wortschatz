@@ -73,30 +73,21 @@ export default function ChatSessionScreen() {
           options={{
             title: "Riepilogo",
             headerLeft: () => (
-              <Pressable onPress={() => setShowSummary(false)}>
-                <Text
-                  style={{
-                    fontFamily: textStyles.body.fontFamily,
-                    fontSize: 15,
-                    color: colors.accent,
-                  }}
-                >
-                  Chat
-                </Text>
+              <Pressable onPress={() => setShowSummary(false)} hitSlop={8}>
+                <Image
+                  source="sf:chevron.left.circle.fill"
+                  style={{ width: 28, height: 28 }}
+                  tintColor={colors.accent}
+                />
               </Pressable>
             ),
             headerRight: () => (
-              <Pressable onPress={() => router.back()}>
-                <Text
-                  style={{
-                    fontFamily: textStyles.body.fontFamily,
-                    fontSize: 15,
-                    color: colors.accent,
-                    fontWeight: "600",
-                  }}
-                >
-                  Termina
-                </Text>
+              <Pressable onPress={() => router.back()} hitSlop={8}>
+                <Image
+                  source="sf:xmark.circle.fill"
+                  style={{ width: 28, height: 28 }}
+                  tintColor={colors.textMuted}
+                />
               </Pressable>
             ),
           }}
