@@ -282,7 +282,11 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
     [stats.masteryDistribution],
   );
   const masteryPct =
-    stats.totalWords > 0 ? Math.round((stats.averageScore / 10) * 100) : 0;
+    stats.totalWords > 0
+      ? Math.round(
+          Math.max(0, Math.min(100, ((stats.averageScore + 5) / 15) * 100)),
+        )
+      : 0;
 
   const DONUT_SIZE = 90;
   const DONUT_R = 33;
