@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fase 1: Collezioni v2 — Native iOS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500&family=Ubuntu+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #1A1816;
+    --card: #262320;
+    --cream: #201E1B;
+    --text-primary: #E8E2D8;
+    --text-secondary: #B8AFA5;
+    --text-tertiary: #8A8078;
+    --text-muted: #6A6258;
+    --text-hint: #5A5248;
+    --text-ghost: #4A4238;
+    --border: #3A3530;
+    --accent: #D4A44A;
+    --accent-light: #3A3020;
+    --der: #D4B97A;
+    --die: #E0B8AE;
+    --das: #9DC59A;
+    --verb: #C0B8E0;
+  }
+
+  body {
+    background: #111;
+    color: var(--text-primary);
+    font-family: 'IBM Plex Sans', sans-serif;
+    padding: 32px 16px;
+  }
+
+  .page-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--accent);
+    letter-spacing: -1px;
+    margin-bottom: 4px;
+  }
+
+  .page-sub {
+    text-align: center;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 40px;
+  }
+
+  .flow { max-width: 400px; margin: 0 auto; }
+
+  .step-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .step-desc {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .native-badge {
+    display: inline-block;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: #1a3a2a;
+    color: #6aaf6a;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* Phone frame */
+  .phone {
+    background: var(--bg);
+    border-radius: 28px;
+    border: 2px solid #2a2826;
+    overflow: hidden;
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 54px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 24px 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* iOS native header */
+  .ios-header {
+    padding: 8px 20px 12px;
+  }
+
+  .ios-header-large {
+    font-family: 'Outfit', sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ios-header-small {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+  }
+
+  .ios-back {
+    font-size: 20px;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .ios-header-center {
+    font-family: 'Outfit', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .ios-header-action {
+    font-size: 16px;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  /* iOS segmented control */
+  .ios-segmented {
+    display: flex;
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 2px;
+    margin: 0 20px 16px;
+  }
+
+  .ios-seg {
+    flex: 1;
+    text-align: center;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-radius: 7px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .ios-seg.active {
+    background: var(--card);
+    color: var(--text-primary);
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* iOS search bar */
+  .ios-search {
+    margin: 0 20px 12px;
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    color: var(--text-ghost);
+  }
+
+  .ios-search .icon { font-size: 14px; opacity: 0.5; }
+
+  /* Bento grid */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 8px;
+    padding: 0 16px;
+  }
+
+  .bento-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .bento-card:hover { transform: scale(1.02); }
+
+  .bento-card.featured {
+    grid-column: 1 / -1;
+    min-height: 110px;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .bento-card .gradient-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+
+  .bento-card h4 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+
+  .bento-card .meta {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bento-card .ai-tag {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 8px;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  .bento-card .emoji { font-size: 28px; }
+
+  .bento-card.featured .emoji { font-size: 36px; }
+
+  .bento-card .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .bento-card .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .bento-add {
+    border: 1.5px dashed var(--border);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 90px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .bento-add:hover { border-color: var(--accent); }
+
+  .bento-add .plus {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--accent);
+  }
+
+  .bento-add .label {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Tab bar */
+  .tab-bar {
+    display: flex;
+    padding: 10px 0 6px;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+  }
+
+  .tab { flex: 1; text-align: center; }
+
+  .tab .tab-icon { font-size: 20px; margin-bottom: 2px; }
+
+  .tab .tab-label {
+    font-size: 10px;
+    color: var(--text-ghost);
+  }
+
+  .tab.active .tab-label { color: var(--accent); }
+
+  /* Context menu */
+  .context-menu {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333028;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    z-index: 10;
+    min-width: 180px;
+  }
+
+  .context-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+  }
+
+  .context-menu-item:hover { background: var(--cream); }
+
+  .context-menu-item .cm-icon { font-size: 16px; color: var(--text-muted); }
+
+  .context-menu-item.destructive { color: #E85050; }
+  .context-menu-item.destructive .cm-icon { color: #E85050; }
+
+  .context-menu-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 8px;
+  }
+
+  /* Form sheet */
+  .form-sheet-bg {
+    background: rgba(0,0,0,0.5);
+    border-radius: 28px;
+    padding: 60px 0 0;
+  }
+
+  .form-sheet {
+    background: var(--card);
+    border-radius: 16px 16px 0 0;
+    padding: 8px 20px 24px;
+  }
+
+  .grabber {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--text-ghost);
+    margin: 0 auto 16px;
+  }
+
+  .sheet-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* Collection list in sheet */
+  .coll-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .coll-option:hover { background: var(--cream); }
+
+  .coll-option .coll-emoji {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .coll-option .coll-info { flex: 1; }
+
+  .coll-option .coll-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+  }
+
+  .coll-option .coll-count {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .coll-option .check { color: var(--accent); font-size: 18px; }
+
+  .create-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px dashed var(--border);
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .create-row:hover { border-color: var(--accent); }
+
+  .create-row .cr-plus {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--accent-light);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 300;
+  }
+
+  .create-row .cr-label {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--accent);
+  }
+
+  /* Word row inside collection */
+  .word-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .word-item:last-child { border-bottom: none; }
+
+  .word-item .w-bar {
+    width: 4px;
+    height: 26px;
+    border-radius: 2px;
+  }
+
+  .word-item .w-term {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    flex: 1;
+  }
+
+  .word-item .w-trans {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* AI suggestion block */
+  .ai-block {
+    margin: 16px;
+    background: var(--accent-light);
+    border: 1px solid rgba(212,164,74,0.15);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+
+  .ai-block .ai-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .ai-block .ai-sparkle { font-size: 14px; }
+
+  .ai-block .ai-title {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .ai-block .ai-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .chip {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip:hover { border-color: var(--accent); }
+
+  .chip.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  /* Flow arrow */
+  .flow-arrow {
+    text-align: center;
+    padding: 12px 0;
+    color: var(--accent);
+    opacity: 0.4;
+    font-size: 18px;
+  }
+
+  .flow-note {
+    text-align: center;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    padding: 4px 0 16px;
+  }
+
+  /* Create form */
+  .form-field {
+    margin-bottom: 18px;
+  }
+
+  .form-label {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 6px;
+  }
+
+  .form-input {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    color: var(--text-primary);
+    width: 100%;
+  }
+
+  .emoji-picker {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .emoji-opt {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+  }
+
+  .emoji-opt:hover { border-color: var(--border); }
+  .emoji-opt.selected { border-color: var(--accent); background: var(--accent-light); }
+
+  .ai-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--accent-light);
+    border: 1px solid rgba(212,164,74,0.15);
+    border-radius: 12px;
+  }
+
+  .toggle-track {
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    background: var(--accent);
+    position: relative;
+    cursor: pointer;
+  }
+
+  .toggle-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    background: white;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn:hover { opacity: 0.85; }
+
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-secondary { background: var(--cream); color: var(--text-tertiary); border: 1px solid var(--border); }
+
+  /* AI triage */
+  .triage-header {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .triage-header .sparkle { font-size: 36px; margin-bottom: 8px; }
+
+  .triage-header h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .triage-header p {
+    font-size: 13px;
+    color: var(--text-tertiary);
+  }
+
+  .triage-card {
+    background: var(--accent-light);
+    border: 1px solid rgba(212,164,74,0.12);
+    border-radius: 14px;
+    margin: 0 16px 10px;
+    padding: 14px 16px;
+  }
+
+  .triage-card .tc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .triage-card .tc-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .triage-btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .triage-btn:hover { opacity: 0.8; }
+  .triage-btn.accept { background: var(--accent); color: var(--bg); }
+  .triage-btn.skip { background: var(--cream); color: var(--text-muted); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="page-title">Fase 1: Collezioni & Liste</div>
+<p class="page-sub">v2 · componenti nativi iOS · 6 schermate</p>
+
+<div class="flow">
+
+<!-- ═══════════════════════════════ SCREEN 1 ═══════════════════════════════ -->
+<div class="step-title">1. Tab Parole — Vista Collezioni <span class="native-badge">SegmentedControl</span></div>
+<div class="step-desc">Toggle nativo tra lista parole e griglia collezioni. Bento layout: la prima card grande, le altre a griglia.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:45</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="ios-header">
+    <div class="ios-header-large">
+      Parole
+      <span style="font-size: 16px; color: var(--accent); cursor: pointer;">+</span>
+    </div>
+  </div>
+
+  <div class="ios-segmented">
+    <div class="ios-seg">Tutte (24)</div>
+    <div class="ios-seg active">Collezioni</div>
+  </div>
+
+  <div class="bento-grid">
+    <div class="bento-card featured">
+      <div class="gradient-strip" style="background: linear-gradient(90deg, var(--accent), #E8C06A);"></div>
+      <div class="emoji">⚡</div>
+      <div>
+        <h4>Verbi d'azione</h4>
+        <div class="meta">8 parole <span class="ai-tag">AI</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 62%; background: var(--accent);"></div></div>
+      </div>
+    </div>
+
+    <div class="bento-card">
+      <div class="gradient-strip" style="background: linear-gradient(90deg, #7A9EC0, #A8C0D0);"></div>
+      <div class="emoji">💼</div>
+      <h4>Lavoro</h4>
+      <div class="meta">12 parole</div>
+      <div class="progress-bar"><div class="progress-fill" style="width: 40%; background: #7A9EC0;"></div></div>
+    </div>
+
+    <div class="bento-card">
+      <div class="gradient-strip" style="background: linear-gradient(90deg, var(--das), #B8D8A8);"></div>
+      <div class="emoji">✈️</div>
+      <h4>Reisen</h4>
+      <div class="meta">6 parole <span class="ai-tag">AI</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width: 83%; background: var(--das);"></div></div>
+    </div>
+
+    <div class="bento-card">
+      <div class="gradient-strip" style="background: linear-gradient(90deg, var(--die), #E8C0B8);"></div>
+      <div class="emoji">🏠</div>
+      <h4>Alltag</h4>
+      <div class="meta">15 parole</div>
+      <div class="progress-bar"><div class="progress-fill" style="width: 25%; background: var(--die);"></div></div>
+    </div>
+
+    <div class="bento-card">
+      <div class="gradient-strip" style="background: linear-gradient(90deg, var(--verb), #D0C8E8);"></div>
+      <div class="emoji">🔑</div>
+      <h4>Modalverben</h4>
+      <div class="meta">6 parole</div>
+      <div class="progress-bar"><div class="progress-fill" style="width: 100%; background: var(--verb);"></div></div>
+    </div>
+
+    <div class="bento-add">
+      <div class="plus">+</div>
+      <div class="label">Nuova</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab"><div class="tab-icon">🔍</div><div class="tab-label">Cerca</div></div>
+    <div class="tab active"><div class="tab-icon">📋</div><div class="tab-label" style="color: var(--accent);">Parole</div></div>
+    <div class="tab"><div class="tab-icon">🔄</div><div class="tab-label">Ripasso</div></div>
+    <div class="tab"><div class="tab-icon">⚙</div><div class="tab-label">Impost.</div></div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">long press su una card</div>
+
+<!-- ═══════════════════════════════ SCREEN 2 ═══════════════════════════════ -->
+<div class="step-title">2. Context Menu <span class="native-badge">Link.Menu</span></div>
+<div class="step-desc">Long press su una collezione mostra menu contestuale nativo iOS con anteprima</div>
+
+<div class="phone">
+  <div style="padding: 60px 16px; position: relative;">
+    <div class="bento-card" style="opacity: 0.95; position: relative; min-height: 80px;">
+      <div class="gradient-strip" style="background: linear-gradient(90deg, var(--accent), #E8C06A);"></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="emoji">⚡</div>
+        <div>
+          <h4>Verbi d'azione</h4>
+          <div class="meta">8 parole</div>
+        </div>
+      </div>
+
+      <div class="context-menu">
+        <div class="context-menu-item">Ripassa <span class="cm-icon">▶</span></div>
+        <div class="context-menu-sep"></div>
+        <div class="context-menu-item">Rinomina <span class="cm-icon">✎</span></div>
+        <div class="context-menu-item">Condividi <span class="cm-icon">↗</span></div>
+        <div class="context-menu-sep"></div>
+        <div class="context-menu-item destructive">Elimina <span class="cm-icon">🗑</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">tap su collezione</div>
+
+<!-- ═══════════════════════════════ SCREEN 3 ═══════════════════════════════ -->
+<div class="step-title">3. Dentro la Collezione <span class="native-badge">Stack.Toolbar</span></div>
+<div class="step-desc">Header con titolo + toolbar (ripassa, modifica). Lista parole con suggerimenti AI in fondo.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:45</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Verbi d'azione</span>
+    <span style="display: flex; gap: 16px;">
+      <span class="ios-header-action">▶</span>
+      <span class="ios-header-action">⋯</span>
+    </span>
+  </div>
+
+  <div style="padding: 0 16px 8px;">
+    <div style="background: var(--accent-light); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase;">Padronanza</div>
+        <div style="font-family: 'Outfit'; font-size: 22px; font-weight: 700; color: var(--accent);">62<span style="font-size: 14px; color: var(--text-muted);">%</span></div>
+      </div>
+      <div style="display: flex; gap: 3px; align-items: flex-end; height: 24px;">
+        <div style="width: 6px; background: var(--accent); border-radius: 2px; height: 40%;"></div>
+        <div style="width: 6px; background: var(--accent); border-radius: 2px; height: 70%;"></div>
+        <div style="width: 6px; background: var(--accent); border-radius: 2px; height: 55%;"></div>
+        <div style="width: 6px; background: var(--accent); border-radius: 2px; height: 90%;"></div>
+        <div style="width: 6px; background: var(--accent); border-radius: 2px; height: 100%; opacity: 0.4;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="word-item">
+    <div class="w-bar" style="background: var(--verb);"></div>
+    <div class="w-term">arbeiten</div>
+    <div class="w-trans">lavorare</div>
+  </div>
+  <div class="word-item">
+    <div class="w-bar" style="background: var(--verb);"></div>
+    <div class="w-term">laufen</div>
+    <div class="w-trans">correre</div>
+  </div>
+  <div class="word-item">
+    <div class="w-bar" style="background: var(--verb);"></div>
+    <div class="w-term">sprechen</div>
+    <div class="w-trans">parlare</div>
+  </div>
+  <div class="word-item">
+    <div class="w-bar" style="background: var(--verb);"></div>
+    <div class="w-term">fahren</div>
+    <div class="w-trans">guidare</div>
+  </div>
+
+  <div class="ai-block">
+    <div class="ai-head">
+      <span class="ai-sparkle">✦</span>
+      <span class="ai-title">Suggerimenti AI</span>
+    </div>
+    <div class="ai-text">Potresti aggiungere questi verbi simili:</div>
+    <div class="chips">
+      <div class="chip">schwimmen</div>
+      <div class="chip">kochen</div>
+      <div class="chip selected">✓ spielen</div>
+      <div class="chip">tanzen</div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">dalla word card → "aggiungi a lista"</div>
+
+<!-- ═══════════════════════════════ SCREEN 4 ═══════════════════════════════ -->
+<div class="step-title">4. Aggiungi a Collezione <span class="native-badge">FormSheet</span></div>
+<div class="step-desc">Sheet nativo dal basso — scegli la lista esistente o creane una nuova</div>
+
+<div class="phone">
+  <div class="form-sheet-bg">
+    <div class="form-sheet">
+      <div class="grabber"></div>
+      <div class="sheet-title">Aggiungi "Tisch" a...</div>
+
+      <div class="coll-option">
+        <div class="coll-emoji" style="background: var(--accent-light);">🏠</div>
+        <div class="coll-info">
+          <div class="coll-name">Alltag</div>
+          <div class="coll-count">15 parole</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="coll-option">
+        <div class="coll-emoji" style="background: #222830;">💼</div>
+        <div class="coll-info">
+          <div class="coll-name">Lavoro</div>
+          <div class="coll-count">12 parole</div>
+        </div>
+      </div>
+      <div class="coll-option">
+        <div class="coll-emoji" style="background: #242E22;">✈️</div>
+        <div class="coll-info">
+          <div class="coll-name">Reisen</div>
+          <div class="coll-count">6 parole</div>
+        </div>
+      </div>
+
+      <div class="create-row">
+        <div class="cr-plus">+</div>
+        <div class="cr-label">Crea nuova lista</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">tap "crea nuova lista"</div>
+
+<!-- ═══════════════════════════════ SCREEN 5 ═══════════════════════════════ -->
+<div class="step-title">5. Crea Collezione <span class="native-badge">FormSheet</span></div>
+<div class="step-desc">Nome, emoji, toggle AI per auto-popolare. Sheet nativo con grabber.</div>
+
+<div class="phone">
+  <div class="form-sheet-bg">
+    <div class="form-sheet">
+      <div class="grabber"></div>
+      <div class="sheet-title">Nuova collezione</div>
+
+      <div class="form-field">
+        <div class="form-label">Nome</div>
+        <div class="form-input">Wohnung<span style="animation: blink 1s infinite; color: var(--accent);">|</span></div>
+      </div>
+
+      <div class="form-field">
+        <div class="form-label">Icona</div>
+        <div class="emoji-picker">
+          <div class="emoji-opt">🏠</div>
+          <div class="emoji-opt selected">🛋️</div>
+          <div class="emoji-opt">🔑</div>
+          <div class="emoji-opt">📖</div>
+          <div class="emoji-opt">✈️</div>
+          <div class="emoji-opt">💼</div>
+          <div class="emoji-opt">🍽️</div>
+          <div class="emoji-opt">⚡</div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <div class="ai-toggle">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px;">✦</span>
+            <div>
+              <div style="font-family: 'Outfit'; font-size: 14px; font-weight: 500;">Popola con AI</div>
+              <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-muted);">Cerca parole correlate nel tuo vocabolario</div>
+            </div>
+          </div>
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <div class="btn btn-secondary">Annulla</div>
+        <div class="btn btn-primary">Crea</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">accesso da toolbar parole → "organizza con ai"</div>
+
+<!-- ═══════════════════════════════ SCREEN 6 ═══════════════════════════════ -->
+<div class="step-title">6. Triage AI <span class="native-badge">Stack Screen</span></div>
+<div class="step-desc">L'AI analizza le parole non organizzate e propone categorie. Accetta o ignora ogni gruppo.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:45</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Organizza con AI</span>
+    <span></span>
+  </div>
+
+  <div class="triage-header">
+    <div class="sparkle">✦</div>
+    <h3>12 parole non organizzate</h3>
+    <p>Ecco come le raggrupperei</p>
+  </div>
+
+  <div class="triage-card">
+    <div class="tc-head">
+      <div class="tc-title">🍽️ Essen & Trinken</div>
+      <div class="triage-btn accept">Crea lista</div>
+    </div>
+    <div class="chips">
+      <div class="chip">Tisch</div>
+      <div class="chip">Küche</div>
+      <div class="chip">Wasser</div>
+      <div class="chip">Brot</div>
+    </div>
+  </div>
+
+  <div class="triage-card">
+    <div class="tc-head">
+      <div class="tc-title">🏢 Arbeit</div>
+      <div class="triage-btn accept">Crea lista</div>
+    </div>
+    <div class="chips">
+      <div class="chip">Prüfung</div>
+      <div class="chip">Büro</div>
+      <div class="chip">arbeiten</div>
+    </div>
+  </div>
+
+  <div class="triage-card">
+    <div class="tc-head">
+      <div class="tc-title">🚶 Bewegung</div>
+      <div class="triage-btn skip">Ignora</div>
+    </div>
+    <div class="chips">
+      <div class="chip">laufen</div>
+      <div class="chip">fahren</div>
+      <div class="chip">gehen</div>
+      <div class="chip">ausgehen</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div style="height: 60px;"></div>
+
+<style>
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+</style>
+
+</body>
+</html>

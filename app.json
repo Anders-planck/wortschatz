@@ -34,7 +34,10 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 120
         }
-      ]
+      ],
+      "expo-audio",
+      "./plugins/with-local-notifications-only",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

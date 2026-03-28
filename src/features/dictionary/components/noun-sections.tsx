@@ -2,27 +2,15 @@ import { View } from "react-native";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { DeclensionTable } from "./declension-table";
 import type { Word } from "@/features/dictionary/types";
+import type { DeclensionForms } from "@/features/dictionary/utils/declension-data";
 
 interface NounSectionsProps {
   word: Word;
 }
 
-interface DeclensionRow {
-  singular?: string;
-  plural?: string;
-}
-
-interface DeclensionData {
-  [key: string]: unknown;
-  nominativ?: DeclensionRow;
-  akkusativ?: DeclensionRow;
-  dativ?: DeclensionRow;
-  genitiv?: DeclensionRow;
-}
-
 function isDeclensionData(
   forms: Record<string, unknown>,
-): forms is DeclensionData {
+): forms is DeclensionForms & Record<string, unknown> {
   return (
     "nominativ" in forms ||
     "akkusativ" in forms ||

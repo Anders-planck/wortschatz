@@ -1,7 +1,7 @@
 import type { Word } from "@/features/dictionary/types";
 import { getDatabase } from "./database";
 
-interface WordRow {
+export interface WordRow {
   id: number;
   term: string;
   type: string;
@@ -29,7 +29,7 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
   }
 }
 
-function rowToWord(row: WordRow): Word {
+export function rowToWord(row: WordRow): Word {
   return {
     id: row.id,
     term: row.term,
@@ -197,68 +197,22 @@ export async function getRecentWords(limit = 10): Promise<Word[]> {
   return rows.map(rowToWord);
 }
 
-function toLocalDateStr(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+export async function updateAudioUrl(
+  term: string,
+  audioUrl: string,
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    "UPDATE words SET audio_url = ? WHERE term = ? COLLATE NOCASE",
+    [audioUrl, term],
+  );
 }
 
-export async function getWeeklyActivity(): Promise<number[]> {
+export async function getAudioUrl(term: string): Promise<string | null> {
   const db = await getDatabase();
-
-  const now = new Date();
-  const dayOfWeek = (now.getDay() + 6) % 7; // Monday=0, Sunday=6
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - dayOfWeek);
-  monday.setHours(0, 0, 0, 0);
-  const mondayStr = toLocalDateStr(monday);
-
-  const rows = await db.getAllAsync<{ day: string; count: number }>(
-    `SELECT DATE(searched_at, 'localtime') as day, COUNT(*) as count
-     FROM words
-     WHERE DATE(searched_at, 'localtime') >= ?
-     GROUP BY day`,
-    [mondayStr],
+  const row = await db.getFirstAsync<{ audio_url: string | null }>(
+    "SELECT audio_url FROM words WHERE term = ? COLLATE NOCASE",
+    [term],
   );
-
-  const countByDay = new Map(rows.map((r) => [r.day, r.count]));
-  const result: number[] = [];
-
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    result.push(countByDay.get(toLocalDateStr(d)) ?? 0);
-  }
-
-  return result; // [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
-}
-
-export async function getStreak(): Promise<number> {
-  const db = await getDatabase();
-  const rows = await db.getAllAsync<{ day: string }>(
-    `SELECT DISTINCT DATE(searched_at, 'localtime') as day
-     FROM words
-     ORDER BY day DESC`,
-  );
-
-  if (rows.length === 0) return 0;
-
-  let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  for (let i = 0; i < rows.length; i++) {
-    const expected = new Date(today);
-    expected.setDate(expected.getDate() - i);
-    const expectedStr = toLocalDateStr(expected);
-
-    if (rows[i].day === expectedStr) {
-      streak++;
-    } else {
-      break;
-    }
-  }
-
-  return streak;
+  return row?.audio_url ?? null;
 }

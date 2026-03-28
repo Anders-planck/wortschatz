@@ -1,13 +1,14 @@
 import { View, Text } from "react-native";
 
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface WordErrorProps {
   message: string;
 }
 
 export function WordError({ message }: WordErrorProps) {
+  const { colors, textStyles } = useAppTheme();
+
   return (
     <View
       style={{

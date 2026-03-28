@@ -1,7 +1,9 @@
 import { View } from "react-native";
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 
 export function Divider() {
+  const colors = useThemeColors();
+
   return (
     <View
       style={{

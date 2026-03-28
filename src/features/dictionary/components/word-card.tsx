@@ -1,7 +1,6 @@
 import { View, Text, ActivityIndicator } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { Divider } from "@/features/shared/components/divider";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { GenderStrip } from "./gender-strip";
@@ -10,7 +9,10 @@ import { VerbSections } from "./verb-sections";
 import { PrepositionSections } from "./preposition-sections";
 import { ExampleSentence } from "./example-sentence";
 import { ContextBox } from "./context-box";
+import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import type { Word } from "@/features/dictionary/types";
+import { useSynonyms } from "@/features/immersion/hooks/use-synonyms";
+import { SynonymSection } from "@/features/immersion/components/synonym-section";
 
 interface WordCardProps {
   word: Word;
@@ -19,9 +21,14 @@ interface WordCardProps {
 }
 
 export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
+  const { colors, textStyles } = useAppTheme();
   const isNoun = word.type === "noun";
   const isVerb = word.type === "verb";
   const isPreposition = word.type === "preposition";
+  const { data: synonymsData } = useSynonyms(
+    isAILoading ? undefined : word.term,
+    isAILoading ? undefined : word.type,
+  );
 
   return (
     <View
@@ -35,9 +42,18 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
     >
       {isNoun && word.gender && <GenderStrip gender={word.gender} />}
 
-      <Text selectable style={textStyles.word}>
-        {word.term}
-      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text selectable style={[textStyles.word, { flex: 1 }]}>
+          {word.term}
+        </Text>
+        <SpeakerButton text={word.term} size="md" />
+      </View>
 
       <Text style={[textStyles.mono, { marginTop: 4 }]}>
         {word.type}
@@ -50,6 +66,15 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
       <Text selectable style={textStyles.body}>
         {word.translations.join(", ")}
       </Text>
+
+      {synonymsData && (
+        <SynonymSection
+          synonyms={synonymsData.synonyms}
+          antonyms={synonymsData.antonyms}
+          comparative={synonymsData.comparative}
+          onWordPress={onWordPress}
+        />
+      )}
 
       <Divider />
 

@@ -1,19 +1,22 @@
-import { Pressable, Text, View } from "react-native";
-import { Link } from "expo-router";
+import { Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 import type { Word } from "@/features/dictionary/types";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { Divider } from "@/features/shared/components/divider";
 import { SectionTitle } from "@/features/shared/components/section-title";
-import { GENDER_COLORS } from "@/features/shared/utils/word-colors";
+import { WordListItem } from "@/features/shared/components/word-link-menu";
+import { getGenderColors } from "@/features/shared/utils/word-colors";
 
 interface RecentSearchesProps {
   words: Word[];
+  onDeleted?: () => void;
 }
 
-export function RecentSearches({ words }: RecentSearchesProps) {
+export function RecentSearches({ words, onDeleted }: RecentSearchesProps) {
+  const { colors, textStyles } = useAppTheme();
+  const GENDER_COLORS = getGenderColors(colors);
+
   if (words.length === 0) {
     return (
       <View style={{ paddingTop: 8 }}>
@@ -32,51 +35,47 @@ export function RecentSearches({ words }: RecentSearchesProps) {
           key={word.id ?? word.term}
           entering={FadeInUp.delay(index * 40).duration(200)}
         >
-          <Link href={`/word/${encodeURIComponent(word.term)}`} asChild>
-            <Pressable
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.6 : 1,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-                paddingVertical: 2,
-              })}
-            >
-              {word.gender && GENDER_COLORS[word.gender] ? (
-                <View
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: 3.5,
-                    backgroundColor: GENDER_COLORS[word.gender],
-                  }}
-                />
-              ) : (
-                <View style={{ width: 7 }} />
-              )}
-              <View style={{ flex: 1, gap: 2 }}>
+          <WordListItem
+            word={word}
+            onDeleted={onDeleted}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              paddingVertical: 2,
+            }}
+          >
+            {word.gender && GENDER_COLORS[word.gender] ? (
+              <View
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: 3.5,
+                  backgroundColor: GENDER_COLORS[word.gender],
+                }}
+              />
+            ) : (
+              <View style={{ width: 7 }} />
+            )}
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text
+                style={[textStyles.heading, { fontSize: 15, letterSpacing: 0 }]}
+              >
+                {word.term}
+              </Text>
+              {word.translations.length > 0 && (
                 <Text
+                  selectable
                   style={[
-                    textStyles.heading,
-                    { fontSize: 15, letterSpacing: 0 },
+                    textStyles.bodyLight,
+                    { fontSize: 12, color: colors.textMuted },
                   ]}
                 >
-                  {word.term}
+                  {word.translations[0]}
                 </Text>
-                {word.translations.length > 0 && (
-                  <Text
-                    selectable
-                    style={[
-                      textStyles.bodyLight,
-                      { fontSize: 12, color: colors.textMuted },
-                    ]}
-                  >
-                    {word.translations[0]}
-                  </Text>
-                )}
-              </View>
-            </Pressable>
-          </Link>
+              )}
+            </View>
+          </WordListItem>
           {index < words.length - 1 && <Divider />}
         </Animated.View>
       ))}

@@ -37,5 +37,11 @@ export function useSearchScreen() {
     [router],
   );
 
-  return { query, setQuery, recentWords, submitSearch };
+  return {
+    query,
+    setQuery,
+    recentWords,
+    refreshRecent: loadRecent,
+    submitSearch,
+  };
 }

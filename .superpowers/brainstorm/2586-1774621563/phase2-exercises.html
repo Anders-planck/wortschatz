@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fase 2: Esercizi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500&family=Ubuntu+Mono:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #1A1816; --card: #262320; --cream: #201E1B;
+    --text-primary: #E8E2D8; --text-secondary: #B8AFA5; --text-tertiary: #8A8078;
+    --text-muted: #6A6258; --text-hint: #5A5248; --text-ghost: #4A4238;
+    --border: #3A3530; --accent: #D4A44A; --accent-light: #3A3020;
+    --der: #D4B97A; --die: #E0B8AE; --das: #9DC59A; --verb: #C0B8E0;
+    --correct: #6AAF6A; --correct-bg: #1a2a1a;
+    --wrong: #C07060; --wrong-bg: #2a1a18;
+    --nom-bg: #222830; --akk-bg: #2E2820; --dat-bg: #242E22; --gen-bg: #2A2430;
+    --nom-text: #8A9AB0; --akk-text: #C4AA78; --dat-text: #8AAA70; --gen-text: #AA98C0;
+  }
+  body { background: #111; color: var(--text-primary); font-family: 'IBM Plex Sans', sans-serif; padding: 32px 16px; }
+  .page-title { font-family: 'Outfit'; font-size: 28px; font-weight: 700; text-align: center; color: var(--accent); letter-spacing: -1px; margin-bottom: 4px; }
+  .page-sub { text-align: center; font-family: 'Ubuntu Mono'; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 40px; }
+  .flow { max-width: 400px; margin: 0 auto; }
+  .step-title { font-family: 'Outfit'; font-size: 17px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .step-desc { text-align: center; font-size: 12px; color: var(--text-tertiary); margin-bottom: 16px; line-height: 1.4; }
+  .native-badge { display: inline-block; font-family: 'Ubuntu Mono'; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; background: #1a3a2a; color: #6aaf6a; padding: 2px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+
+  .phone { background: var(--bg); border-radius: 28px; border: 2px solid #2a2826; overflow: hidden; margin-bottom: 40px; }
+  .status-bar { height: 54px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 24px 6px; font-size: 14px; font-weight: 600; }
+  .ios-header-small { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; }
+  .ios-back { font-size: 20px; color: var(--accent); }
+  .ios-header-center { font-family: 'Outfit'; font-size: 17px; font-weight: 600; }
+
+  .flow-arrow { text-align: center; padding: 12px 0; color: var(--accent); opacity: 0.4; font-size: 18px; }
+  .flow-note { text-align: center; font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-ghost); padding: 4px 0 16px; }
+
+  /* Progress bar */
+  .progress-strip { display: flex; gap: 3px; padding: 12px 20px 8px; }
+  .progress-dot { flex: 1; height: 3px; border-radius: 2px; }
+  .progress-dot.done { background: var(--accent); }
+  .progress-dot.current { background: var(--text-primary); opacity: 0.3; }
+  .progress-dot.todo { background: var(--text-ghost); opacity: 0.15; }
+
+  /* Exercise type selector */
+  .exercise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; }
+  .exercise-card { background: var(--card); border-radius: 16px; padding: 20px 16px; text-align: center; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; }
+  .exercise-card:hover { border-color: var(--border); }
+  .exercise-card.active { border-color: var(--accent); background: var(--accent-light); }
+  .exercise-card .ex-icon { font-size: 28px; margin-bottom: 8px; color: var(--text-muted); }
+  .exercise-card.active .ex-icon { color: var(--accent); }
+  .exercise-card h4 { font-family: 'Outfit'; font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .exercise-card .ex-desc { font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-muted); }
+  .exercise-card.active .ex-desc { color: var(--accent); opacity: 0.7; }
+
+  /* Fill in blank */
+  .sentence-block { padding: 20px; text-align: center; }
+  .sentence { font-family: 'Outfit'; font-size: 20px; font-weight: 400; line-height: 1.6; color: var(--text-secondary); }
+  .sentence .blank { display: inline-block; border-bottom: 2px solid var(--accent); min-width: 80px; color: var(--accent); font-weight: 700; padding: 2px 4px; }
+  .sentence .blank.correct { border-color: var(--correct); color: var(--correct); }
+  .sentence .blank.wrong { border-color: var(--wrong); color: var(--wrong); text-decoration: line-through; }
+  .sentence-translation { font-size: 13px; color: var(--text-muted); margin-top: 12px; font-style: italic; }
+
+  /* Text input field */
+  .answer-input { margin: 20px; background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; font-family: 'Outfit'; font-size: 18px; color: var(--text-primary); text-align: center; display: block; width: calc(100% - 40px); }
+  .answer-input.focused { border-color: var(--accent); }
+  .answer-input.correct { border-color: var(--correct); background: var(--correct-bg); }
+  .answer-input.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+
+  /* Multiple choice options */
+  .mc-options { padding: 0 20px; display: flex; flex-direction: column; gap: 8px; }
+  .mc-option { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
+  .mc-option:hover { border-color: var(--text-muted); }
+  .mc-option .mc-letter { font-family: 'Ubuntu Mono'; font-size: 12px; font-weight: 700; width: 28px; height: 28px; border-radius: 8px; background: var(--cream); display: flex; align-items: center; justify-content: center; color: var(--text-muted); flex-shrink: 0; }
+  .mc-option .mc-text { font-family: 'Outfit'; font-size: 16px; font-weight: 500; flex: 1; }
+  .mc-option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .mc-option.selected .mc-letter { background: var(--accent); color: var(--bg); }
+  .mc-option.correct { border-color: var(--correct); background: var(--correct-bg); }
+  .mc-option.correct .mc-letter { background: var(--correct); color: white; }
+  .mc-option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .mc-option.wrong .mc-letter { background: var(--wrong); color: white; }
+
+  /* Feedback banner */
+  .feedback { margin: 16px 20px; padding: 14px 16px; border-radius: 14px; display: flex; align-items: center; gap: 10px; }
+  .feedback.correct { background: var(--correct-bg); border: 1px solid rgba(106,175,106,0.3); }
+  .feedback.wrong { background: var(--wrong-bg); border: 1px solid rgba(192,112,96,0.3); }
+  .feedback .fb-icon { font-size: 22px; }
+  .feedback .fb-text { flex: 1; }
+  .feedback .fb-title { font-family: 'Outfit'; font-weight: 600; font-size: 15px; }
+  .feedback.correct .fb-title { color: var(--correct); }
+  .feedback.wrong .fb-title { color: var(--wrong); }
+  .feedback .fb-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Dictation */
+  .audio-wave { display: flex; align-items: center; justify-content: center; gap: 3px; padding: 30px 0; }
+  .audio-wave .bar { width: 4px; border-radius: 2px; background: var(--accent); animation: wave 1.2s ease-in-out infinite; }
+  .audio-wave .bar:nth-child(1) { height: 16px; animation-delay: 0s; }
+  .audio-wave .bar:nth-child(2) { height: 28px; animation-delay: 0.1s; }
+  .audio-wave .bar:nth-child(3) { height: 20px; animation-delay: 0.2s; }
+  .audio-wave .bar:nth-child(4) { height: 36px; animation-delay: 0.3s; }
+  .audio-wave .bar:nth-child(5) { height: 24px; animation-delay: 0.4s; }
+  .audio-wave .bar:nth-child(6) { height: 32px; animation-delay: 0.5s; }
+  .audio-wave .bar:nth-child(7) { height: 18px; animation-delay: 0.6s; }
+  @keyframes wave { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(0.4); } }
+
+  .speaker-btn { width: 64px; height: 64px; border-radius: 32px; background: var(--accent); display: flex; align-items: center; justify-content: center; margin: 0 auto; cursor: pointer; font-size: 24px; color: var(--bg); }
+  .speaker-btn.small { width: 36px; height: 36px; border-radius: 18px; font-size: 16px; background: var(--accent-light); color: var(--accent); }
+
+  /* Case quiz */
+  .case-sentence { padding: 20px; text-align: center; }
+  .case-sentence .cs-text { font-family: 'Outfit'; font-size: 20px; line-height: 1.6; }
+  .case-gap { display: inline-block; min-width: 60px; border: 1.5px dashed var(--accent); border-radius: 6px; padding: 4px 8px; color: var(--accent); font-weight: 700; text-align: center; cursor: pointer; }
+  .case-gap.filled { border-style: solid; }
+  .case-gap.correct { border-color: var(--correct); color: var(--correct); background: var(--correct-bg); }
+  .case-gap.wrong { border-color: var(--wrong); color: var(--wrong); background: var(--wrong-bg); }
+
+  .case-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 16px 20px; }
+  .case-pill { font-family: 'Outfit'; font-size: 16px; font-weight: 600; padding: 8px 18px; border-radius: 10px; cursor: pointer; border: 1.5px solid var(--border); background: var(--card); transition: all 0.15s; }
+  .case-pill:hover { border-color: var(--accent); }
+  .case-pill.selected { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .case-pill.disabled { opacity: 0.3; pointer-events: none; }
+
+  /* Bottom action bar */
+  .action-bar { padding: 16px 20px; display: flex; gap: 10px; }
+  .action-btn { flex: 1; text-align: center; padding: 14px; border-radius: 14px; font-family: 'IBM Plex Sans'; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .action-btn.primary { background: var(--accent); color: var(--bg); }
+  .action-btn.skip { background: var(--cream); color: var(--text-muted); border: 1px solid var(--border); }
+  .action-btn.next { background: var(--correct); color: white; }
+
+  /* Score summary */
+  .score-ring { width: 120px; height: 120px; border-radius: 60px; border: 6px solid var(--border); display: flex; align-items: center; justify-content: center; flex-direction: column; margin: 0 auto; position: relative; }
+  .score-ring .ring-fill { position: absolute; top: -6px; left: -6px; right: -6px; bottom: -6px; border-radius: 60px; border: 6px solid transparent; border-top-color: var(--correct); border-right-color: var(--correct); transform: rotate(-45deg); }
+  .score-ring .score-num { font-family: 'Outfit'; font-size: 36px; font-weight: 700; color: var(--correct); }
+  .score-ring .score-label { font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .score-stats { display: flex; gap: 16px; justify-content: center; padding: 20px; }
+  .score-stat { text-align: center; }
+  .score-stat .num { font-family: 'Outfit'; font-size: 20px; font-weight: 700; }
+  .score-stat .label { font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .section-gap { height: 20px; }
+
+  /* Exercise type label in corner */
+  .ex-type-label { font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-ghost); text-align: center; padding: 4px 0; }
+</style>
+</head>
+<body>
+
+<div class="page-title">Fase 2: Esercizi</div>
+<p class="page-sub">4 tipi di esercizio · 8 schermate</p>
+
+<div class="flow">
+
+<!-- ══════════════ SCREEN 1: Exercise Hub ══════════════ -->
+<div class="step-title">1. Hub Esercizi <span class="native-badge">Stack Screen</span></div>
+<div class="step-desc">Accessibile dal tab Ripasso. 4 tipi di esercizio, ognuno con icona SF Symbol e descrizione.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:50</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Esercizi</span>
+    <span></span>
+  </div>
+  <div style="padding: 12px 20px 8px;">
+    <div style="font-family: 'Outfit'; font-size: 15px; color: var(--text-secondary); margin-bottom: 4px;">Scegli un esercizio</div>
+    <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-muted);">Basato sulle tue 24 parole salvate</div>
+  </div>
+
+  <div class="exercise-grid">
+    <div class="exercise-card active">
+      <div class="ex-icon">✏</div>
+      <h4>Completa</h4>
+      <div class="ex-desc">sf:pencil.line</div>
+      <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--accent); margin-top: 6px;">Fill-in-the-blank</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-icon">🎧</div>
+      <h4>Dettato</h4>
+      <div class="ex-desc">sf:ear</div>
+      <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost); margin-top: 6px;">Ascolta e scrivi</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-icon">📝</div>
+      <h4>Articoli & Casi</h4>
+      <div class="ex-desc">sf:textformat.abc</div>
+      <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost); margin-top: 6px;">der/die/das + casi</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-icon">💬</div>
+      <h4>Chat AI</h4>
+      <div class="ex-desc">sf:bubble.left.and.bubble.right</div>
+      <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost); margin-top: 6px;">Conversazione libera</div>
+    </div>
+  </div>
+
+  <div style="padding: 20px;">
+    <div style="background: var(--accent-light); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px;">
+      <span style="color: var(--accent); font-size: 16px;">✦</span>
+      <div>
+        <div style="font-family: 'Outfit'; font-size: 13px; font-weight: 500;">Mix intelligente</div>
+        <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-muted);">L'AI sceglie gli esercizi migliori per te</div>
+      </div>
+      <div style="margin-left: auto; color: var(--accent); font-size: 14px;">▶</div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">tap "completa"</div>
+
+<!-- ══════════════ SCREEN 2: Fill-in-the-blank ══════════════ -->
+<div class="step-title">2. Completa la frase <span class="native-badge">TextInput</span></div>
+<div class="step-desc">Frase con gap da riempire. L'utente scrive la parola corretta. Tastiera nativa.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:50</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="progress-strip">
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot current"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+  </div>
+  <div class="ex-type-label">sf:pencil.line · completa</div>
+
+  <div class="sentence-block">
+    <div class="sentence">
+      Ich <span class="blank">möchte</span> nach Berlin fahren.
+    </div>
+    <div class="sentence-translation">"Vorrei andare a Berlino."</div>
+  </div>
+
+  <div class="answer-input focused" style="letter-spacing: 1px;">möcht<span style="animation: blink 1s infinite; color: var(--accent);">|</span></div>
+
+  <div style="padding: 0 20px;">
+    <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-ghost); text-align: center;">
+      sf:speaker.wave.2 · tocca per ascoltare la frase
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <div class="action-btn skip">Salta</div>
+    <div class="action-btn primary">Verifica</div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">risposta corretta</div>
+
+<!-- ══════════════ SCREEN 3: Correct feedback ══════════════ -->
+<div class="step-title">3. Feedback corretto <span class="native-badge">expo-haptics</span></div>
+<div class="step-desc">Banner verde con haptic success. Mostra la risposta e un dettaglio grammaticale.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:50</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="progress-strip">
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done" style="background: var(--correct);"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+  </div>
+
+  <div class="sentence-block">
+    <div class="sentence">
+      Ich <span class="blank correct">möchte</span> nach Berlin fahren.
+    </div>
+  </div>
+
+  <div class="feedback correct">
+    <div class="fb-icon">✓</div>
+    <div class="fb-text">
+      <div class="fb-title">Perfetto!</div>
+      <div class="fb-detail">"möchte" è il Konjunktiv II di "mögen" (volere)</div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <div class="action-btn next">Continua</div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">esercizio successivo: dettato</div>
+
+<!-- ══════════════ SCREEN 4: Dictation ══════════════ -->
+<div class="step-title">4. Dettato <span class="native-badge">expo-audio + TTS</span></div>
+<div class="step-desc">Ascolta la frase e scrivila. Bottone speaker grande per replay. Velocità regolabile.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:51</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="progress-strip">
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot current"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+  </div>
+  <div class="ex-type-label">sf:ear · dettato</div>
+
+  <div class="audio-wave">
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: center; gap: 16px; padding: 0 0 20px;">
+    <div class="speaker-btn small">🐢</div>
+    <div class="speaker-btn">🔊</div>
+    <div class="speaker-btn small">1x</div>
+  </div>
+
+  <div style="padding: 0 20px; text-align: center;">
+    <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-ghost); margin-bottom: 8px;">SCRIVI QUELLO CHE SENTI</div>
+  </div>
+
+  <div class="answer-input focused">Die Kinder spielen<span style="animation: blink 1s infinite; color: var(--accent);">|</span></div>
+
+  <div class="action-bar">
+    <div class="action-btn skip">Salta</div>
+    <div class="action-btn primary">Verifica</div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">feedback errato</div>
+
+<!-- ══════════════ SCREEN 5: Wrong feedback ══════════════ -->
+<div class="step-title">5. Feedback errato</div>
+<div class="step-desc">Banner rosso con correzione. Mostra la risposta corretta e cosa è stato sbagliato.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:51</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="progress-strip">
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done" style="background: var(--wrong);"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+  </div>
+
+  <div style="padding: 20px; text-align: center;">
+    <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-ghost); margin-bottom: 12px;">TUA RISPOSTA</div>
+    <div class="answer-input wrong" style="margin: 0 0 16px;">Die Kinder spielen</div>
+    <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-ghost); margin-bottom: 8px;">RISPOSTA CORRETTA</div>
+    <div style="font-family: 'Outfit'; font-size: 20px; font-weight: 600; color: var(--correct);">Die Kinder <span style="text-decoration: underline;">spielen im Garten</span>.</div>
+  </div>
+
+  <div class="feedback wrong">
+    <div class="fb-icon">✗</div>
+    <div class="fb-text">
+      <div class="fb-title">Quasi!</div>
+      <div class="fb-detail">Mancava "im Garten" — Dativ con preposizione "in"</div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <div class="action-btn" style="background: var(--wrong); color: white;">Continua</div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">esercizio tipo 3: quiz articoli</div>
+
+<!-- ══════════════ SCREEN 6: Article/Case Quiz ══════════════ -->
+<div class="step-title">6. Quiz Articoli & Casi <span class="native-badge">Multiple Choice</span></div>
+<div class="step-desc">Frase con gap per l'articolo. Pill selezionabili con i colori dei casi.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:52</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="progress-strip">
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot done"></div>
+    <div class="progress-dot current"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+    <div class="progress-dot todo"></div>
+  </div>
+  <div class="ex-type-label">sf:textformat.abc · articoli & casi</div>
+
+  <div class="case-sentence">
+    <div class="cs-text">
+      Ich gebe <span class="case-gap filled">dem</span> Kind <span class="case-gap">___</span> Ball.
+    </div>
+    <div class="sentence-translation" style="margin-top: 12px; font-size: 13px; color: var(--text-muted); font-style: italic;">"Do al bambino la palla."</div>
+  </div>
+
+  <div style="padding: 0 20px 8px;">
+    <div style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost); text-align: center; margin-bottom: 8px;">QUALE ARTICOLO?</div>
+  </div>
+
+  <div class="case-pills">
+    <div class="case-pill">der</div>
+    <div class="case-pill selected">den</div>
+    <div class="case-pill">dem</div>
+    <div class="case-pill">des</div>
+  </div>
+
+  <div style="text-align: center; padding: 8px 20px;">
+    <div style="display: inline-flex; gap: 12px;">
+      <span style="font-family: 'Ubuntu Mono'; font-size: 9px; padding: 3px 8px; border-radius: 4px; background: var(--akk-bg); color: var(--akk-text);">AKK</span>
+      <span style="font-family: 'Ubuntu Mono'; font-size: 9px; color: var(--text-ghost);">Ball → der Ball → Akkusativ</span>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <div class="action-btn skip">Salta</div>
+    <div class="action-btn primary">Verifica</div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">esercizio tipo 4: chat ai</div>
+
+<!-- ══════════════ SCREEN 7: AI Chat ══════════════ -->
+<div class="step-title">7. Chat AI <span class="native-badge">Gemini + Streaming</span></div>
+<div class="step-desc">Conversazione libera in tedesco. L'AI corregge errori inline con spiegazione.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:53</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="ios-header-small">
+    <span class="ios-back">‹</span>
+    <span class="ios-header-center">Chat Tedesco</span>
+    <span style="color: var(--accent); font-size: 14px;">✦</span>
+  </div>
+
+  <div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 12px;">
+    <!-- AI message -->
+    <div style="display: flex; gap: 8px; align-items: flex-start;">
+      <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">✦</div>
+      <div style="background: var(--card); border-radius: 14px 14px 14px 4px; padding: 12px 14px; max-width: 280px;">
+        <div style="font-size: 14px; line-height: 1.5;">Hallo! Wie war dein Tag heute? Erzähl mir, was du gemacht hast.</div>
+      </div>
+    </div>
+
+    <!-- User message -->
+    <div style="display: flex; gap: 8px; align-items: flex-start; flex-direction: row-reverse;">
+      <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--accent); color: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; font-weight: 700;">A</div>
+      <div style="background: var(--accent-light); border: 1px solid rgba(212,164,74,0.2); border-radius: 14px 14px 4px 14px; padding: 12px 14px; max-width: 280px;">
+        <div style="font-size: 14px; line-height: 1.5;">Heute ich habe viel gearbeitet und dann ich bin ins Kino gegangen.</div>
+      </div>
+    </div>
+
+    <!-- AI correction -->
+    <div style="display: flex; gap: 8px; align-items: flex-start;">
+      <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">✦</div>
+      <div style="background: var(--card); border-radius: 14px 14px 14px 4px; padding: 12px 14px; max-width: 300px;">
+        <div style="font-size: 14px; line-height: 1.5; margin-bottom: 10px;">Super, dass du ins Kino warst! Kleine Korrektur:</div>
+
+        <div style="background: var(--wrong-bg); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; border-left: 3px solid var(--wrong);">
+          <div style="font-size: 12px; color: var(--wrong); text-decoration: line-through;">Heute ich habe viel gearbeitet</div>
+        </div>
+        <div style="background: var(--correct-bg); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; border-left: 3px solid var(--correct);">
+          <div style="font-size: 12px; color: var(--correct);">Heute <strong>habe ich</strong> viel gearbeitet</div>
+        </div>
+
+        <div style="font-family: 'Ubuntu Mono'; font-size: 10px; color: var(--text-muted); line-height: 1.4; padding: 6px 0;">
+          ℹ Con avverbi di tempo (heute, gestern...) il verbo va in 2ª posizione → inversione soggetto-verbo.
+        </div>
+
+        <div style="font-size: 14px; line-height: 1.5; margin-top: 8px;">Was für einen Film hast du gesehen? 🎬</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input bar -->
+  <div style="margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center;">
+    <div style="flex: 1; background: var(--card); border-radius: 20px; padding: 10px 16px; font-size: 14px; color: var(--text-ghost);">Scrivi in tedesco...</div>
+    <div style="width: 32px; height: 32px; border-radius: 16px; background: var(--accent); display: flex; align-items: center; justify-content: center; color: var(--bg); font-size: 14px; cursor: pointer;">↑</div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓</div>
+<div class="flow-note">fine sessione</div>
+
+<!-- ══════════════ SCREEN 8: Session Summary ══════════════ -->
+<div class="step-title">8. Riepilogo Sessione <span class="native-badge">Reanimated</span></div>
+<div class="step-desc">Score animato, statistiche, parole da ripassare. Azione per ricominciare o uscire.</div>
+
+<div class="phone">
+  <div class="status-bar"><span>21:55</span><span style="font-size: 12px;">●●●●</span></div>
+  <div class="ios-header-small">
+    <span></span>
+    <span class="ios-header-center">Sessione completata</span>
+    <span class="ios-back" style="font-size: 16px;">✕</span>
+  </div>
+
+  <div style="padding: 30px 20px 10px;">
+    <div class="score-ring">
+      <div class="ring-fill"></div>
+      <div class="score-num">75%</div>
+      <div class="score-label">Corretto</div>
+    </div>
+  </div>
+
+  <div class="score-stats">
+    <div class="score-stat">
+      <div class="num" style="color: var(--correct);">6</div>
+      <div class="label">Corrette</div>
+    </div>
+    <div class="score-stat">
+      <div class="num" style="color: var(--wrong);">2</div>
+      <div class="label">Errori</div>
+    </div>
+    <div class="score-stat">
+      <div class="num" style="color: var(--accent);">3m</div>
+      <div class="label">Tempo</div>
+    </div>
+  </div>
+
+  <div style="padding: 0 20px;">
+    <div style="font-family: 'Ubuntu Mono'; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 8px;">DA RIPASSARE</div>
+
+    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+      <div style="font-family: 'Outfit'; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 8px; background: var(--wrong-bg); border: 1px solid rgba(192,112,96,0.2); color: var(--wrong);">möchte</div>
+      <div style="font-family: 'Outfit'; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 8px; background: var(--wrong-bg); border: 1px solid rgba(192,112,96,0.2); color: var(--wrong);">den Ball</div>
+    </div>
+  </div>
+
+  <div class="action-bar" style="flex-direction: column; gap: 8px; padding-top: 24px;">
+    <div class="action-btn primary" style="width: 100%;">Ripeti gli errori</div>
+    <div class="action-btn skip" style="width: 100%;">Torna al Ripasso</div>
+  </div>
+</div>
+
+</div>
+<div style="height: 60px;"></div>
+
+<style>@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }</style>
+</body>
+</html>

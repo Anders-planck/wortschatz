@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, View, Text } from "react-native";
 import { Stack } from "expo-router";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SectionTitle } from "@/features/shared/components/section-title";
+import { SpeakerButton } from "@/features/shared/components/speaker-button";
+import { useSpeech } from "@/features/shared/hooks/use-speech";
 import { getWordByTerm } from "@/features/shared/db/words-repository";
 import type { Word, VerbConjugation } from "@/features/dictionary/types";
 import { isVerbConjugation } from "@/features/dictionary/types";
@@ -24,6 +25,17 @@ interface ConjugationTenseData {
   sie: string;
 }
 
+function buildSpokenForms(data: ConjugationTenseData): string[] {
+  return [
+    `ich ${data.ich}`,
+    `du ${data.du}`,
+    `er ${data.er}`,
+    `wir ${data.wir}`,
+    `ihr ${data.ihr}`,
+    `sie ${data.sie}`,
+  ];
+}
+
 function TenseTable({
   title,
   data,
@@ -35,7 +47,15 @@ function TenseTable({
   isIrregular: boolean;
   highlightEnding: boolean;
 }) {
+  const { colors, textStyles } = useAppTheme();
+  const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
   const referenceForm = data.wir;
+
+  const forms = useMemo(() => buildSpokenForms(data), [data]);
+
+  const handleSpeakAll = useCallback(() => {
+    isSpeaking ? stop() : speakAll(forms);
+  }, [isSpeaking, stop, speakAll, forms]);
 
   const renderForm = useCallback(
     (pronoun: string, form: string) => (
@@ -52,7 +72,10 @@ function TenseTable({
 
   return (
     <View style={{ gap: 8 }}>
-      <SectionTitle>{title}</SectionTitle>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <SectionTitle>{title}</SectionTitle>
+        <SpeakerButton onSpeakAll={handleSpeakAll} size="md" />
+      </View>
       <View
         style={{
           backgroundColor: colors.card,
@@ -62,7 +85,11 @@ function TenseTable({
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
         }}
       >
-        <PronounGrid data={data} renderForm={renderForm} />
+        <PronounGrid
+          data={data}
+          renderForm={renderForm}
+          highlightedIndex={currentSpeakingIndex}
+        />
       </View>
     </View>
   );
@@ -75,6 +102,7 @@ function PerfektForm({
   form: string;
   partizipII: string;
 }) {
+  const { colors, textStyles } = useAppTheme();
   const parts = form.split(partizipII);
   if (parts.length < 2) {
     return (
@@ -108,6 +136,15 @@ function PerfektTable({
   data: ConjugationTenseData;
   partizipII: string;
 }) {
+  const { colors, textStyles } = useAppTheme();
+  const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
+
+  const forms = useMemo(() => buildSpokenForms(data), [data]);
+
+  const handleSpeakAll = useCallback(() => {
+    isSpeaking ? stop() : speakAll(forms);
+  }, [isSpeaking, stop, speakAll, forms]);
+
   const renderForm = useCallback(
     (_pronoun: string, form: string) => (
       <PerfektForm form={form} partizipII={partizipII} />
@@ -117,7 +154,10 @@ function PerfektTable({
 
   return (
     <View style={{ gap: 8 }}>
-      <SectionTitle>Perfekt</SectionTitle>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <SectionTitle>Perfekt</SectionTitle>
+        <SpeakerButton onSpeakAll={handleSpeakAll} size="md" />
+      </View>
       <View
         style={{
           backgroundColor: colors.card,
@@ -127,7 +167,11 @@ function PerfektTable({
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
         }}
       >
-        <PronounGrid data={data} renderForm={renderForm} />
+        <PronounGrid
+          data={data}
+          renderForm={renderForm}
+          highlightedIndex={currentSpeakingIndex}
+        />
       </View>
     </View>
   );
@@ -167,6 +211,7 @@ function buildPerfektData(
 }
 
 export function ConjugationScreen({ term }: ConjugationScreenProps) {
+  const { colors, textStyles } = useAppTheme();
   const [word, setWord] = useState<Word | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

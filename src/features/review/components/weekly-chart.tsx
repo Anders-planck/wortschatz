@@ -1,7 +1,6 @@
 import { Text, View } from "react-native";
 import { SectionTitle } from "@/features/shared/components/section-title";
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 const DAY_LABELS = ["L", "M", "M", "G", "V", "S", "D"];
 
@@ -10,12 +9,13 @@ interface WeeklyChartProps {
 }
 
 export function WeeklyChart({ data }: WeeklyChartProps) {
+  const { colors, textStyles } = useAppTheme();
   const maxValue = Math.max(...data, 1);
   const todayIndex = (new Date().getDay() + 6) % 7; // Monday = 0
 
   return (
     <View style={{ gap: 8 }}>
-      <SectionTitle>This week</SectionTitle>
+      <SectionTitle>Questa settimana</SectionTitle>
 
       <View
         style={{

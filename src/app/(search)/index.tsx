@@ -1,13 +1,15 @@
 import { Stack } from "expo-router";
 import { ScrollView } from "react-native";
 
-import { colors } from "@/features/shared/theme/colors";
+import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { useSearchScreen } from "@/features/search/hooks/use-search-screen";
 import { RecentSearches } from "@/features/search/components/recent-searches";
 import { SearchHint } from "@/features/search/components/search-hint";
 
 export default function SearchScreen() {
-  const { query, setQuery, recentWords, submitSearch } = useSearchScreen();
+  const colors = useThemeColors();
+  const { query, setQuery, recentWords, refreshRecent, submitSearch } =
+    useSearchScreen();
 
   return (
     <>
@@ -16,7 +18,9 @@ export default function SearchScreen() {
         contentContainerStyle={{ padding: 24, gap: 12 }}
         style={{ backgroundColor: colors.bg }}
       >
-        {!query && <RecentSearches words={recentWords} />}
+        {!query && (
+          <RecentSearches words={recentWords} onDeleted={refreshRecent} />
+        )}
         {query && query.length < 2 && <SearchHint />}
       </ScrollView>
 

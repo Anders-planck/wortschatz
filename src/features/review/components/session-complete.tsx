@@ -1,8 +1,7 @@
 import { Pressable, Text } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import { colors } from "@/features/shared/theme/colors";
-import { textStyles } from "@/features/shared/theme/typography";
+import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface SessionCompleteProps {
   total: number;
@@ -15,6 +14,7 @@ export function SessionComplete({
   responses,
   onDone,
 }: SessionCompleteProps) {
+  const { colors, textStyles } = useAppTheme();
   const goodCount = responses.filter((r) => r >= 2).length;
 
   return (

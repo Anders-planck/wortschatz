@@ -2,7 +2,8 @@ import { useState, useCallback } from "react";
 
 import type { Word } from "@/features/dictionary/types";
 import { getWordsForReview } from "@/features/shared/db/words-repository";
-import { submitReview } from "./use-spaced-repetition";
+import { getWordsForReviewByCollection } from "@/features/shared/db/collections-repository";
+import { submitReview, type ActivityContext } from "./use-spaced-repetition";
 import {
   hapticMedium,
   hapticSuccess,
@@ -24,7 +25,7 @@ interface ReviewSession {
   respond: (response: Response) => Promise<void>;
 }
 
-export function useReviewSession(): ReviewSession {
+export function useReviewSession(collectionId?: number): ReviewSession {
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -35,7 +36,9 @@ export function useReviewSession(): ReviewSession {
   const startSession = useCallback(async () => {
     try {
       setIsLoading(true);
-      const reviewWords = await getWordsForReview(12);
+      const reviewWords = collectionId
+        ? await getWordsForReviewByCollection(collectionId, 12)
+        : await getWordsForReview(12);
       setWords(reviewWords);
       setCurrentIndex(0);
       setIsRevealed(false);
@@ -46,7 +49,7 @@ export function useReviewSession(): ReviewSession {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [collectionId]);
 
   const reveal = useCallback(() => {
     setIsRevealed(true);
@@ -60,7 +63,14 @@ export function useReviewSession(): ReviewSession {
       hapticMedium();
 
       try {
-        await submitReview(word.term, word.reviewScore, response);
+        await submitReview(
+          word.term,
+          word.reviewScore,
+          response,
+          word.id != null
+            ? { wordId: word.id, activityType: "review" }
+            : undefined,
+        );
       } catch {
         // Continue session even if DB update fails
       }
