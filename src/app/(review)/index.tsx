@@ -22,12 +22,12 @@ export default function ReviewScreen() {
         style={{ backgroundColor: colors.bg }}
       >
         <DashboardGreeting streak={streak} totalCount={totalCount} />
+        <WeeklyChart data={weeklyActivity} />
         <TodaySessionCard
           wordCount={wordsToReview.length}
           onStart={() => router.push("/(review)/session")}
         />
         <TrickyWordsList words={trickyWords} />
-        <WeeklyChart data={weeklyActivity} />
       </ScrollView>
 
       <Stack.Screen.Title large>Ripasso</Stack.Screen.Title>
