@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import {
   Stack,
   useFocusEffect,
@@ -42,22 +43,9 @@ export default function ChatHistoryScreen() {
     }, [scenarioId]),
   );
 
-  const handleDelete = (id: number) => {
-    Alert.alert(
-      "Elimina conversazione",
-      "Vuoi eliminare questa conversazione?",
-      [
-        { text: "Annulla", style: "cancel" },
-        {
-          text: "Elimina",
-          style: "destructive",
-          onPress: async () => {
-            await deleteChatSession(id);
-            setSessions((prev) => prev.filter((s) => s.id !== id));
-          },
-        },
-      ],
-    );
+  const handleDelete = async (id: number) => {
+    await deleteChatSession(id);
+    setSessions((prev) => prev.filter((s) => s.id !== id));
   };
 
   return (
@@ -198,83 +186,107 @@ export default function ChatHistoryScreen() {
                 key={session.id}
                 entering={FadeInUp.delay((index + 2) * 50).duration(300)}
               >
-                <Pressable
-                  onPress={() =>
-                    router.push({
-                      pathname: "/(review)/chat-session",
-                      params: {
-                        scenarioId: scenario.id,
-                        sessionId: String(session.id),
-                      },
-                    })
-                  }
-                  onLongPress={() => handleDelete(session.id)}
-                  style={({ pressed }) => ({
-                    backgroundColor: colors.card,
-                    borderRadius: 14,
-                    borderCurve: "continuous",
-                    padding: 14,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 12,
-                    opacity: pressed ? 0.9 : 1,
-                  })}
-                >
-                  <SymbolView
-                    name="bubble.left.and.bubble.right"
-                    size={20}
-                    tintColor={colors.textMuted}
-                    resizeMode="scaleAspectFit"
-                  />
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <Text
+                <Swipeable
+                  renderRightActions={() => (
+                    <Pressable
+                      onPress={() => handleDelete(session.id)}
                       style={{
-                        fontFamily: textStyles.mono.fontFamily,
-                        fontSize: 12,
-                        color: colors.textSecondary,
-                      }}
-                    >
-                      {formatDate(session.createdAt)}
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: textStyles.mono.fontFamily,
-                        fontSize: 11,
-                        color: colors.textHint,
-                      }}
-                    >
-                      {session.messagesCount} messaggi ·{" "}
-                      {formatDuration(session.durationSeconds)}
-                    </Text>
-                  </View>
-                  {session.correctionsCount > 0 && (
-                    <View
-                      style={{
-                        backgroundColor: colors.accentLight,
-                        borderRadius: 6,
+                        backgroundColor: "#C05050",
+                        borderRadius: 14,
                         borderCurve: "continuous",
-                        paddingHorizontal: 6,
-                        paddingVertical: 2,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingHorizontal: 20,
+                        marginLeft: 8,
                       }}
                     >
+                      <SymbolView
+                        name="trash"
+                        size={20}
+                        tintColor="#FFFFFF"
+                        resizeMode="scaleAspectFit"
+                      />
+                    </Pressable>
+                  )}
+                  overshootRight={false}
+                >
+                  <Pressable
+                    onPress={() =>
+                      router.push({
+                        pathname: "/(review)/chat-session",
+                        params: {
+                          scenarioId: scenario.id,
+                          sessionId: String(session.id),
+                        },
+                      })
+                    }
+                    style={({ pressed }) => ({
+                      backgroundColor: colors.card,
+                      borderRadius: 14,
+                      borderCurve: "continuous",
+                      padding: 14,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 12,
+                      opacity: pressed ? 0.9 : 1,
+                    })}
+                  >
+                    <SymbolView
+                      name="bubble.left.and.bubble.right"
+                      size={20}
+                      tintColor={colors.textMuted}
+                      resizeMode="scaleAspectFit"
+                    />
+                    <View style={{ flex: 1, gap: 2 }}>
                       <Text
                         style={{
                           fontFamily: textStyles.mono.fontFamily,
-                          fontSize: 10,
-                          color: colors.accent,
+                          fontSize: 12,
+                          color: colors.textSecondary,
                         }}
                       >
-                        {session.correctionsCount} corr.
+                        {formatDate(session.createdAt)}
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: textStyles.mono.fontFamily,
+                          fontSize: 11,
+                          color: colors.textHint,
+                        }}
+                      >
+                        {session.messagesCount} messaggi ·{" "}
+                        {formatDuration(session.durationSeconds)}
                       </Text>
                     </View>
-                  )}
-                  <SymbolView
-                    name="chevron.right"
-                    size={12}
-                    tintColor={colors.textGhost}
-                    resizeMode="scaleAspectFit"
-                  />
-                </Pressable>
+                    {session.correctionsCount > 0 && (
+                      <View
+                        style={{
+                          backgroundColor: colors.accentLight,
+                          borderRadius: 6,
+                          borderCurve: "continuous",
+                          paddingHorizontal: 6,
+                          paddingVertical: 2,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: textStyles.mono.fontFamily,
+                            fontSize: 10,
+                            color: colors.accent,
+                          }}
+                        >
+                          {session.correctionsCount} corr.
+                        </Text>
+                      </View>
+                    )}
+                    <SymbolView
+                      name="chevron.right"
+                      size={12}
+                      tintColor={colors.textGhost}
+                      resizeMode="scaleAspectFit"
+                    />
+                  </Pressable>
+                </Swipeable>
               </Animated.View>
             ))}
           </View>
