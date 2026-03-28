@@ -25,6 +25,7 @@ interface ChatSessionState {
 
 interface ChatSessionActions {
   start: (scenario: Scenario) => Promise<void>;
+  resume: (scenario: Scenario, messages: ChatMessage[]) => void;
   sendMessage: (text: string) => Promise<void>;
   endSession: () => Promise<{
     messageCount: number;
@@ -159,6 +160,20 @@ export function useChatSession(): ChatSessionHook {
     [streamAssistantMessage],
   );
 
+  const resume = useCallback((s: Scenario, previousMessages: ChatMessage[]) => {
+    cancelledRef.current = false;
+    setScenario(s);
+    scenarioRef.current = s;
+    setMessages(previousMessages);
+    messagesRef.current = previousMessages;
+    setCorrections([]);
+    setDiscoveredWords([]);
+    setSuggestions([]);
+    setStartTime(Date.now());
+    parsedMapRef.current = new Map();
+    setParsedMap(new Map());
+  }, []);
+
   const sendMessage = useCallback(
     async (text: string) => {
       const currentScenario = scenarioRef.current;
@@ -227,6 +242,7 @@ export function useChatSession(): ChatSessionHook {
     scenario,
     parsedMap,
     start,
+    resume,
     sendMessage,
     endSession,
     cancel,

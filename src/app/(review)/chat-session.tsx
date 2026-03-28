@@ -12,6 +12,7 @@ import { SymbolView } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SCENARIOS } from "@/features/chat/constants";
 import { useChatSession } from "@/features/chat/hooks/use-chat-session";
+import { getChatSessionMessages } from "@/features/chat/services/chat-repository";
 import { ChatBubble } from "@/features/chat/components/chat-bubble";
 import { TypingIndicator } from "@/features/chat/components/typing-indicator";
 import { QuickReplyChips } from "@/features/chat/components/quick-reply-chips";
@@ -21,7 +22,10 @@ import { ChatSummary } from "@/features/chat/components/chat-summary";
 export default function ChatSessionScreen() {
   const { colors, textStyles } = useAppTheme();
   const router = useRouter();
-  const { scenarioId } = useLocalSearchParams<{ scenarioId: string }>();
+  const { scenarioId, sessionId } = useLocalSearchParams<{
+    scenarioId: string;
+    sessionId?: string;
+  }>();
   const [showSummary, setShowSummary] = useState(false);
   const [summaryStats, setSummaryStats] = useState<{
     messageCount: number;
@@ -32,7 +36,13 @@ export default function ChatSessionScreen() {
   const session = useChatSession();
 
   useEffect(() => {
-    session.start(scenario);
+    if (sessionId) {
+      getChatSessionMessages(Number(sessionId)).then((messages) => {
+        session.resume(scenario, messages);
+      });
+    } else {
+      session.start(scenario);
+    }
   }, []);
 
   const handleEndSession = async () => {

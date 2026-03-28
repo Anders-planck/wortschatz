@@ -10,6 +10,7 @@ export default function ReviewLayout() {
       <Stack.Screen name="stats" />
       <Stack.Screen name="session" options={{ presentation: "modal" }} />
       <Stack.Screen name="chat" />
+      <Stack.Screen name="chat-history" />
       <Stack.Screen
         name="chat-session"
         options={{
