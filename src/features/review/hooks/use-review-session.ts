@@ -70,6 +70,7 @@ export function useReviewSession(collectionId?: number): ReviewSession {
           word.id != null
             ? { wordId: word.id, activityType: "review" }
             : undefined,
+          word,
         );
       } catch {
         // Continue session even if DB update fails

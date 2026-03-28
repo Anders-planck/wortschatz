@@ -85,4 +85,13 @@ export const WordSchema = z.object({
   nextReview: z.string().nullable(),
   category: z.string().nullable(),
   createdAt: z.string(),
+  srDue: z.string().nullable().optional(),
+  srStability: z.number().default(0),
+  srDifficulty: z.number().default(0),
+  srElapsedDays: z.number().default(0),
+  srScheduledDays: z.number().default(0),
+  srReps: z.number().default(0),
+  srLapses: z.number().default(0),
+  srState: z.number().default(0),
+  srLastReview: z.string().nullable().optional(),
 });
