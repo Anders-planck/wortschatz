@@ -1,3 +1,4 @@
+import React from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
@@ -77,7 +78,7 @@ function renderTextWithMarkedWords(
   );
 }
 
-export function ChatBubble({
+export const ChatBubble = React.memo(function ChatBubble({
   message,
   corrections,
   markedWords,
@@ -86,12 +87,8 @@ export function ChatBubble({
   const { colors, textStyles } = useAppTheme();
   const isUser = message.role === "user";
 
-  // Clean display text: remove markers for display
-  const displayText = message.content
-    .replace(/\[CORRECTION\][\s\S]*?\[\/CORRECTION\]/g, "")
-    .replace(/\[WORD\](.*?)\[\/WORD\]/g, "$1")
-    .replace(/\[SUGGESTIONS\][\s\S]*?\[\/SUGGESTIONS\]/g, "")
-    .trim();
+  // Content is already clean — parsed.text is stored by the hook (Fix 2)
+  const displayText = message.content;
 
   return (
     <Animated.View
@@ -144,4 +141,4 @@ export function ChatBubble({
       </View>
     </Animated.View>
   );
-}
+});

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -16,7 +16,6 @@ import { TypingIndicator } from "@/features/chat/components/typing-indicator";
 import { QuickReplyChips } from "@/features/chat/components/quick-reply-chips";
 import { ChatInputBar } from "@/features/chat/components/chat-input-bar";
 import { ChatSummary } from "@/features/chat/components/chat-summary";
-import { parseAIResponse } from "@/features/chat/services/chat-service";
 
 export default function ChatSessionScreen() {
   const { colors } = useAppTheme();
@@ -48,21 +47,9 @@ export default function ChatSessionScreen() {
     session.sendMessage(text);
   };
 
-  const handleWordTap = (_word: string) => {
+  const handleWordTap = useCallback((_word: string) => {
     // Could navigate to dictionary or show word details
-  };
-
-  // Build per-message corrections map: only show corrections for the latest AI message
-  // that produced them (corrections are accumulated, so we parse each AI message individually)
-  const messageCorrectionMap = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof parseAIResponse>>();
-    for (const msg of session.messages) {
-      if (msg.role === "assistant" && msg.content.length > 0) {
-        map.set(msg.id, parseAIResponse(msg.content));
-      }
-    }
-    return map;
-  }, [session.messages]);
+  }, []);
 
   if (showSummary) {
     return (
@@ -88,7 +75,25 @@ export default function ChatSessionScreen() {
   }
 
   // Messages in reverse for inverted FlatList
-  const reversedMessages = [...session.messages].reverse();
+  const reversedMessages = useMemo(
+    () => [...session.messages].reverse(),
+    [session.messages],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: (typeof session.messages)[number] }) => {
+      const parsed = session.parsedMap.get(item.id);
+      return (
+        <ChatBubble
+          message={item}
+          corrections={parsed?.corrections ?? []}
+          markedWords={parsed?.markedWords ?? []}
+          onWordTap={handleWordTap}
+        />
+      );
+    },
+    [session.parsedMap, handleWordTap],
+  );
 
   return (
     <>
@@ -103,17 +108,7 @@ export default function ChatSessionScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
           keyboardShouldPersistTaps="handled"
-          renderItem={({ item }) => {
-            const parsed = messageCorrectionMap.get(item.id);
-            return (
-              <ChatBubble
-                message={item}
-                corrections={parsed?.corrections ?? []}
-                markedWords={parsed?.markedWords ?? []}
-                onWordTap={handleWordTap}
-              />
-            );
-          }}
+          renderItem={renderItem}
           ListHeaderComponent={session.isStreaming ? <TypingIndicator /> : null}
         />
 

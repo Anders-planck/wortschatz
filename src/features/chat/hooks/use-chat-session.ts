@@ -1,5 +1,10 @@
-import { useState, useCallback, useRef } from "react";
-import type { Scenario, ChatMessage, Correction } from "../types";
+import { useState, useCallback, useRef, useEffect } from "react";
+import type {
+  Scenario,
+  ChatMessage,
+  Correction,
+  ParsedAIResponse,
+} from "../types";
 import {
   buildSystemPrompt,
   streamChatResponse,
@@ -15,6 +20,7 @@ interface ChatSessionState {
   suggestions: string[];
   startTime: number;
   scenario: Scenario | null;
+  parsedMap: Map<string, ParsedAIResponse>;
 }
 
 interface ChatSessionActions {
@@ -26,6 +32,7 @@ interface ChatSessionActions {
     discoveredWordsCount: number;
     durationSeconds: number;
   }>;
+  cancel: () => void;
 }
 
 export type ChatSessionHook = ChatSessionState & ChatSessionActions;
@@ -39,6 +46,28 @@ export function useChatSession(): ChatSessionHook {
   const [startTime, setStartTime] = useState(0);
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const scenarioRef = useRef<Scenario | null>(null);
+
+  // Mirror of messages state for use inside async callbacks without stale closures
+  const messagesRef = useRef<ChatMessage[]>([]);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  // Parsed results per assistant message id
+  const parsedMapRef = useRef<Map<string, ParsedAIResponse>>(new Map());
+  const [parsedMap, setParsedMap] = useState<Map<string, ParsedAIResponse>>(
+    () => new Map(),
+  );
+
+  // Cancellation flag for streaming loops
+  const cancelledRef = useRef(false);
+
+  // Cleanup on unmount: cancel any active stream
+  useEffect(() => {
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, []);
 
   const streamAssistantMessage = useCallback(
     async (
@@ -61,6 +90,7 @@ export function useChatSession(): ChatSessionHook {
         setMessages((prev) => [...prev, assistantMsg]);
 
         for await (const chunk of stream.textStream) {
+          if (cancelledRef.current) break;
           fullText += chunk;
           setMessages((prev) =>
             prev.map((m) =>
@@ -77,10 +107,17 @@ export function useChatSession(): ChatSessionHook {
         ]);
         setSuggestions(parsed.suggestions);
 
-        // Update final message with cleaned text
+        // Store parsed result keyed by message id
+        parsedMapRef.current = new Map(parsedMapRef.current).set(
+          assistantMsg.id,
+          parsed,
+        );
+        setParsedMap(new Map(parsedMapRef.current));
+
+        // Update final message with clean text (Fix 2: store parsed.text, not fullText)
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === assistantMsg.id ? { ...m, content: fullText } : m,
+            m.id === assistantMsg.id ? { ...m, content: parsed.text } : m,
           ),
         );
       } finally {
@@ -92,13 +129,17 @@ export function useChatSession(): ChatSessionHook {
 
   const start = useCallback(
     async (s: Scenario) => {
+      cancelledRef.current = false;
       setScenario(s);
       scenarioRef.current = s;
       setMessages([]);
+      messagesRef.current = [];
       setCorrections([]);
       setDiscoveredWords([]);
       setSuggestions([]);
       setStartTime(Date.now());
+      parsedMapRef.current = new Map();
+      setParsedMap(new Map());
 
       // Send initial empty message to get AI greeting
       await streamAssistantMessage(s, [
@@ -124,20 +165,17 @@ export function useChatSession(): ChatSessionHook {
         timestamp: new Date().toISOString(),
       };
 
-      setMessages((prev) => {
-        const updated = [...prev, userMsg];
+      // Fix 1: setState updater is pure — no async calls inside
+      setMessages((prev) => [...prev, userMsg]);
 
-        // Build message list for the API (use functional update to capture latest)
-        const aiMessages = updated.map((m) => ({
-          role: m.role,
-          content: m.content,
-        }));
+      // Build aiMessages using the ref (up-to-date without waiting for re-render)
+      const currentMessages = [...messagesRef.current, userMsg];
+      const aiMessages = currentMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
 
-        // Stream the response
-        streamAssistantMessage(currentScenario, aiMessages);
-
-        return updated;
-      });
+      await streamAssistantMessage(currentScenario, aiMessages);
     },
     [streamAssistantMessage],
   );
@@ -169,6 +207,10 @@ export function useChatSession(): ChatSessionHook {
     };
   }, [startTime, messages, corrections, discoveredWords, scenario]);
 
+  const cancel = useCallback(() => {
+    cancelledRef.current = true;
+  }, []);
+
   return {
     messages,
     isStreaming,
@@ -177,8 +219,10 @@ export function useChatSession(): ChatSessionHook {
     suggestions,
     startTime,
     scenario,
+    parsedMap,
     start,
     sendMessage,
     endSession,
+    cancel,
   };
 }

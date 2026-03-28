@@ -2,6 +2,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Image } from "expo-image";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
+import { formatDuration } from "@/features/shared/utils/format-duration";
 import type { Correction } from "../types";
 
 interface ChatSummaryProps {
@@ -11,13 +12,6 @@ interface ChatSummaryProps {
   durationSeconds: number;
   onSaveWords: () => void;
   onClose: () => void;
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  if (m === 0) return `${s}s`;
-  return `${m}m ${s}s`;
 }
 
 export function ChatSummary({
