@@ -11,6 +11,7 @@ interface ChatSummaryProps {
   messageCount: number;
   durationSeconds: number;
   onSaveWords: () => void;
+  onBack: () => void;
   onClose: () => void;
 }
 
@@ -20,28 +21,18 @@ export function ChatSummary({
   messageCount,
   durationSeconds,
   onSaveWords,
+  onBack,
   onClose,
 }: ChatSummaryProps) {
   const { colors, textStyles } = useAppTheme();
 
   return (
     <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
       style={{ flex: 1 }}
       contentContainerStyle={{ padding: 24, gap: 28 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Title */}
-      <Animated.View
-        entering={FadeInUp.duration(400)}
-        style={{ alignItems: "center", gap: 4 }}
-      >
-        <Text
-          style={[textStyles.heading, { fontSize: 24, letterSpacing: -0.5 }]}
-        >
-          Riepilogo
-        </Text>
-      </Animated.View>
-
       {/* Stats row */}
       <Animated.View
         entering={FadeInUp.delay(80).duration(400)}
@@ -75,7 +66,10 @@ export function ChatSummary({
           >
             {messageCount}
           </Text>
-          <Text style={[textStyles.mono, { color: colors.textMuted }]}>
+          <Text
+            numberOfLines={1}
+            style={[textStyles.mono, { color: colors.textMuted, fontSize: 9 }]}
+          >
             Messaggi
           </Text>
         </View>
@@ -108,8 +102,11 @@ export function ChatSummary({
           >
             {corrections.length}
           </Text>
-          <Text style={[textStyles.mono, { color: colors.textMuted }]}>
-            Correzioni
+          <Text
+            numberOfLines={1}
+            style={[textStyles.mono, { color: colors.textMuted, fontSize: 9 }]}
+          >
+            Errori
           </Text>
         </View>
 
@@ -141,7 +138,10 @@ export function ChatSummary({
           >
             {discoveredWords.length}
           </Text>
-          <Text style={[textStyles.mono, { color: colors.textMuted }]}>
+          <Text
+            numberOfLines={1}
+            style={[textStyles.mono, { color: colors.textMuted, fontSize: 9 }]}
+          >
             Parole
           </Text>
         </View>
@@ -174,7 +174,10 @@ export function ChatSummary({
           >
             {formatDuration(durationSeconds)}
           </Text>
-          <Text style={[textStyles.mono, { color: colors.textMuted }]}>
+          <Text
+            numberOfLines={1}
+            style={[textStyles.mono, { color: colors.textMuted, fontSize: 9 }]}
+          >
             Tempo
           </Text>
         </View>
@@ -336,9 +339,9 @@ export function ChatSummary({
         style={{ gap: 10, paddingTop: 4 }}
       >
         <Pressable
-          onPress={onClose}
+          onPress={onBack}
           style={({ pressed }) => ({
-            backgroundColor: colors.textPrimary,
+            backgroundColor: colors.accent,
             borderRadius: 12,
             borderCurve: "continuous",
             paddingVertical: 16,
@@ -349,10 +352,30 @@ export function ChatSummary({
           <Text
             style={[
               textStyles.body,
-              { color: colors.card, fontWeight: "600", fontSize: 15 },
+              { color: "#FFFFFF", fontWeight: "600", fontSize: 15 },
             ]}
           >
-            Torna al ripasso
+            Torna alla conversazione
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={onClose}
+          style={({ pressed }) => ({
+            backgroundColor: colors.card,
+            borderRadius: 12,
+            borderCurve: "continuous",
+            paddingVertical: 16,
+            alignItems: "center",
+            opacity: pressed ? 0.85 : 1,
+          })}
+        >
+          <Text
+            style={[
+              textStyles.body,
+              { color: colors.textSecondary, fontWeight: "600", fontSize: 15 },
+            ]}
+          >
+            Termina
           </Text>
         </Pressable>
       </Animated.View>

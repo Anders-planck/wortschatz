@@ -66,10 +66,13 @@ export default function ChatSessionScreen() {
             onSaveWords={() => {
               // TODO: save discovered words to dictionary
             }}
+            onBack={() => setShowSummary(false)}
             onClose={() => router.back()}
           />
         </View>
-        <Stack.Screen options={{ title: "Riepilogo" }} />
+        <Stack.Screen
+          options={{ title: "Riepilogo", headerRight: () => null }}
+        />
       </>
     );
   }
