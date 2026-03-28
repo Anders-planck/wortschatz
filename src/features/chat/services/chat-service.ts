@@ -1,5 +1,6 @@
 import { streamText } from "ai";
 import { google } from "@/features/shared/config/ai-provider";
+import { trackAiStream } from "@/features/shared/services/ai-usage-tracker";
 import type { Scenario, ParsedAIResponse, Correction } from "../types";
 
 export function buildSystemPrompt(scenario: Scenario): string {
@@ -26,11 +27,14 @@ export function streamChatResponse(
   systemPrompt: string,
   messages: { role: "user" | "assistant"; content: string }[],
 ) {
-  return streamText({
-    model: google("gemini-2.5-flash-lite"),
-    system: systemPrompt,
-    messages,
-  });
+  return trackAiStream(
+    "chat",
+    streamText({
+      model: google("gemini-2.5-flash-lite"),
+      system: systemPrompt,
+      messages,
+    }),
+  );
 }
 
 export function parseAIResponse(raw: string): ParsedAIResponse {

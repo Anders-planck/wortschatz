@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { generateText, Output } from "ai";
 import { google } from "@/features/shared/config/ai-provider";
+import { trackAiCall } from "@/features/shared/services/ai-usage-tracker";
 import type { Word } from "@/features/dictionary/types";
 import { COLLECTION_ICONS } from "@/features/collections/types";
 
@@ -28,12 +29,13 @@ export async function triageWords(words: Word[]): Promise<TriageGroup[]> {
 
   const terms = words.map((w) => w.term).join(", ");
 
-  const result = await generateText({
-    model: google("gemini-2.5-flash-lite"),
-    output: Output.object({
-      schema: TriageResultSchema,
-    }),
-    prompt: `You are a German vocabulary organizer for an Italian-speaking student.
+  const result = await trackAiCall("collections", () =>
+    generateText({
+      model: google("gemini-2.5-flash-lite"),
+      output: Output.object({
+        schema: TriageResultSchema,
+      }),
+      prompt: `You are a German vocabulary organizer for an Italian-speaking student.
 
 Given these German words: ${terms}
 
@@ -46,7 +48,8 @@ For each group provide:
 - "reason": a brief explanation in Italian of why these words are grouped together
 
 Every word must appear in exactly one group. Do not skip any word.`,
-  });
+    }),
+  );
 
   if (!result.output) {
     throw new Error("AI failed to generate vocabulary triage");
@@ -63,19 +66,21 @@ export async function autoPopulateCollection(
 
   const terms = allWords.map((w) => w.term).join(", ");
 
-  const result = await generateText({
-    model: google("gemini-2.5-flash-lite"),
-    output: Output.object({
-      schema: AutoPopulateSchema,
-    }),
-    prompt: `You are a German vocabulary organizer for an Italian-speaking student.
+  const result = await trackAiCall("collections", () =>
+    generateText({
+      model: google("gemini-2.5-flash-lite"),
+      output: Output.object({
+        schema: AutoPopulateSchema,
+      }),
+      prompt: `You are a German vocabulary organizer for an Italian-speaking student.
 
 The user has a collection named "${collectionName}".
 
 From the following German words, select ONLY the ones that thematically fit this collection: ${terms}
 
 Return only the matching terms as an array. If no words fit, return an empty array.`,
-  });
+    }),
+  );
 
   if (!result.output) {
     throw new Error("AI failed to auto-populate collection");

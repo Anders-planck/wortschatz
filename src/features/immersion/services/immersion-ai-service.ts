@@ -1,5 +1,7 @@
 import { generateText, Output } from "ai";
 import { google } from "@/features/shared/config/ai-provider";
+import { trackAiCall } from "@/features/shared/services/ai-usage-tracker";
+
 const AI_MODEL = "gemini-2.5-flash-lite";
 
 import {
@@ -17,10 +19,11 @@ export async function generateWordFamily(
   term: string,
   type: string,
 ): Promise<WordFamily> {
-  const result = await generateText({
-    model: google(AI_MODEL),
-    output: Output.object({ schema: WordFamilySchema }),
-    prompt: `You are a German etymology expert helping an Italian-speaking learner.
+  const result = await trackAiCall("word_family", () =>
+    generateText({
+      model: google(AI_MODEL),
+      output: Output.object({ schema: WordFamilySchema }),
+      prompt: `You are a German etymology expert helping an Italian-speaking learner.
 
 Given the German word "${term}" (${type}), generate its word family (Wortfamilie).
 
@@ -30,7 +33,8 @@ For each word provide: term, type (noun/verb/adjective/adverb/preposition), gend
 Example: "fahren" → Fahrer, Fahrrad, Erfahrung, Abfahrt, erfahren, Einfahrt, mitfahren, Führerschein.
 
 Include common, useful words a B1 learner would encounter. Order from most common to least common.`,
-  });
+    }),
+  );
 
   if (!result.output) {
     throw new Error("AI failed to generate word family");
@@ -42,10 +46,11 @@ export async function generateSynonymsAntonyms(
   term: string,
   type: string,
 ): Promise<SynonymsAntonyms> {
-  const result = await generateText({
-    model: google(AI_MODEL),
-    output: Output.object({ schema: SynonymsAntonymsSchema }),
-    prompt: `You are a German vocabulary expert helping an Italian-speaking B1 learner.
+  const result = await trackAiCall("synonyms", () =>
+    generateText({
+      model: google(AI_MODEL),
+      output: Output.object({ schema: SynonymsAntonymsSchema }),
+      prompt: `You are a German vocabulary expert helping an Italian-speaking B1 learner.
 
 For the German word "${term}" (${type}):
 
@@ -56,7 +61,8 @@ For the German word "${term}" (${type}):
 3. Comparative: ONLY for adjectives — provide Komparativ and Superlativ forms. For non-adjectives, return null.
 
 All translations must be in Italian. Only include real, commonly used words.`,
-  });
+    }),
+  );
 
   if (!result.output) {
     throw new Error("AI failed to generate synonyms/antonyms");
@@ -69,10 +75,11 @@ export async function generateReading(
   level: string,
 ): Promise<Reading> {
   const wordList = vocabularyWords.join(", ");
-  const result = await generateText({
-    model: google(AI_MODEL),
-    output: Output.object({ schema: ReadingSchema }),
-    prompt: `You are a German language teacher creating graded reading material for an Italian-speaking student.
+  const result = await trackAiCall("readings", () =>
+    generateText({
+      model: google(AI_MODEL),
+      output: Output.object({ schema: ReadingSchema }),
+      prompt: `You are a German language teacher creating graded reading material for an Italian-speaking student.
 
 Create a short story (100-200 words) at ${level} level using these vocabulary words naturally: ${wordList}.
 
@@ -83,7 +90,8 @@ Requirements:
 - wordTranslations: A map of EVERY unique German word in the text → its Italian translation. Include articles, prepositions, verbs in their conjugated form mapped to the infinitive meaning. This is for tap-to-translate.
 
 Make the story interesting and relatable — daily life in Germany, a small adventure, a conversation.`,
-  });
+    }),
+  );
 
   if (!result.output) {
     throw new Error("AI failed to generate reading");
@@ -96,10 +104,11 @@ export async function generateListeningExercises(
   level: string,
 ): Promise<ListeningExercise[]> {
   const wordList = vocabularyWords.join(", ");
-  const result = await generateText({
-    model: google(AI_MODEL),
-    output: Output.object({ schema: ListeningSetSchema }),
-    prompt: `You are a German listening comprehension teacher for an Italian-speaking ${level} student.
+  const result = await trackAiCall("listening", () =>
+    generateText({
+      model: google(AI_MODEL),
+      output: Output.object({ schema: ListeningSetSchema }),
+      prompt: `You are a German listening comprehension teacher for an Italian-speaking ${level} student.
 
 Create 3 listening comprehension exercises using these vocabulary words: ${wordList}.
 
@@ -111,7 +120,8 @@ Each exercise has:
 - explanation: Why the correct answer is right, explained in Italian
 
 Make dialogues realistic — ordering at a restaurant, asking for directions, a phone call, at the doctor, etc. Vary the scenarios.`,
-  });
+    }),
+  );
 
   if (!result.output) {
     throw new Error("AI failed to generate listening exercises");

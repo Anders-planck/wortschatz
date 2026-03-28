@@ -1,6 +1,7 @@
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { google } from "@/features/shared/config/ai-provider";
+import { trackAiCall } from "@/features/shared/services/ai-usage-tracker";
 import type { Word } from "@/features/dictionary/types";
 import type {
   Exercise,
@@ -48,17 +49,19 @@ async function generateFillBlank(words: Word[]): Promise<FillBlankExercise[]> {
     .map((w) => `${w.term} (${w.translations[0] ?? ""})`)
     .join(", ");
 
-  const result = await generateText({
-    model: google("gemini-2.5-flash-lite"),
-    output: Output.object({ schema: FillBlankSchema }),
-    prompt: `Sei un insegnante di tedesco per studenti italiani di livello B1.
+  const result = await trackAiCall("exercises", () =>
+    generateText({
+      model: google("gemini-2.5-flash-lite"),
+      output: Output.object({ schema: FillBlankSchema }),
+      prompt: `Sei un insegnante di tedesco per studenti italiani di livello B1.
 
 Crea esercizi "fill in the blank" per queste parole tedesche: ${wordList}
 
 Per ogni parola, crea una frase tedesca di livello B1 con ___ al posto della parola da inserire.
 Fornisci la traduzione italiana della frase completa e un suggerimento grammaticale in italiano.
 Genera un esercizio per ogni parola fornita.`,
-  });
+    }),
+  );
 
   if (!result.output) {
     throw new Error("AI failed to generate fill-blank exercises");
@@ -97,10 +100,11 @@ async function generateCaseQuiz(words: Word[]): Promise<CaseQuizExercise[]> {
     .map((w) => `${w.gender} ${w.term} (${w.translations[0] ?? ""})`)
     .join(", ");
 
-  const result = await generateText({
-    model: google("gemini-2.5-flash-lite"),
-    output: Output.object({ schema: CaseQuizSchema }),
-    prompt: `Sei un insegnante di tedesco per studenti italiani di livello B1.
+  const result = await trackAiCall("exercises", () =>
+    generateText({
+      model: google("gemini-2.5-flash-lite"),
+      output: Output.object({ schema: CaseQuizSchema }),
+      prompt: `Sei un insegnante di tedesco per studenti italiani di livello B1.
 
 Crea esercizi sugli articoli e i casi grammaticali tedeschi per questi sostantivi: ${wordList}
 
@@ -108,7 +112,8 @@ Per ogni sostantivo, crea una frase tedesca con ___ dove va l'articolo declinato
 Fornisci 4 opzioni di articolo (solo una corretta), il caso grammaticale usato,
 la traduzione italiana della frase e una spiegazione in italiano del perché si usa quel caso.
 Genera un esercizio per ogni sostantivo fornito.`,
-  });
+    }),
+  );
 
   if (!result.output) {
     throw new Error("AI failed to generate case quiz exercises");

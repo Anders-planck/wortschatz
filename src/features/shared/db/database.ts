@@ -96,6 +96,24 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   );
 
   await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS ai_usage_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      feature TEXT NOT NULL,
+      input_tokens INTEGER NOT NULL,
+      output_tokens INTEGER NOT NULL,
+      cost_usd REAL NOT NULL,
+      model TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+  `);
+  await db.execAsync(
+    `CREATE INDEX IF NOT EXISTS idx_ai_usage_created ON ai_usage_log(created_at);`,
+  );
+  await db.execAsync(
+    `CREATE INDEX IF NOT EXISTS idx_ai_usage_feature ON ai_usage_log(feature);`,
+  );
+
+  await db.execAsync(`
     CREATE TABLE IF NOT EXISTS chat_scenarios (
       id TEXT PRIMARY KEY,
       title TEXT NOT NULL,
