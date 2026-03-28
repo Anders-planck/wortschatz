@@ -18,6 +18,8 @@ import {
   ThemeProvider,
   ThemeContext,
 } from "@/features/shared/theme/theme-context";
+import { rescheduleSmartNotifications } from "@/features/review/services/review-notifications";
+import { getSetting } from "@/features/settings/services/settings-repository";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,6 +30,18 @@ function AppContent() {
   useEffect(() => {
     Appearance.setColorScheme(resolvedScheme);
   }, [resolvedScheme]);
+
+  // Reschedule smart notifications on every app open
+  useEffect(() => {
+    (async () => {
+      const enabled = await getSetting("reviewReminder");
+      if (enabled === "true") {
+        const hour = Number(await getSetting("reviewReminderHour")) || 20;
+        const minute = Number(await getSetting("reviewReminderMinute")) || 0;
+        rescheduleSmartNotifications(hour, minute);
+      }
+    })();
+  }, []);
 
   // Navigate to review tab when tapping the notification
   useEffect(() => {
