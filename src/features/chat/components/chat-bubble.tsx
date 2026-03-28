@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
+import { Image } from "expo-image";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
+import { useSpeech } from "@/features/shared/hooks/use-speech";
 import type { ChatMessage, Correction } from "../types";
 import { CorrectionBlock } from "./correction-block";
 
@@ -12,46 +14,51 @@ interface ChatBubbleProps {
   onWordTap: (word: string) => void;
 }
 
-function renderTextWithMarkedWords(
-  text: string,
-  markedWords: string[],
-  onWordTap: (word: string) => void,
-  accentColor: string,
-  textColor: string,
-  fontFamily: string,
-) {
-  if (markedWords.length === 0) {
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  const h = String(d.getHours()).padStart(2, "0");
+  const m = String(d.getMinutes()).padStart(2, "0");
+  return `${h}:${m}`;
+}
+
+function RenderTextWithMarkedWords({
+  text,
+  markedWords,
+  onWordTap,
+  accentColor,
+  textColor,
+  fontFamily,
+}: {
+  text: string;
+  markedWords: string[];
+  onWordTap: (word: string) => void;
+  accentColor: string;
+  textColor: string;
+  fontFamily: string;
+}) {
+  const pattern = useMemo(() => {
+    if (markedWords.length === 0) return null;
+    const escaped = markedWords.map((w) =>
+      w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+    );
+    return new RegExp(`\\b(${escaped.join("|")})\\b`, "gi");
+  }, [markedWords]);
+
+  if (!pattern) {
     return (
       <Text
-        style={{
-          fontFamily,
-          fontSize: 15,
-          fontWeight: "400",
-          color: textColor,
-          lineHeight: 22,
-        }}
+        style={{ fontFamily, fontSize: 15, color: textColor, lineHeight: 22 }}
       >
         {text}
       </Text>
     );
   }
 
-  // Build a regex to match any marked word (case-insensitive, word boundaries)
-  const escaped = markedWords.map((w) =>
-    w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-  );
-  const pattern = new RegExp(`\\b(${escaped.join("|")})\\b`, "gi");
   const parts = text.split(pattern);
 
   return (
     <Text
-      style={{
-        fontFamily,
-        fontSize: 15,
-        fontWeight: "400",
-        color: textColor,
-        lineHeight: 22,
-      }}
+      style={{ fontFamily, fontSize: 15, color: textColor, lineHeight: 22 }}
     >
       {parts.map((part, i) => {
         const isMarked = markedWords.some(
@@ -85,9 +92,8 @@ export const ChatBubble = React.memo(function ChatBubble({
   onWordTap,
 }: ChatBubbleProps) {
   const { colors, textStyles } = useAppTheme();
+  const { speak, isSpeaking } = useSpeech();
   const isUser = message.role === "user";
-
-  // Content is already clean — parsed.text is stored by the hook (Fix 2)
   const displayText = message.content;
 
   return (
@@ -96,7 +102,7 @@ export const ChatBubble = React.memo(function ChatBubble({
       style={{
         alignSelf: isUser ? "flex-end" : "flex-start",
         maxWidth: "80%",
-        marginBottom: 8,
+        marginBottom: 12,
       }}
     >
       <View
@@ -116,7 +122,6 @@ export const ChatBubble = React.memo(function ChatBubble({
             style={{
               fontFamily: textStyles.body.fontFamily,
               fontSize: 15,
-              fontWeight: "400",
               color: "#FFFFFF",
               lineHeight: 22,
             }}
@@ -125,18 +130,57 @@ export const ChatBubble = React.memo(function ChatBubble({
           </Text>
         ) : (
           <>
-            {renderTextWithMarkedWords(
-              displayText,
-              markedWords,
-              onWordTap,
-              colors.accent,
-              colors.textPrimary,
-              textStyles.body.fontFamily,
-            )}
+            <RenderTextWithMarkedWords
+              text={displayText}
+              markedWords={markedWords}
+              onWordTap={onWordTap}
+              accentColor={colors.accent}
+              textColor={colors.textPrimary}
+              fontFamily={textStyles.body.fontFamily}
+            />
             {corrections.map((c, i) => (
               <CorrectionBlock key={`${c.wrong}-${i}`} correction={c} />
             ))}
           </>
+        )}
+      </View>
+
+      {/* Footer: time + speech */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 6,
+          marginTop: 4,
+          alignSelf: isUser ? "flex-end" : "flex-start",
+          paddingHorizontal: 4,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: textStyles.mono.fontFamily,
+            fontSize: 10,
+            color: colors.textGhost,
+            fontVariant: ["tabular-nums"],
+          }}
+        >
+          {formatTime(message.timestamp)}
+        </Text>
+
+        {displayText.length > 0 && (
+          <Pressable
+            onPress={() => speak(displayText)}
+            hitSlop={8}
+            style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
+          >
+            <Image
+              source={
+                isSpeaking ? "sf:speaker.wave.3.fill" : "sf:speaker.wave.2"
+              }
+              style={{ width: 12, height: 12 }}
+              tintColor={colors.textGhost}
+            />
+          </Pressable>
         )}
       </View>
     </Animated.View>
