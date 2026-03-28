@@ -95,5 +95,18 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
     `CREATE INDEX IF NOT EXISTS idx_activity_word ON activity_log(word_id);`,
   );
 
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS chat_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      scenario TEXT NOT NULL,
+      messages TEXT NOT NULL DEFAULT '[]',
+      corrections_count INTEGER NOT NULL DEFAULT 0,
+      correct_count INTEGER NOT NULL DEFAULT 0,
+      new_words TEXT NOT NULL DEFAULT '[]',
+      duration_seconds INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
+  `);
+
   return db;
 }
