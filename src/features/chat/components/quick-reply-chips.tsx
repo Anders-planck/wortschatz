@@ -41,10 +41,12 @@ export function QuickReplyChips({
         >
           <Text
             numberOfLines={1}
-            style={[
-              textStyles.body,
-              { fontSize: 14, color: colors.accent, fontWeight: "500" },
-            ]}
+            style={{
+              fontFamily: textStyles.heading.fontFamily,
+              fontSize: 15,
+              fontWeight: "600",
+              color: colors.accent,
+            }}
           >
             {text}
           </Text>
