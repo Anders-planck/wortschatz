@@ -682,58 +682,78 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
         </Text>
 
         <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-          {/* Donut SVG */}
-          <Svg width={DONUT_SIZE} height={DONUT_SIZE}>
-            {/* Background track */}
-            <Circle
-              cx={DONUT_CX}
-              cy={DONUT_CY}
-              r={DONUT_R}
-              fill="none"
-              stroke={colors.cream}
-              strokeWidth={STROKE_W}
-            />
-
-            {/* Segments */}
-            {donutSegments.map((seg) => (
+          {/* Donut SVG + center overlay */}
+          <View style={{ width: DONUT_SIZE, height: DONUT_SIZE }}>
+            <Svg width={DONUT_SIZE} height={DONUT_SIZE}>
               <Circle
-                key={seg.level}
                 cx={DONUT_CX}
                 cy={DONUT_CY}
                 r={DONUT_R}
                 fill="none"
-                stroke={MASTERY_COLORS[seg.level]}
+                stroke={colors.cream}
                 strokeWidth={STROKE_W}
-                strokeDasharray={`${seg.dashLen} ${CIRCUMFERENCE}`}
-                strokeDashoffset={-seg.offset}
-                strokeLinecap="butt"
-                rotation={-90}
-                origin={`${DONUT_CX},${DONUT_CY}`}
               />
-            ))}
-
-            {/* Center text */}
-            <SvgText
-              x={DONUT_CX}
-              y={DONUT_CY + 2}
-              textAnchor="middle"
-              fontSize="18"
-              fontWeight="800"
-              fill={colors.textPrimary}
+              {donutSegments.map((seg) => (
+                <Circle
+                  key={seg.level}
+                  cx={DONUT_CX}
+                  cy={DONUT_CY}
+                  r={DONUT_R}
+                  fill="none"
+                  stroke={MASTERY_COLORS[seg.level]}
+                  strokeWidth={STROKE_W}
+                  strokeDasharray={`${seg.dashLen} ${CIRCUMFERENCE}`}
+                  strokeDashoffset={-seg.offset}
+                  strokeLinecap="butt"
+                  rotation={-90}
+                  origin={`${DONUT_CX},${DONUT_CY}`}
+                />
+              ))}
+            </Svg>
+            {/* Native center text */}
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {masteryPct} %
-            </SvgText>
-            <SvgText
-              x={DONUT_CX}
-              y={DONUT_CY + 14}
-              textAnchor="middle"
-              fontSize="7"
-              fill={colors.textHint}
-              letterSpacing="1"
-            >
-              MEDIA
-            </SvgText>
-          </Svg>
+              <View
+                style={{ flexDirection: "row", alignItems: "baseline", gap: 2 }}
+              >
+                <Text
+                  style={{
+                    fontFamily: textStyles.heading.fontFamily,
+                    fontSize: 18,
+                    fontWeight: "800",
+                    color: colors.textPrimary,
+                  }}
+                >
+                  {masteryPct}
+                </Text>
+                <Image
+                  source="sf:percent"
+                  style={{ width: 12, height: 12 }}
+                  tintColor={colors.textMuted}
+                />
+              </View>
+              <Text
+                style={{
+                  fontFamily: textStyles.mono.fontFamily,
+                  fontSize: 7,
+                  color: colors.textHint,
+                  letterSpacing: 1,
+                  textTransform: "uppercase",
+                }}
+              >
+                Media
+              </Text>
+            </View>
+          </View>
 
           {/* Legend */}
           <View style={{ flex: 1, gap: 6 }}>
