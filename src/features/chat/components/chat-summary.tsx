@@ -86,7 +86,7 @@ export function ChatSummary({
           <SymbolView
             name="pencil.circle.fill"
             size={22}
-            tintColor="#C05050"
+            tintColor={colors.danger}
             resizeMode="scaleAspectFit"
           />
           <Text
@@ -94,7 +94,7 @@ export function ChatSummary({
               fontFamily: textStyles.heading.fontFamily,
               fontSize: 20,
               fontWeight: "700",
-              color: "#C05050",
+              color: colors.danger,
               letterSpacing: -0.5,
             }}
           >
@@ -123,7 +123,7 @@ export function ChatSummary({
           <SymbolView
             name="book.fill"
             size={22}
-            tintColor="#4A9A4A"
+            tintColor={colors.success}
             resizeMode="scaleAspectFit"
           />
           <Text
@@ -131,7 +131,7 @@ export function ChatSummary({
               fontFamily: textStyles.heading.fontFamily,
               fontSize: 20,
               fontWeight: "700",
-              color: "#4A9A4A",
+              color: colors.success,
               letterSpacing: -0.5,
             }}
           >
@@ -221,7 +221,7 @@ export function ChatSummary({
                     style={[
                       textStyles.body,
                       {
-                        color: "#C05050",
+                        color: colors.danger,
                         textDecorationLine: "line-through",
                         fontSize: 14,
                       },
@@ -241,7 +241,7 @@ export function ChatSummary({
                     style={[
                       textStyles.body,
                       {
-                        color: "#4A9A4A",
+                        color: colors.success,
                         fontWeight: "600",
                         fontSize: 14,
                       },

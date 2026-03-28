@@ -42,34 +42,26 @@ export async function getRecentChatSessions(
   const rows = await db.getAllAsync<{
     id: number;
     scenario: string;
-    messages: string;
+    messages_count: number;
     corrections_count: number;
     duration_seconds: number;
     created_at: string;
   }>(
-    `SELECT id, scenario, messages, corrections_count, duration_seconds, created_at
+    `SELECT id, scenario, json_array_length(messages) as messages_count, corrections_count, duration_seconds, created_at
      FROM chat_sessions
      ORDER BY created_at DESC
      LIMIT ?`,
     [limit],
   );
 
-  return rows.map((r) => {
-    let messagesCount = 0;
-    try {
-      messagesCount = (JSON.parse(r.messages) as unknown[]).length;
-    } catch {
-      // ignore
-    }
-    return {
-      id: r.id,
-      scenario: r.scenario,
-      messagesCount,
-      correctionsCount: r.corrections_count,
-      durationSeconds: r.duration_seconds,
-      createdAt: r.created_at,
-    };
-  });
+  return rows.map((r) => ({
+    id: r.id,
+    scenario: r.scenario,
+    messagesCount: r.messages_count,
+    correctionsCount: r.corrections_count,
+    durationSeconds: r.duration_seconds,
+    createdAt: r.created_at,
+  }));
 }
 
 export async function getChatSessionsByScenario(
@@ -79,34 +71,26 @@ export async function getChatSessionsByScenario(
   const rows = await db.getAllAsync<{
     id: number;
     scenario: string;
-    messages: string;
+    messages_count: number;
     corrections_count: number;
     duration_seconds: number;
     created_at: string;
   }>(
-    `SELECT id, scenario, messages, corrections_count, duration_seconds, created_at
+    `SELECT id, scenario, json_array_length(messages) as messages_count, corrections_count, duration_seconds, created_at
      FROM chat_sessions
      WHERE scenario = ?
      ORDER BY created_at DESC`,
     [scenarioId],
   );
 
-  return rows.map((r) => {
-    let messagesCount = 0;
-    try {
-      messagesCount = (JSON.parse(r.messages) as unknown[]).length;
-    } catch {
-      // ignore
-    }
-    return {
-      id: r.id,
-      scenario: r.scenario,
-      messagesCount,
-      correctionsCount: r.corrections_count,
-      durationSeconds: r.duration_seconds,
-      createdAt: r.created_at,
-    };
-  });
+  return rows.map((r) => ({
+    id: r.id,
+    scenario: r.scenario,
+    messagesCount: r.messages_count,
+    correctionsCount: r.corrections_count,
+    durationSeconds: r.duration_seconds,
+    createdAt: r.created_at,
+  }));
 }
 
 export async function getChatSessionMessages(
@@ -128,4 +112,14 @@ export async function getChatSessionMessages(
 export async function deleteChatSession(id: number): Promise<void> {
   const db = await getDatabase();
   await db.runAsync("DELETE FROM chat_sessions WHERE id = ?", [id]);
+}
+
+export async function deleteChatSessions(ids: number[]): Promise<void> {
+  if (ids.length === 0) return;
+  const db = await getDatabase();
+  const placeholders = ids.map(() => "?").join(", ");
+  await db.runAsync(
+    `DELETE FROM chat_sessions WHERE id IN (${placeholders})`,
+    ids,
+  );
 }

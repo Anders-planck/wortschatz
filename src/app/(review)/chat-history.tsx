@@ -15,6 +15,7 @@ import { SCENARIOS } from "@/features/chat/constants";
 import {
   getChatSessionsByScenario,
   deleteChatSession,
+  deleteChatSessions,
   type SavedChatSession,
 } from "@/features/chat/services/chat-repository";
 import { formatDuration } from "@/features/shared/utils/format-duration";
@@ -94,9 +95,7 @@ export default function ChatHistoryScreen() {
           text: "Elimina",
           style: "destructive",
           onPress: async () => {
-            for (const id of selectedIds) {
-              await deleteChatSession(id);
-            }
+            await deleteChatSessions([...selectedIds]);
             setSessions((prev) => prev.filter((s) => !selectedIds.has(s.id)));
             setSelectedIds(new Set());
             setIsSelecting(false);
@@ -218,7 +217,7 @@ export default function ChatHistoryScreen() {
                 <SymbolView
                   name="plus.bubble"
                   size={18}
-                  tintColor="#FFFFFF"
+                  tintColor={colors.onAccent}
                   resizeMode="scaleAspectFit"
                 />
                 <Text
@@ -226,7 +225,7 @@ export default function ChatHistoryScreen() {
                     fontFamily: textStyles.heading.fontFamily,
                     fontSize: 16,
                     fontWeight: "600",
-                    color: "#FFFFFF",
+                    color: colors.onAccent,
                   }}
                 >
                   Nuova conversazione
@@ -269,7 +268,7 @@ export default function ChatHistoryScreen() {
                 style={({ pressed }) => ({
                   flex: 1,
                   backgroundColor:
-                    selectedIds.size > 0 ? "#C05050" : colors.borderLight,
+                    selectedIds.size > 0 ? colors.danger : colors.borderLight,
                   borderRadius: 12,
                   borderCurve: "continuous",
                   paddingVertical: 14,
@@ -284,7 +283,7 @@ export default function ChatHistoryScreen() {
                   name="trash"
                   size={14}
                   tintColor={
-                    selectedIds.size > 0 ? "#FFFFFF" : colors.textMuted
+                    selectedIds.size > 0 ? colors.onAccent : colors.textMuted
                   }
                   resizeMode="scaleAspectFit"
                 />
@@ -294,7 +293,9 @@ export default function ChatHistoryScreen() {
                     {
                       fontSize: 14,
                       color:
-                        selectedIds.size > 0 ? "#FFFFFF" : colors.textMuted,
+                        selectedIds.size > 0
+                          ? colors.onAccent
+                          : colors.textMuted,
                     },
                   ]}
                 >
@@ -315,13 +316,7 @@ export default function ChatHistoryScreen() {
                 }}
               >
                 <Text
-                  style={{
-                    fontFamily: textStyles.mono.fontFamily,
-                    fontSize: 10,
-                    color: colors.textGhost,
-                    letterSpacing: 1.5,
-                    textTransform: "uppercase",
-                  }}
+                  style={[textStyles.monoLabel, { color: colors.textGhost }]}
                 >
                   Conversazioni precedenti
                 </Text>
@@ -405,7 +400,7 @@ export default function ChatHistoryScreen() {
                         <Pressable
                           onPress={() => handleDeleteSingle(session.id)}
                           style={{
-                            backgroundColor: "#C05050",
+                            backgroundColor: colors.danger,
                             borderRadius: 14,
                             borderCurve: "continuous",
                             justifyContent: "center",
@@ -417,7 +412,7 @@ export default function ChatHistoryScreen() {
                           <SymbolView
                             name="trash"
                             size={20}
-                            tintColor="#FFFFFF"
+                            tintColor={colors.onAccent}
                             resizeMode="scaleAspectFit"
                           />
                         </Pressable>

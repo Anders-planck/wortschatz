@@ -49,7 +49,7 @@ export function ExerciseSummary({
             fontFamily: textStyles.heading.fontFamily,
             fontSize: 56,
             fontWeight: "700",
-            color: isGood ? "#4A9A4A" : colors.accent,
+            color: isGood ? colors.success : colors.accent,
             letterSpacing: -2,
           }}
         >
@@ -81,7 +81,7 @@ export function ExerciseSummary({
           <SymbolView
             name="checkmark.circle.fill"
             size={24}
-            tintColor="#4A9A4A"
+            tintColor={colors.success}
             resizeMode="scaleAspectFit"
           />
           <Text
@@ -89,7 +89,7 @@ export function ExerciseSummary({
               fontFamily: textStyles.heading.fontFamily,
               fontSize: 22,
               fontWeight: "700",
-              color: "#4A9A4A",
+              color: colors.success,
               letterSpacing: -0.5,
             }}
           >
@@ -116,7 +116,7 @@ export function ExerciseSummary({
           <SymbolView
             name="xmark.circle.fill"
             size={24}
-            tintColor="#C05050"
+            tintColor={colors.danger}
             resizeMode="scaleAspectFit"
           />
           <Text
@@ -124,7 +124,7 @@ export function ExerciseSummary({
               fontFamily: textStyles.heading.fontFamily,
               fontSize: 22,
               fontWeight: "700",
-              color: "#C05050",
+              color: colors.danger,
               letterSpacing: -0.5,
             }}
           >
@@ -231,7 +231,7 @@ export function ExerciseSummary({
             <Text
               style={[
                 textStyles.body,
-                { color: "#FFFFFF", fontWeight: "600", fontSize: 15 },
+                { color: colors.onAccent, fontWeight: "600", fontSize: 15 },
               ]}
             >
               Ripeti gli errori

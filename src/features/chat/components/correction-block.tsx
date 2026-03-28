@@ -12,7 +12,7 @@ export function CorrectionBlock({ correction }: CorrectionBlockProps) {
   return (
     <View
       style={{
-        backgroundColor: "rgba(192, 80, 80, 0.08)",
+        backgroundColor: colors.dangerBg,
         borderRadius: 8,
         borderCurve: "continuous",
         padding: 10,
@@ -25,7 +25,7 @@ export function CorrectionBlock({ correction }: CorrectionBlockProps) {
           style={[
             textStyles.body,
             {
-              color: "#C05050",
+              color: colors.danger,
               textDecorationLine: "line-through",
               fontSize: 13,
             },
@@ -41,7 +41,7 @@ export function CorrectionBlock({ correction }: CorrectionBlockProps) {
         <Text
           style={[
             textStyles.body,
-            { color: "#4A9A4A", fontWeight: "600", fontSize: 13 },
+            { color: colors.success, fontWeight: "600", fontSize: 13 },
           ]}
         >
           {correction.right}

@@ -34,12 +34,15 @@ export function ScenarioCard({
           <SymbolView
             name={scenario.icon as SFSymbol}
             size={36}
-            tintColor="#FFFFFF"
+            tintColor={colors.onAccent}
             resizeMode="scaleAspectFit"
           />
           <View style={{ gap: 6 }}>
             <Text
-              style={[textStyles.heading, { fontSize: 20, color: "#FFFFFF" }]}
+              style={[
+                textStyles.heading,
+                { fontSize: 20, color: colors.onAccent },
+              ]}
             >
               {scenario.title}
             </Text>
@@ -60,7 +63,7 @@ export function ScenarioCard({
             <Text
               style={[
                 textStyles.mono,
-                { color: "#FFFFFF", fontSize: 10, fontWeight: "600" },
+                { color: colors.onAccent, fontSize: 10, fontWeight: "600" },
               ]}
             >
               {scenario.level}

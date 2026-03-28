@@ -60,16 +60,13 @@ export function useChatSession(): ChatSessionHook {
     messagesRef.current = messages;
   }, [messages]);
 
-  // Parsed results per assistant message id
   const parsedMapRef = useRef<Map<string, ParsedAIResponse>>(new Map());
   const [parsedMap, setParsedMap] = useState<Map<string, ParsedAIResponse>>(
     () => new Map(),
   );
 
-  // Cancellation flag for streaming loops
   const cancelledRef = useRef(false);
 
-  // Cleanup on unmount: cancel any active stream
   useEffect(() => {
     return () => {
       cancelledRef.current = true;

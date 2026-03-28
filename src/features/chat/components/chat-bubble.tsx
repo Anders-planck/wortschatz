@@ -122,7 +122,7 @@ export const ChatBubble = React.memo(function ChatBubble({
             style={{
               fontFamily: textStyles.body.fontFamily,
               fontSize: 15,
-              color: "#FFFFFF",
+              color: colors.onAccent,
               lineHeight: 22,
             }}
           >

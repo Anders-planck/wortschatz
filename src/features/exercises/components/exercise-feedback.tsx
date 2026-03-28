@@ -22,9 +22,9 @@ export function ExerciseFeedback({
 
   const bgColor = isCorrect ? "#1A3A1A" : "#3A1A1A";
   const iconName = isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill";
-  const iconColor = isCorrect ? "#4A9A4A" : "#C05050";
+  const iconColor = isCorrect ? colors.success : colors.danger;
   const title = isCorrect ? "Corretto!" : "Sbagliato";
-  const buttonBg = isCorrect ? "#4A9A4A" : "#C05050";
+  const buttonBg = isCorrect ? colors.success : colors.danger;
 
   return (
     <Animated.View
@@ -86,7 +86,7 @@ export function ExerciseFeedback({
         <Text
           style={[
             textStyles.body,
-            { color: "#FFFFFF", fontWeight: "600", fontSize: 15 },
+            { color: colors.onAccent, fontWeight: "600", fontSize: 15 },
           ]}
         >
           Continua

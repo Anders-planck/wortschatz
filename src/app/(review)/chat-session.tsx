@@ -37,9 +37,13 @@ export default function ChatSessionScreen() {
 
   useEffect(() => {
     if (sessionId) {
-      getChatSessionMessages(Number(sessionId)).then((messages) => {
-        session.resume(scenario, messages);
-      });
+      getChatSessionMessages(Number(sessionId))
+        .then((messages) => {
+          session.resume(scenario, messages);
+        })
+        .catch(() => {
+          session.start(scenario);
+        });
     } else {
       session.start(scenario);
     }
@@ -108,7 +112,6 @@ export default function ChatSessionScreen() {
     );
   }
 
-  // Messages in reverse for inverted FlatList
   const reversedMessages = useMemo(
     () => [...session.messages].reverse(),
     [session.messages],
