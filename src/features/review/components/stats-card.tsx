@@ -288,11 +288,11 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
         )
       : 0;
 
-  const DONUT_SIZE = 140;
-  const DONUT_R = 54;
+  const DONUT_SIZE = 90;
+  const DONUT_R = 33;
   const DONUT_CX = DONUT_SIZE / 2;
   const DONUT_CY = DONUT_SIZE / 2;
-  const STROKE_W = 14;
+  const STROKE_W = 10;
   const CIRCUMFERENCE = 2 * Math.PI * DONUT_R;
 
   const donutSegments = useMemo(() => {
@@ -717,17 +717,17 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
               x={DONUT_CX}
               y={DONUT_CY + 2}
               textAnchor="middle"
-              fontSize="28"
+              fontSize="18"
               fontWeight="800"
               fill={colors.textPrimary}
             >
-              {masteryPct}%
+              {masteryPct} %
             </SvgText>
             <SvgText
               x={DONUT_CX}
-              y={DONUT_CY + 20}
+              y={DONUT_CY + 14}
               textAnchor="middle"
-              fontSize="9"
+              fontSize="7"
               fill={colors.textHint}
               letterSpacing="1"
             >
