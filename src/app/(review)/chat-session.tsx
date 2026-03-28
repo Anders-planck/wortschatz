@@ -127,6 +127,7 @@ export default function ChatSessionScreen() {
         <FlatList
           data={reversedMessages}
           inverted
+          contentInsetAdjustmentBehavior="automatic"
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
           keyboardShouldPersistTaps="handled"
