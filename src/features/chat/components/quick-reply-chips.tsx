@@ -31,7 +31,7 @@ export function QuickReplyChips({
           key={`${i}-${text}`}
           onPress={() => onSelect(text)}
           style={({ pressed }) => ({
-            backgroundColor: colors.accent,
+            backgroundColor: colors.accentLight,
             borderRadius: 20,
             borderCurve: "continuous",
             paddingHorizontal: 16,
@@ -46,7 +46,7 @@ export function QuickReplyChips({
               fontFamily: textStyles.heading.fontFamily,
               fontSize: 14,
               fontWeight: "600",
-              color: "#FFFFFF",
+              color: colors.accent,
             }}
           >
             {text}
