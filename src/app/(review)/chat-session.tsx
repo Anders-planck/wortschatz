@@ -147,6 +147,7 @@ export default function ChatSessionScreen() {
       <Stack.Screen
         options={{
           title: scenario.title,
+          headerBackVisible: false,
           headerRight: () => (
             <Pressable onPress={handleEndSession}>
               <Image
