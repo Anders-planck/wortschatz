@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  Text,
   View,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -18,7 +19,7 @@ import { ChatInputBar } from "@/features/chat/components/chat-input-bar";
 import { ChatSummary } from "@/features/chat/components/chat-summary";
 
 export default function ChatSessionScreen() {
-  const { colors } = useAppTheme();
+  const { colors, textStyles } = useAppTheme();
   const router = useRouter();
   const { scenarioId } = useLocalSearchParams<{ scenarioId: string }>();
   const [showSummary, setShowSummary] = useState(false);
@@ -66,12 +67,39 @@ export default function ChatSessionScreen() {
             onSaveWords={() => {
               // TODO: save discovered words to dictionary
             }}
-            onBack={() => setShowSummary(false)}
-            onClose={() => router.back()}
           />
         </View>
         <Stack.Screen
-          options={{ title: "Riepilogo", headerRight: () => null }}
+          options={{
+            title: "Riepilogo",
+            headerLeft: () => (
+              <Pressable onPress={() => setShowSummary(false)}>
+                <Text
+                  style={{
+                    fontFamily: textStyles.body.fontFamily,
+                    fontSize: 15,
+                    color: colors.accent,
+                  }}
+                >
+                  Chat
+                </Text>
+              </Pressable>
+            ),
+            headerRight: () => (
+              <Pressable onPress={() => router.back()}>
+                <Text
+                  style={{
+                    fontFamily: textStyles.body.fontFamily,
+                    fontSize: 15,
+                    color: colors.accent,
+                    fontWeight: "600",
+                  }}
+                >
+                  Termina
+                </Text>
+              </Pressable>
+            ),
+          }}
         />
       </>
     );

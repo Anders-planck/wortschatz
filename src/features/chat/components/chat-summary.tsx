@@ -11,8 +11,6 @@ interface ChatSummaryProps {
   messageCount: number;
   durationSeconds: number;
   onSaveWords: () => void;
-  onBack: () => void;
-  onClose: () => void;
 }
 
 export function ChatSummary({
@@ -21,8 +19,6 @@ export function ChatSummary({
   messageCount,
   durationSeconds,
   onSaveWords,
-  onBack,
-  onClose,
 }: ChatSummaryProps) {
   const { colors, textStyles } = useAppTheme();
 
@@ -332,53 +328,6 @@ export function ChatSummary({
           </View>
         </Animated.View>
       )}
-
-      {/* Close button */}
-      <Animated.View
-        entering={FadeInUp.delay(320).duration(400)}
-        style={{ gap: 10, paddingTop: 4 }}
-      >
-        <Pressable
-          onPress={onBack}
-          style={({ pressed }) => ({
-            backgroundColor: colors.accent,
-            borderRadius: 12,
-            borderCurve: "continuous",
-            paddingVertical: 16,
-            alignItems: "center",
-            opacity: pressed ? 0.85 : 1,
-          })}
-        >
-          <Text
-            style={[
-              textStyles.body,
-              { color: "#FFFFFF", fontWeight: "600", fontSize: 15 },
-            ]}
-          >
-            Torna alla conversazione
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={onClose}
-          style={({ pressed }) => ({
-            backgroundColor: colors.card,
-            borderRadius: 12,
-            borderCurve: "continuous",
-            paddingVertical: 16,
-            alignItems: "center",
-            opacity: pressed ? 0.85 : 1,
-          })}
-        >
-          <Text
-            style={[
-              textStyles.body,
-              { color: colors.textSecondary, fontWeight: "600", fontSize: 15 },
-            ]}
-          >
-            Termina
-          </Text>
-        </Pressable>
-      </Animated.View>
     </ScrollView>
   );
 }
