@@ -208,3 +208,27 @@ export async function getRecentActivity(limit: number): Promise<
     createdAt: r.created_at,
   }));
 }
+
+export async function getScoreTrend(
+  days: number,
+): Promise<{ day: string; avgScore: number }[]> {
+  const db = await getDatabase();
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  const startStr = toLocalDateStr(startDate);
+
+  const rows = await db.getAllAsync<{ day: string; avg_score: number }>(
+    `SELECT DATE(created_at, 'localtime') as day,
+            AVG(score_after) as avg_score
+     FROM activity_log
+     WHERE DATE(created_at, 'localtime') >= ?
+     GROUP BY day
+     ORDER BY day ASC`,
+    [startStr],
+  );
+
+  return rows.map((r) => ({
+    day: r.day,
+    avgScore: Math.round(r.avg_score * 10) / 10,
+  }));
+}

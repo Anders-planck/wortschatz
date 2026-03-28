@@ -6,6 +6,7 @@ import {
   getExerciseStats,
   getTotalStudyStats,
   getRecentActivity,
+  getScoreTrend,
 } from "./activity-repository";
 
 const MASTERY_LEVELS = [
@@ -41,6 +42,7 @@ export interface WordStats {
     isCorrect: boolean;
     createdAt: string;
   }[];
+  scoreTrend: { day: string; avgScore: number }[];
 }
 
 export async function getDetailedStats(): Promise<WordStats> {
@@ -57,6 +59,7 @@ export async function getDetailedStats(): Promise<WordStats> {
     exerciseBreakdown,
     studyStats,
     recentActivity,
+    scoreTrend,
   ] = await Promise.all([
     getWordCount(),
     db.getAllAsync<{ type: string; count: number }>(
@@ -90,6 +93,7 @@ export async function getDetailedStats(): Promise<WordStats> {
     getExerciseStats(),
     getTotalStudyStats(),
     getRecentActivity(10),
+    getScoreTrend(30),
   ]);
 
   // Backward compat: if activity_log is empty (first launch after update), fall back to searched_at count
@@ -116,5 +120,6 @@ export async function getDetailedStats(): Promise<WordStats> {
     monthlyActivity,
     exerciseBreakdown,
     recentActivity,
+    scoreTrend,
   };
 }
