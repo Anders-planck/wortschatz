@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Pressable, Share, type StyleProp, type ViewStyle } from "react-native";
+import { Share, View, type StyleProp, type ViewStyle } from "react-native";
 import { Link } from "expo-router";
 import * as Speech from "expo-speech";
 import { createAudioPlayer } from "expo-audio";
@@ -26,7 +26,7 @@ export function WordListItem({
   return (
     <Link href={`/word/${encodeURIComponent(word.term)}`}>
       <Link.Trigger>
-        <Pressable style={style}>{children}</Pressable>
+        <View style={style}>{children}</View>
       </Link.Trigger>
 
       <Link.Preview />
