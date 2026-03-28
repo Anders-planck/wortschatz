@@ -1,7 +1,6 @@
-import { ScrollView, Text, View } from "react-native";
-import { Stack } from "expo-router";
+import { ScrollView } from "react-native";
+import { Stack, useRouter } from "expo-router";
 import Constants from "expo-constants";
-import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { useSpeech } from "@/features/shared/hooks/use-speech";
 import { useThemeColors } from "@/features/shared/theme/theme-context";
@@ -21,6 +20,8 @@ import { SettingsValueRow } from "@/features/settings/components/settings-value-
 import { SettingsVoiceRow } from "@/features/settings/components/settings-voice-row";
 import { SettingsThemeRow } from "@/features/settings/components/settings-theme-row";
 import { SettingsExportRow } from "@/features/settings/components/settings-export-row";
+import { SettingsNavRow } from "@/features/settings/components/settings-nav-row";
+import { SettingsTimeRow } from "@/features/settings/components/settings-time-row";
 import { Divider } from "@/features/shared/components/divider";
 import {
   scheduleReviewReminder,
@@ -29,6 +30,7 @@ import {
 
 export default function SettingsScreen() {
   const colors = useThemeColors();
+  const router = useRouter();
   const { settings, updateSetting } = useSettings();
   const { speak } = useSpeech({ speechRate: settings.speechRate });
 
@@ -122,40 +124,27 @@ export default function SettingsScreen() {
           {settings.reviewReminder && (
             <>
               <Divider />
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
+              <SettingsTimeRow
+                label="Ora"
+                value={reminderDate}
+                onChange={async (date) => {
+                  const h = date.getHours();
+                  const m = date.getMinutes();
+                  updateSetting("reviewReminderHour", h);
+                  updateSetting("reviewReminderMinute", m);
+                  await scheduleReviewReminder(h, m);
                 }}
-              >
-                <Text
-                  style={{
-                    fontFamily: fonts.body,
-                    fontSize: 16,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  Ora
-                </Text>
-                <DateTimePicker
-                  value={reminderDate}
-                  mode="time"
-                  minuteInterval={15}
-                  onChange={async (_event, selectedDate) => {
-                    if (!selectedDate) return;
-                    const h = selectedDate.getHours();
-                    const m = selectedDate.getMinutes();
-                    updateSetting("reviewReminderHour", h);
-                    updateSetting("reviewReminderMinute", m);
-                    await scheduleReviewReminder(h, m);
-                  }}
-                />
-              </View>
+              />
             </>
           )}
+        </SettingsSection>
+
+        <SettingsSection title="AI">
+          <SettingsNavRow
+            label="Uso AI"
+            icon="cpu"
+            onPress={() => router.push("/(settings)/ai-usage")}
+          />
         </SettingsSection>
 
         <SettingsSection

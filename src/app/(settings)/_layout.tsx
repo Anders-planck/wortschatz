@@ -7,6 +7,7 @@ export default function SettingsLayout() {
   return (
     <Stack screenOptions={screenOptions}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="ai-usage" />
     </Stack>
   );
 }

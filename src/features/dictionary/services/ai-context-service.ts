@@ -1,5 +1,6 @@
 import { generateText, Output } from "ai";
 import { google } from "@/features/shared/config/ai-provider";
+import { trackAiCall } from "@/features/shared/services/ai-usage-tracker";
 import { WordContextSchema } from "@/features/dictionary/schemas/word-schema";
 import type { Word, WordContext } from "@/features/dictionary/types";
 
@@ -71,13 +72,15 @@ Keep sentences natural and useful for daily life in Germany/Austria/Switzerland.
 export async function generateWordContext(
   word: Partial<Word>,
 ): Promise<WordContext> {
-  const result = await generateText({
-    model: google("gemini-2.5-flash-lite"),
-    output: Output.object({
-      schema: WordContextSchema,
+  const result = await trackAiCall("enrichment", () =>
+    generateText({
+      model: google("gemini-2.5-flash-lite"),
+      output: Output.object({
+        schema: WordContextSchema,
+      }),
+      prompt: buildPrompt(word),
     }),
-    prompt: buildPrompt(word),
-  });
+  );
 
   if (!result.output) {
     throw new Error("AI failed to generate structured word context");
