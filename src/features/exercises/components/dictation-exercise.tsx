@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { useSpeech } from "@/features/shared/hooks/use-speech";
 import type { DictationExercise } from "@/features/exercises/types";
@@ -46,10 +46,11 @@ export function DictationView({
             opacity: pressed ? 0.8 : 1,
           })}
         >
-          <Image
-            source="sf:speaker.wave.2.fill"
-            style={{ width: 34, height: 34 }}
+          <SymbolView
+            name="speaker.wave.2.fill"
+            size={34}
             tintColor={colors.accent}
+            resizeMode="scaleAspectFit"
           />
         </Pressable>
 

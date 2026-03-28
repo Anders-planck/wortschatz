@@ -1,5 +1,5 @@
 import { Pressable } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -78,10 +78,11 @@ export function SpeakerButton({
   return (
     <Pressable onPress={handlePress} hitSlop={hitSlop}>
       <Animated.View style={animatedStyle}>
-        <Image
-          source={`sf:${iconName}`}
-          style={{ width: iconSize, height: iconSize }}
+        <SymbolView
+          name={iconName as SFSymbol}
+          size={iconSize}
           tintColor={iconColor}
+          resizeMode="scaleAspectFit"
         />
       </Animated.View>
     </Pressable>

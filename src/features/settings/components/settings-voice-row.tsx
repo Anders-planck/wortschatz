@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { fonts } from "@/features/shared/theme/typography";
 import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { hapticLight } from "@/features/shared/hooks/use-haptics";
@@ -57,10 +57,11 @@ export function SettingsVoiceRow({
             borderCurve: "continuous",
           }}
         >
-          <Image
-            source="sf:speaker.wave.2"
-            style={{ width: 14, height: 14 }}
+          <SymbolView
+            name="speaker.wave.2"
+            size={14}
             tintColor={colors.accent}
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -100,10 +101,15 @@ export function SettingsVoiceRow({
                 borderColor: isSelected ? colors.accent : "transparent",
               }}
             >
-              <Image
-                source={`sf:${voice.gender === "F" ? "person.crop.circle" : "person.crop.circle.fill"}`}
-                style={{ width: 16, height: 16 }}
+              <SymbolView
+                name={
+                  voice.gender === "F"
+                    ? "person.crop.circle"
+                    : "person.crop.circle.fill"
+                }
+                size={16}
                 tintColor={isSelected ? colors.accent : colors.textMuted}
+                resizeMode="scaleAspectFit"
               />
               <Text
                 style={{

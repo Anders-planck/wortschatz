@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { formatDuration } from "@/features/shared/utils/format-duration";
 import type { Correction } from "../types";
@@ -46,10 +46,11 @@ export function ChatSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:bubble.left.and.bubble.right.fill"
-            style={{ width: 22, height: 22 }}
+          <SymbolView
+            name="bubble.left.and.bubble.right.fill"
+            size={22}
             tintColor={colors.accent}
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -82,10 +83,11 @@ export function ChatSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:pencil.circle.fill"
-            style={{ width: 22, height: 22 }}
+          <SymbolView
+            name="pencil.circle.fill"
+            size={22}
             tintColor="#C05050"
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -118,10 +120,11 @@ export function ChatSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:book.fill"
-            style={{ width: 22, height: 22 }}
+          <SymbolView
+            name="book.fill"
+            size={22}
             tintColor="#4A9A4A"
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -154,10 +157,11 @@ export function ChatSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:clock.fill"
-            style={{ width: 22, height: 22 }}
+          <SymbolView
+            name="clock.fill"
+            size={22}
             tintColor={colors.textMuted}
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{

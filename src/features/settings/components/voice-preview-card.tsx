@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { fonts } from "@/features/shared/theme/typography";
 import { hapticLight } from "@/features/shared/hooks/use-haptics";
@@ -34,10 +34,11 @@ export function VoicePreviewCard({ onPress }: VoicePreviewCardProps) {
           justifyContent: "center",
         }}
       >
-        <Image
-          source="sf:speaker.wave.2.fill"
-          style={{ width: 24, height: 24 }}
+        <SymbolView
+          name="speaker.wave.2.fill"
+          size={24}
           tintColor={colors.accent}
+          resizeMode="scaleAspectFit"
         />
       </View>
       <View style={{ flex: 1 }}>

@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import type { ExerciseType } from "@/features/exercises/types";
 
@@ -85,12 +85,13 @@ export function ExerciseHub({ onSelect }: ExerciseHubProps) {
               justifyContent: "center",
             }}
           >
-            <Image
-              source={`sf:${option.icon}`}
-              style={{ width: 22, height: 22 }}
+            <SymbolView
+              name={option.icon as SFSymbol}
+              size={22}
               tintColor={
                 option.type === "mix" ? colors.accent : colors.textSecondary
               }
+              resizeMode="scaleAspectFit"
             />
           </View>
 
@@ -117,10 +118,11 @@ export function ExerciseHub({ onSelect }: ExerciseHubProps) {
             </Text>
           </View>
 
-          <Image
-            source="sf:chevron.right"
-            style={{ width: 14, height: 14 }}
+          <SymbolView
+            name="chevron.right"
+            size={14}
             tintColor={colors.textHint}
+            resizeMode="scaleAspectFit"
           />
         </Pressable>
       ))}

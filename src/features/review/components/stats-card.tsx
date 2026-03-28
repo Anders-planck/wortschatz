@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Text, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import Svg, {
   Path,
   Circle,
@@ -735,10 +735,11 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
                 >
                   {masteryPct}
                 </Text>
-                <Image
-                  source="sf:percent"
-                  style={{ width: 12, height: 12 }}
+                <SymbolView
+                  name="percent"
+                  size={12}
                   tintColor={colors.textMuted}
+                  resizeMode="scaleAspectFit"
                 />
               </View>
               <Text
@@ -1182,14 +1183,15 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
                   gap: 8,
                 }}
               >
-                <Image
-                  source={
+                <SymbolView
+                  name={
                     item.isCorrect
-                      ? "sf:checkmark.circle.fill"
-                      : "sf:xmark.circle.fill"
+                      ? "checkmark.circle.fill"
+                      : "xmark.circle.fill"
                   }
-                  style={{ width: 18, height: 18 }}
+                  size={18}
                   tintColor={item.isCorrect ? "#6AAF6A" : "#C07060"}
+                  resizeMode="scaleAspectFit"
                 />
                 <Text
                   style={[

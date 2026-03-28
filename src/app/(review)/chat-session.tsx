@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SCENARIOS } from "@/features/chat/constants";
 import { useChatSession } from "@/features/chat/hooks/use-chat-session";
@@ -74,19 +74,21 @@ export default function ChatSessionScreen() {
             title: "Riepilogo",
             headerLeft: () => (
               <Pressable onPress={() => setShowSummary(false)} hitSlop={8}>
-                <Image
-                  source="sf:chevron.left.circle.fill"
-                  style={{ width: 28, height: 28 }}
+                <SymbolView
+                  name="chevron.left.circle.fill"
+                  size={28}
                   tintColor={colors.accent}
+                  resizeMode="scaleAspectFit"
                 />
               </Pressable>
             ),
             headerRight: () => (
               <Pressable onPress={() => router.back()} hitSlop={8}>
-                <Image
-                  source="sf:xmark.circle.fill"
-                  style={{ width: 28, height: 28 }}
+                <SymbolView
+                  name="xmark.circle.fill"
+                  size={28}
                   tintColor={colors.textMuted}
+                  resizeMode="scaleAspectFit"
                 />
               </Pressable>
             ),
@@ -151,10 +153,11 @@ export default function ChatSessionScreen() {
           headerLeft: () => null,
           headerRight: () => (
             <Pressable onPress={handleEndSession}>
-              <Image
-                source="sf:ellipsis.circle"
-                style={{ width: 22, height: 22 }}
+              <SymbolView
+                name="ellipsis.circle"
+                size={22}
                 tintColor={colors.accent}
+                resizeMode="scaleAspectFit"
               />
             </Pressable>
           ),

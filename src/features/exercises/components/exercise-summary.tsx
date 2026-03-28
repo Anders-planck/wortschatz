@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { formatDuration } from "@/features/shared/utils/format-duration";
 import type { ExerciseResult } from "@/features/exercises/types";
@@ -78,10 +78,11 @@ export function ExerciseSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:checkmark.circle.fill"
-            style={{ width: 24, height: 24 }}
+          <SymbolView
+            name="checkmark.circle.fill"
+            size={24}
             tintColor="#4A9A4A"
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -112,10 +113,11 @@ export function ExerciseSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:xmark.circle.fill"
-            style={{ width: 24, height: 24 }}
+          <SymbolView
+            name="xmark.circle.fill"
+            size={24}
             tintColor="#C05050"
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -146,10 +148,11 @@ export function ExerciseSummary({
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <Image
-            source="sf:clock.fill"
-            style={{ width: 24, height: 24 }}
+          <SymbolView
+            name="clock.fill"
+            size={24}
             tintColor={colors.accent}
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{

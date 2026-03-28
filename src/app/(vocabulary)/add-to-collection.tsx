@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import type { Collection } from "@/features/collections/types";
@@ -90,10 +90,11 @@ export default function AddToCollectionScreen() {
                   justifyContent: "center",
                 }}
               >
-                <Image
-                  source={`sf:${col.icon}`}
-                  style={{ width: 18, height: 18 }}
+                <SymbolView
+                  name={col.icon as SFSymbol}
+                  size={18}
                   tintColor={col.color}
+                  resizeMode="scaleAspectFit"
                 />
               </View>
 
@@ -105,10 +106,11 @@ export default function AddToCollectionScreen() {
               </Text>
 
               {isMember && (
-                <Image
-                  source="sf:checkmark.circle.fill"
-                  style={{ width: 22, height: 22 }}
+                <SymbolView
+                  name="checkmark.circle.fill"
+                  size={22}
                   tintColor={colors.accent}
+                  resizeMode="scaleAspectFit"
                 />
               )}
             </Pressable>
@@ -139,10 +141,11 @@ export default function AddToCollectionScreen() {
               justifyContent: "center",
             }}
           >
-            <Image
-              source="sf:plus"
-              style={{ width: 18, height: 18 }}
+            <SymbolView
+              name="plus"
+              size={18}
               tintColor={colors.textMuted}
+              resizeMode="scaleAspectFit"
             />
           </View>
 

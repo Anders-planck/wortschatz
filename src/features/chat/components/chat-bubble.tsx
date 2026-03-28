@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { useSpeech } from "@/features/shared/hooks/use-speech";
@@ -173,12 +173,11 @@ export const ChatBubble = React.memo(function ChatBubble({
             hitSlop={8}
             style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
           >
-            <Image
-              source={
-                isSpeaking ? "sf:speaker.wave.3.fill" : "sf:speaker.wave.2"
-              }
-              style={{ width: 12, height: 12 }}
+            <SymbolView
+              name={isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2"}
+              size={12}
               tintColor={colors.textGhost}
+              resizeMode="scaleAspectFit"
             />
           </Pressable>
         )}

@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 import type { CollectionWithStats } from "../types";
@@ -46,10 +46,11 @@ function EmptyState({
           justifyContent: "center",
         }}
       >
-        <Image
-          source="sf:folder.fill"
-          style={{ width: 32, height: 32 }}
+        <SymbolView
+          name="folder.fill"
+          size={32}
           tintColor={colors.accent}
+          resizeMode="scaleAspectFit"
         />
       </View>
 
@@ -88,10 +89,11 @@ function EmptyState({
             opacity: pressed ? 0.85 : 1,
           })}
         >
-          <Image
-            source="sf:plus"
-            style={{ width: 14, height: 14 }}
+          <SymbolView
+            name="plus"
+            size={14}
             tintColor="#FFFFFF"
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -119,10 +121,11 @@ function EmptyState({
             opacity: pressed ? 0.85 : 1,
           })}
         >
-          <Image
-            source="sf:sparkles"
-            style={{ width: 14, height: 14 }}
+          <SymbolView
+            name="sparkles"
+            size={14}
             tintColor={colors.accent}
+            resizeMode="scaleAspectFit"
           />
           <Text
             style={{
@@ -184,10 +187,11 @@ function CreateNewButton({
             justifyContent: "center",
           }}
         >
-          <Image
-            source="sf:plus"
-            style={{ width: 14, height: 14 }}
+          <SymbolView
+            name="plus"
+            size={14}
             tintColor={colors.textMuted}
+            resizeMode="scaleAspectFit"
           />
         </View>
         <Text

@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import {
@@ -138,10 +138,11 @@ export default function OrganizeScreen() {
               gap: 16,
             }}
           >
-            <Image
-              source="sf:checkmark.circle.fill"
-              style={{ width: 48, height: 48 }}
+            <SymbolView
+              name="checkmark.circle.fill"
+              size={48}
               tintColor={colors.accent}
+              resizeMode="scaleAspectFit"
             />
             <Text style={[textStyles.heading, { fontSize: 18 }]}>
               Tutte le parole sono organizzate!
@@ -223,10 +224,11 @@ export default function OrganizeScreen() {
               gap: 16,
             }}
           >
-            <Image
-              source="sf:checkmark.circle.fill"
-              style={{ width: 48, height: 48 }}
+            <SymbolView
+              name="checkmark.circle.fill"
+              size={48}
               tintColor={colors.accent}
+              resizeMode="scaleAspectFit"
             />
             <Text style={[textStyles.heading, { fontSize: 18 }]}>
               Tutto organizzato!
@@ -271,10 +273,11 @@ export default function OrganizeScreen() {
                   gap: 10,
                 }}
               >
-                <Image
-                  source={`sf:${group.icon}`}
-                  style={{ width: 22, height: 22 }}
+                <SymbolView
+                  name={group.icon as SFSymbol}
+                  size={22}
                   tintColor={colors.accent}
+                  resizeMode="scaleAspectFit"
                 />
                 <Text style={[textStyles.heading, { fontSize: 16, flex: 1 }]}>
                   {group.name}

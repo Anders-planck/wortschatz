@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
 interface ExerciseFeedbackProps {
@@ -39,10 +39,11 @@ export function ExerciseFeedback({
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <Image
-          source={`sf:${iconName}`}
-          style={{ width: 24, height: 24 }}
+        <SymbolView
+          name={iconName as SFSymbol}
+          size={24}
           tintColor={iconColor}
+          resizeMode="scaleAspectFit"
         />
         <Text style={[textStyles.heading, { color: iconColor, fontSize: 18 }]}>
           {title}

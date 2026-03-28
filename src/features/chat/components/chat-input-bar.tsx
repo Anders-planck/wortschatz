@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, TextInput, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView } from "expo-symbols";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
@@ -78,10 +78,11 @@ export function ChatInputBar({ onSend, disabled }: ChatInputBarProps) {
           opacity: pressed ? 0.7 : 1,
         })}
       >
-        <Image
-          source="sf:arrow.up.circle.fill"
-          style={{ width: 32, height: 32 }}
+        <SymbolView
+          name="arrow.up.circle.fill"
+          size={32}
           tintColor={hasText && !disabled ? colors.accent : colors.textHint}
+          resizeMode="scaleAspectFit"
         />
       </Pressable>
     </View>

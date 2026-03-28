@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 import { fonts } from "@/features/shared/theme/typography";
 import {
   useThemeColors,
@@ -55,10 +55,11 @@ export function SettingsThemeRow() {
                 borderColor: isSelected ? colors.accent : "transparent",
               }}
             >
-              <Image
-                source={`sf:${m.icon}`}
-                style={{ width: 16, height: 16 }}
+              <SymbolView
+                name={m.icon as SFSymbol}
+                size={16}
                 tintColor={isSelected ? colors.accent : colors.textMuted}
+                resizeMode="scaleAspectFit"
               />
               <Text
                 style={{

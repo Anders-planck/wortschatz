@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import type { Scenario } from "../types";
@@ -31,10 +31,11 @@ export function ScenarioCard({
             opacity: pressed ? 0.9 : 1,
           })}
         >
-          <Image
-            source={`sf:${scenario.icon}`}
-            style={{ width: 36, height: 36 }}
+          <SymbolView
+            name={scenario.icon as SFSymbol}
+            size={36}
             tintColor="#FFFFFF"
+            resizeMode="scaleAspectFit"
           />
           <View style={{ gap: 6 }}>
             <Text
@@ -97,10 +98,11 @@ export function ScenarioCard({
             justifyContent: "center",
           }}
         >
-          <Image
-            source={`sf:${scenario.icon}`}
-            style={{ width: 22, height: 22 }}
+          <SymbolView
+            name={scenario.icon as SFSymbol}
+            size={22}
             tintColor={colors.accent}
+            resizeMode="scaleAspectFit"
           />
         </View>
 

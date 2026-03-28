@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, View } from "react-native";
-import { Image } from "expo-image";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 
 import { COLLECTION_ICONS } from "../types";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
@@ -36,10 +36,11 @@ export const SfIconPicker = React.memo(function SfIconPicker({
               borderColor: isSelected ? colors.accent : "transparent",
             }}
           >
-            <Image
-              source={`sf:${icon}`}
-              style={{ width: 22, height: 22 }}
+            <SymbolView
+              name={icon as SFSymbol}
+              size={22}
               tintColor={isSelected ? colors.accent : colors.textSecondary}
+              resizeMode="scaleAspectFit"
             />
           </Pressable>
         );
