@@ -27,7 +27,7 @@ export function streamChatResponse(
   messages: { role: "user" | "assistant"; content: string }[],
 ) {
   return streamText({
-    model: google("gemini-2.0-flash"),
+    model: google("gemini-2.5-flash-lite"),
     system: systemPrompt,
     messages,
   });
