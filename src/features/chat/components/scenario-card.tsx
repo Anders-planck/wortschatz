@@ -7,12 +7,14 @@ import type { Scenario } from "../types";
 interface ScenarioCardProps {
   scenario: Scenario;
   onPress: () => void;
+  onLongPress?: () => void;
   featured?: boolean;
 }
 
 export function ScenarioCard({
   scenario,
   onPress,
+  onLongPress,
   featured = false,
 }: ScenarioCardProps) {
   const { colors, textStyles } = useAppTheme();
@@ -22,6 +24,7 @@ export function ScenarioCard({
       <Animated.View entering={FadeInUp.duration(400)}>
         <Pressable
           onPress={onPress}
+          onLongPress={onLongPress}
           style={({ pressed }) => ({
             backgroundColor: colors.accent,
             borderRadius: 16,
@@ -78,6 +81,7 @@ export function ScenarioCard({
     <Animated.View entering={FadeInUp.delay(80).duration(400)}>
       <Pressable
         onPress={onPress}
+        onLongPress={onLongPress}
         style={({ pressed }) => ({
           backgroundColor: colors.card,
           borderRadius: 12,

@@ -33,3 +33,38 @@ export interface ChatSession {
   discoveredWords: string[];
   startTime: number;
 }
+
+export const SCENARIO_ICONS = [
+  "text.bubble",
+  "cart",
+  "building.2",
+  "house",
+  "cross.case",
+  "airplane",
+  "fork.knife",
+  "cup.and.saucer",
+  "tram",
+  "graduationcap",
+  "phone",
+  "music.note",
+  "sportscourt",
+  "theatermasks",
+  "book",
+  "map",
+  "camera",
+  "paintbrush",
+  "wrench",
+  "leaf",
+] as const;
+
+export const SCENARIO_LEVELS = [
+  "A1",
+  "A2",
+  "B1",
+  "B2",
+  "C1",
+  "C2",
+  "Adaptive",
+] as const;
+
+export type ScenarioLevel = (typeof SCENARIO_LEVELS)[number];

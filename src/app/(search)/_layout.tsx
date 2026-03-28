@@ -8,6 +8,7 @@ export default function SearchLayout() {
     <Stack screenOptions={screenOptions}>
       <Stack.Screen name="index" />
       <Stack.Screen name="word/[term]" />
+      <Stack.Screen name="word-family/[term]" />
       <Stack.Screen
         name="conjugation/[term]"
         options={{ title: "Konjugation" }}

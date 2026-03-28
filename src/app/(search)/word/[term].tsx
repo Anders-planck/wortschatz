@@ -37,6 +37,17 @@ export default function WordDetailScreen() {
       <Stack.Toolbar placement="right">
         {word && (
           <Stack.Toolbar.Button
+            icon="leaf"
+            onPress={() =>
+              router.push({
+                pathname: "/word-family/[term]",
+                params: { term: word.term, type: word.type },
+              })
+            }
+          />
+        )}
+        {word && (
+          <Stack.Toolbar.Button
             icon="folder.badge.plus"
             onPress={() =>
               router.push({

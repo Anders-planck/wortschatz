@@ -96,6 +96,46 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   );
 
   await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS chat_scenarios (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      icon TEXT NOT NULL DEFAULT 'text.bubble',
+      level TEXT NOT NULL DEFAULT 'Adaptive',
+      is_default INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  // Seed default scenarios once
+  const scenarioCount = await db.getFirstAsync<{ count: number }>(
+    "SELECT COUNT(*) as count FROM chat_scenarios WHERE is_default = 1",
+  );
+  if (scenarioCount?.count === 0) {
+    const now = new Date().toISOString();
+    await db.execAsync(`
+      INSERT INTO chat_scenarios (id, title, description, icon, level, is_default, created_at) VALUES
+        ('free', 'Conversazione libera', 'Parla di qualsiasi argomento', 'text.bubble', 'Adaptive', 1, '${now}'),
+        ('supermarket', 'Al supermercato', 'Fare la spesa, prezzi, prodotti', 'cart', 'A2', 1, '${now}'),
+        ('job-interview', 'Colloquio di lavoro', 'Competenze, esperienza, domande', 'building.2', 'B1', 1, '${now}'),
+        ('apartment', 'Cercare un appartamento', 'Affitto, stanze, quartiere', 'house', 'A2-B1', 1, '${now}'),
+        ('doctor', 'Dal dottore', 'Sintomi, ricette, visite', 'cross.case', 'B1', 1, '${now}');
+    `);
+  }
+
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS readings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      level TEXT NOT NULL,
+      content TEXT NOT NULL,
+      word_translations TEXT NOT NULL DEFAULT '{}',
+      word_count INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  await db.execAsync(`
     CREATE TABLE IF NOT EXISTS chat_sessions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       scenario TEXT NOT NULL,

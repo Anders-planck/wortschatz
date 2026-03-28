@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
@@ -32,6 +32,7 @@ export default function ExerciseSessionScreen() {
 
   useEffect(() => {
     session.start(type);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (answer: string) => {

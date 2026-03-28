@@ -11,6 +11,7 @@ import {
   parseAIResponse,
 } from "../services/chat-service";
 import { saveChatSession } from "../services/chat-repository";
+import { uuidv7 } from "uuidv7";
 
 interface ChatSessionState {
   messages: ChatMessage[];
@@ -37,8 +38,6 @@ interface ChatSessionActions {
 }
 
 export type ChatSessionHook = ChatSessionState & ChatSessionActions;
-
-import { uuidv7 } from "uuidv7";
 
 function nextMsgId(): string {
   return uuidv7();

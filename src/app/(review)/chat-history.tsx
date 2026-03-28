@@ -11,7 +11,8 @@ import {
 import { SymbolView, type SFSymbol } from "expo-symbols";
 import Animated, { FadeInUp, FadeOutLeft } from "react-native-reanimated";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
-import { SCENARIOS } from "@/features/chat/constants";
+import { getScenarioById } from "@/features/chat/services/scenario-repository";
+import type { Scenario } from "@/features/chat/types";
 import {
   getChatSessionsByScenario,
   deleteChatSession,
@@ -39,12 +40,12 @@ export default function ChatHistoryScreen() {
   const [isSelecting, setIsSelecting] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
-
-  const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS[0];
+  const [scenario, setScenario] = useState<Scenario | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       if (scenarioId) {
+        getScenarioById(scenarioId).then(setScenario);
         getChatSessionsByScenario(scenarioId).then(setSessions);
       }
     }, [scenarioId]),
@@ -112,6 +113,15 @@ export default function ChatHistoryScreen() {
     setSelectedIds(new Set());
     setIsSelecting(false);
   };
+
+  if (!scenario) {
+    return (
+      <>
+        <View style={{ flex: 1, backgroundColor: colors.bg }} />
+        <Stack.Screen options={{ title: "" }} />
+      </>
+    );
+  }
 
   return (
     <>

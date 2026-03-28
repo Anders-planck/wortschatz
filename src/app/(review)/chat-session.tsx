@@ -4,15 +4,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  Text,
   View,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
-import { SCENARIOS } from "@/features/chat/constants";
 import { useChatSession } from "@/features/chat/hooks/use-chat-session";
 import { getChatSessionMessages } from "@/features/chat/services/chat-repository";
+import { getScenarioById } from "@/features/chat/services/scenario-repository";
+import type { Scenario } from "@/features/chat/types";
 import { ChatBubble } from "@/features/chat/components/chat-bubble";
 import { TypingIndicator } from "@/features/chat/components/typing-indicator";
 import { QuickReplyChips } from "@/features/chat/components/quick-reply-chips";
@@ -20,7 +20,7 @@ import { ChatInputBar } from "@/features/chat/components/chat-input-bar";
 import { ChatSummary } from "@/features/chat/components/chat-summary";
 
 export default function ChatSessionScreen() {
-  const { colors, textStyles } = useAppTheme();
+  const { colors } = useAppTheme();
   const router = useRouter();
   const { scenarioId, sessionId } = useLocalSearchParams<{
     scenarioId: string;
@@ -31,22 +31,28 @@ export default function ChatSessionScreen() {
     messageCount: number;
     durationSeconds: number;
   } | null>(null);
+  const [scenario, setScenario] = useState<Scenario | null>(null);
 
-  const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS[0];
   const session = useChatSession();
 
   useEffect(() => {
-    if (sessionId) {
-      getChatSessionMessages(Number(sessionId))
-        .then((messages) => {
-          session.resume(scenario, messages);
-        })
-        .catch(() => {
-          session.start(scenario);
-        });
-    } else {
-      session.start(scenario);
-    }
+    if (!scenarioId) return;
+    getScenarioById(scenarioId).then((s) => {
+      if (!s) return;
+      setScenario(s);
+      if (sessionId) {
+        getChatSessionMessages(Number(sessionId))
+          .then((messages) => {
+            session.resume(s, messages);
+          })
+          .catch(() => {
+            session.start(s);
+          });
+      } else {
+        session.start(s);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEndSession = async () => {
@@ -65,6 +71,26 @@ export default function ChatSessionScreen() {
   const handleWordTap = useCallback((_word: string) => {
     // Could navigate to dictionary or show word details
   }, []);
+
+  const reversedMessages = useMemo(
+    () => [...session.messages].reverse(),
+    [session.messages],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: (typeof session.messages)[number] }) => {
+      const parsed = session.parsedMap.get(item.id);
+      return (
+        <ChatBubble
+          message={item}
+          corrections={parsed?.corrections ?? []}
+          markedWords={parsed?.markedWords ?? []}
+          onWordTap={handleWordTap}
+        />
+      );
+    },
+    [session.parsedMap, handleWordTap],
+  );
 
   if (showSummary) {
     return (
@@ -112,26 +138,6 @@ export default function ChatSessionScreen() {
     );
   }
 
-  const reversedMessages = useMemo(
-    () => [...session.messages].reverse(),
-    [session.messages],
-  );
-
-  const renderItem = useCallback(
-    ({ item }: { item: (typeof session.messages)[number] }) => {
-      const parsed = session.parsedMap.get(item.id);
-      return (
-        <ChatBubble
-          message={item}
-          corrections={parsed?.corrections ?? []}
-          markedWords={parsed?.markedWords ?? []}
-          onWordTap={handleWordTap}
-        />
-      );
-    },
-    [session.parsedMap, handleWordTap],
-  );
-
   return (
     <>
       <KeyboardAvoidingView
@@ -162,7 +168,7 @@ export default function ChatSessionScreen() {
 
       <Stack.Screen
         options={{
-          title: scenario.title,
+          title: scenario?.title ?? "",
           headerLeft: () => null,
           headerRight: () => (
             <Pressable onPress={handleEndSession}>

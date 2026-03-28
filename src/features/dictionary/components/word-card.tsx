@@ -11,6 +11,8 @@ import { ExampleSentence } from "./example-sentence";
 import { ContextBox } from "./context-box";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import type { Word } from "@/features/dictionary/types";
+import { useSynonyms } from "@/features/immersion/hooks/use-synonyms";
+import { SynonymSection } from "@/features/immersion/components/synonym-section";
 
 interface WordCardProps {
   word: Word;
@@ -23,6 +25,10 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
   const isNoun = word.type === "noun";
   const isVerb = word.type === "verb";
   const isPreposition = word.type === "preposition";
+  const { data: synonymsData } = useSynonyms(
+    isAILoading ? undefined : word.term,
+    isAILoading ? undefined : word.type,
+  );
 
   return (
     <View
@@ -60,6 +66,15 @@ export function WordCard({ word, isAILoading, onWordPress }: WordCardProps) {
       <Text selectable style={textStyles.body}>
         {word.translations.join(", ")}
       </Text>
+
+      {synonymsData && (
+        <SynonymSection
+          synonyms={synonymsData.synonyms}
+          antonyms={synonymsData.antonyms}
+          comparative={synonymsData.comparative}
+          onWordPress={onWordPress}
+        />
+      )}
 
       <Divider />
 

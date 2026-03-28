@@ -41,6 +41,14 @@ export default function ReviewScreen() {
           onPress={() => router.push("/(review)/exercises")}
         />
         <Stack.Toolbar.Button
+          icon="book"
+          onPress={() => router.push("/(review)/readings")}
+        />
+        <Stack.Toolbar.Button
+          icon="ear"
+          onPress={() => router.push("/(review)/listening")}
+        />
+        <Stack.Toolbar.Button
           icon="chart.bar.xaxis"
           onPress={() => router.push("/(review)/stats")}
         />
