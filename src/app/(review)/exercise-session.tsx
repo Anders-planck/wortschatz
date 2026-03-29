@@ -136,6 +136,7 @@ export default function ExerciseSessionScreen() {
 
         {exercise.type === "fill" && (
           <FillBlankView
+            key={session.currentIndex}
             exercise={exercise}
             onSubmit={handleSubmit}
             onSkip={handleSkip}
@@ -145,6 +146,7 @@ export default function ExerciseSessionScreen() {
 
         {exercise.type === "dictation" && (
           <DictationView
+            key={session.currentIndex}
             exercise={exercise}
             onSubmit={handleSubmit}
             onSkip={handleSkip}
@@ -154,6 +156,7 @@ export default function ExerciseSessionScreen() {
 
         {exercise.type === "cases" && (
           <CaseQuizView
+            key={session.currentIndex}
             exercise={exercise}
             onSubmit={handleSubmit}
             onSkip={handleSkip}
