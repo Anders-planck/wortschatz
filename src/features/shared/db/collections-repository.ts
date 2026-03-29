@@ -160,6 +160,11 @@ export async function createCollection(
 
 export async function deleteCollection(collectionId: number): Promise<void> {
   const db = await getDatabase();
+  // Cascade: delete words, then associations, then collection
+  await db.runAsync(
+    `DELETE FROM words WHERE id IN (SELECT word_id FROM collection_words WHERE collection_id = ?)`,
+    [collectionId],
+  );
   await db.runAsync(`DELETE FROM collection_words WHERE collection_id = ?`, [
     collectionId,
   ]);
@@ -170,6 +175,11 @@ export async function deleteCollections(ids: number[]): Promise<void> {
   if (ids.length === 0) return;
   const db = await getDatabase();
   const placeholders = ids.map(() => "?").join(", ");
+  // Cascade: delete words, then associations, then collections
+  await db.runAsync(
+    `DELETE FROM words WHERE id IN (SELECT word_id FROM collection_words WHERE collection_id IN (${placeholders}))`,
+    ids,
+  );
   await db.runAsync(
     `DELETE FROM collection_words WHERE collection_id IN (${placeholders})`,
     ids,

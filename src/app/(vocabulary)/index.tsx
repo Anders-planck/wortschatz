@@ -58,7 +58,7 @@ export default function ListeScreen() {
       if (!col) return;
       Alert.alert(
         "Elimina lista",
-        `Vuoi eliminare "${col.name}" e tutte le sue associazioni?`,
+        `Vuoi eliminare "${col.name}" e tutte le parole contenute?`,
         [
           { text: "Annulla", style: "cancel" },
           {
@@ -90,7 +90,7 @@ export default function ListeScreen() {
     const count = selectedIds.size;
     Alert.alert(
       "Elimina liste",
-      `Vuoi eliminare ${count} ${count === 1 ? "lista" : "liste"} e tutte le associazioni?`,
+      `Vuoi eliminare ${count} ${count === 1 ? "lista" : "liste"} e tutte le parole contenute?`,
       [
         { text: "Annulla", style: "cancel" },
         {
