@@ -45,3 +45,5 @@ app-example
 
 # superpowers brainstorm mockups
 .superpowers/
+docs/mockups/*.html
+preview-*.html
