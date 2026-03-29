@@ -35,28 +35,28 @@ export default function WordDetailScreen() {
 
       <Stack.Screen options={{ title: term ?? "" }} />
       <Stack.Toolbar placement="right">
-        {word && (
-          <Stack.Toolbar.Button
-            icon="folder.badge.plus"
-            onPress={() =>
-              router.push({
-                pathname: "/add-to-collection",
-                params: { wordId: String(word.id) },
-              })
-            }
-          />
-        )}
-        {isNoun && (
-          <Stack.Toolbar.Button
-            icon="tablecells"
-            onPress={() =>
-              router.push({
-                pathname: "/declension/[term]",
-                params: { term: word.term },
-              })
-            }
-          />
-        )}
+        <Stack.Toolbar.Button
+          icon="folder.badge.plus"
+          hidden={!word}
+          onPress={() =>
+            word &&
+            router.push({
+              pathname: "/add-to-collection",
+              params: { wordId: String(word.id) },
+            })
+          }
+        />
+        <Stack.Toolbar.Button
+          icon="tablecells"
+          hidden={!isNoun}
+          onPress={() =>
+            word &&
+            router.push({
+              pathname: "/declension/[term]",
+              params: { term: word.term },
+            })
+          }
+        />
       </Stack.Toolbar>
     </>
   );

@@ -273,48 +273,22 @@ export default function ChatScreen() {
         onDismiss={() => setToastVisible(false)}
         icon="trash.circle.fill"
       />
-      <Stack.Screen
-        options={{
-          title: "Conversazione",
-          headerRight: () =>
-            isSelecting ? (
-              <Pressable onPress={cancelSelection} hitSlop={8}>
-                <Text
-                  style={{
-                    fontFamily: textStyles.heading.fontFamily,
-                    fontSize: 15,
-                    fontWeight: "600",
-                    color: colors.accent,
-                  }}
-                >
-                  Fine
-                </Text>
-              </Pressable>
-            ) : (
-              <View style={{ flexDirection: "row", gap: 16 }}>
-                <Pressable onPress={() => setIsSelecting(true)} hitSlop={8}>
-                  <SymbolView
-                    name="checkmark.circle"
-                    size={22}
-                    tintColor={colors.textMuted}
-                    resizeMode="scaleAspectFit"
-                  />
-                </Pressable>
-                <Pressable
-                  onPress={() => router.push("/(review)/create-scenario")}
-                  hitSlop={8}
-                >
-                  <SymbolView
-                    name="plus.circle.fill"
-                    size={24}
-                    tintColor={colors.accent}
-                    resizeMode="scaleAspectFit"
-                  />
-                </Pressable>
-              </View>
-            ),
-        }}
-      />
+      <Stack.Screen options={{ title: "Conversazione" }} />
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button onPress={cancelSelection} hidden={!isSelecting}>
+          Fine
+        </Stack.Toolbar.Button>
+        <Stack.Toolbar.Button
+          icon="checkmark.circle"
+          onPress={() => setIsSelecting(true)}
+          hidden={isSelecting}
+        />
+        <Stack.Toolbar.Button
+          icon="plus.circle.fill"
+          onPress={() => router.push("/(review)/create-scenario")}
+          hidden={isSelecting}
+        />
+      </Stack.Toolbar>
     </>
   );
 }

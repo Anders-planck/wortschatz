@@ -58,7 +58,7 @@ export default function ListeScreen() {
       if (!col) return;
       Alert.alert(
         "Elimina lista",
-        `Vuoi eliminare "${col.name}" e tutte le sue associazioni?`,
+        `Vuoi eliminare "${col.name}" e tutte le parole contenute?`,
         [
           { text: "Annulla", style: "cancel" },
           {
@@ -90,7 +90,7 @@ export default function ListeScreen() {
     const count = selectedIds.size;
     Alert.alert(
       "Elimina liste",
-      `Vuoi eliminare ${count} ${count === 1 ? "lista" : "liste"} e tutte le associazioni?`,
+      `Vuoi eliminare ${count} ${count === 1 ? "lista" : "liste"} e tutte le parole contenute?`,
       [
         { text: "Annulla", style: "cancel" },
         {
@@ -319,55 +319,27 @@ export default function ListeScreen() {
         icon="trash.circle.fill"
       />
 
-      <Stack.Screen
-        options={{
-          title: "Liste",
-          headerLargeTitle: true,
-          headerRight: () =>
-            isSelecting ? (
-              <Pressable onPress={cancelSelection} hitSlop={8}>
-                <SymbolView
-                  name="xmark.circle.fill"
-                  size={24}
-                  tintColor={colors.textMuted}
-                  resizeMode="scaleAspectFit"
-                />
-              </Pressable>
-            ) : (
-              <View style={{ flexDirection: "row", gap: 16 }}>
-                {collections.length > 1 && (
-                  <Pressable onPress={() => setIsSelecting(true)} hitSlop={8}>
-                    <SymbolView
-                      name="checkmark.circle"
-                      size={22}
-                      tintColor={colors.textMuted}
-                      resizeMode="scaleAspectFit"
-                    />
-                  </Pressable>
-                )}
-                <Pressable onPress={() => router.push("/organize")} hitSlop={8}>
-                  <SymbolView
-                    name="sparkles"
-                    size={22}
-                    tintColor={colors.accent}
-                    resizeMode="scaleAspectFit"
-                  />
-                </Pressable>
-                <Pressable
-                  onPress={() => router.push("/create-collection")}
-                  hitSlop={8}
-                >
-                  <SymbolView
-                    name="plus.circle.fill"
-                    size={24}
-                    tintColor={colors.accent}
-                    resizeMode="scaleAspectFit"
-                  />
-                </Pressable>
-              </View>
-            ),
-        }}
-      />
+      <Stack.Screen.Title large>Liste</Stack.Screen.Title>
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button onPress={cancelSelection} hidden={!isSelecting}>
+          Fine
+        </Stack.Toolbar.Button>
+        <Stack.Toolbar.Button
+          icon="checkmark.circle"
+          onPress={() => setIsSelecting(true)}
+          hidden={isSelecting || collections.length <= 1}
+        />
+        <Stack.Toolbar.Button
+          icon="sparkles"
+          onPress={() => router.push("/organize")}
+          hidden={isSelecting}
+        />
+        <Stack.Toolbar.Button
+          icon="plus"
+          onPress={() => router.push("/create-collection")}
+          hidden={isSelecting}
+        />
+      </Stack.Toolbar>
     </>
   );
 }
