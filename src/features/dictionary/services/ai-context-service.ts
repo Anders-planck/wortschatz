@@ -31,13 +31,15 @@ function buildPrompt(word: Partial<Word>): string {
       break;
   }
 
-  return `You are a German language tutor for an Italian-speaking B1 student.
+  return `You are a German language tutor for a multilingual student (Italian/French-speaking, B1 level).
 
 The user searched for: "${term}"
 
-IMPORTANT: The user may search in German OR Italian. If "${term}" is an Italian word (not German), identify the correct German equivalent and generate data for THAT German word. For example, if the user searches "mangiare", generate data for "essen". If the user searches "casa", generate data for "Haus". Always return the GERMAN word in your response.
-
-If "${term}" is already a German word, use it directly.
+IMPORTANT: The user may search in German, Italian, OR French. Detect the input language:
+- If "${term}" is Italian (e.g. "mangiare", "casa"), find the German equivalent ("essen", "Haus").
+- If "${term}" is French (e.g. "manger", "maison"), find the German equivalent ("essen", "Haus").
+- If "${term}" is already German, use it directly.
+Always return the GERMAN word in your response, regardless of the input language.
 
 ${type !== "noun" ? `Likely type: ${type}.` : ""}
 ${typeSpecificInstruction}

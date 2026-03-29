@@ -69,7 +69,11 @@ export function FillBlankView({
             {exercise.translation}
           </Text>
           <SpeakerButton
-            text={exercise.sentence.replace("___", exercise.answer)}
+            text={
+              disabled
+                ? exercise.sentence.replace("___", exercise.answer)
+                : exercise.sentence.replace("___", "Lücke")
+            }
             size="sm"
           />
         </View>

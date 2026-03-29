@@ -94,7 +94,11 @@ export function CaseQuizView({
             {exercise.translation}
           </Text>
           <SpeakerButton
-            text={exercise.sentence.replace("___", exercise.correctArticle)}
+            text={
+              disabled
+                ? exercise.sentence.replace("___", exercise.correctArticle)
+                : exercise.sentence.replace("___", "Lücke")
+            }
             size="sm"
           />
         </View>
