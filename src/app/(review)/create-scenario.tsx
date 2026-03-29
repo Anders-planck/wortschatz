@@ -223,25 +223,15 @@ export default function CreateScenarioScreen() {
         </View>
       </ScrollView>
 
-      <Stack.Screen
-        options={{
-          title: "Nuova categoria",
-          headerRight: () => (
-            <Pressable onPress={handleSave} disabled={!canSave || saving}>
-              <Text
-                style={{
-                  fontFamily: textStyles.heading.fontFamily,
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: canSave ? colors.accent : colors.textGhost,
-                }}
-              >
-                {saving ? "Salvo..." : "Salva"}
-              </Text>
-            </Pressable>
-          ),
-        }}
-      />
+      <Stack.Screen options={{ title: "Nuova categoria" }} />
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button
+          onPress={handleSave}
+          disabled={!canSave || saving}
+        >
+          {saving ? "Salvo..." : "Salva"}
+        </Stack.Toolbar.Button>
+      </Stack.Toolbar>
     </>
   );
 }
