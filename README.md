@@ -1,131 +1,134 @@
 # WortSchatz
 
-A smart German-Italian dictionary app for language learners. Built with Expo SDK 55 and React Native.
+A German vocabulary learning app for Italian speakers. AI-powered word enrichment, FSRS spaced repetition, conversational practice, graded reading, and listening comprehension — all offline-first on iOS.
 
-WortSchatz combines Wiktionary structured data with Gemini AI contextual enrichment to provide rich word cards with gender, plural forms, conjugation tables, example sentences, and usage context. Every searched word is automatically saved to your personal vocabulary for spaced repetition review.
+Built with Expo SDK 55, React Native, and Gemini AI.
 
 ## Features
 
-- **Smart Search** — Search in German or Italian. The AI detects the language and returns the German equivalent with full context.
-- **Adaptive Word Cards** — Cards adapt to word type: nouns show gender/plural/declension, verbs show conjugation with stem highlighting, prepositions show governed cases.
-- **Full Conjugation Tables** — Prasens, Prateritum, Perfekt (with hilfsverb highlighting), and Konjunktiv II for every verb.
-- **Text-to-Speech** — Native iOS pronunciation for every word and conjugated form. Sequential playback for entire tense tables with row highlighting.
-- **Personal Vocabulary** — Every search is auto-saved. Filter by word type, long-press for context menu (pronounce, share, delete).
-- **Spaced Repetition** — SM-2 algorithm for review sessions. Dashboard with streak tracking, weekly activity chart, and tricky words list.
-- **Settings** — Configurable speech rate, auto-play on card reveal.
+### Dictionary
+- **Smart Search** — type in German or Italian, AI detects the language and returns full context
+- **Adaptive Word Cards** — nouns show gender/plural/declension, verbs show conjugation tables, prepositions show governed cases
+- **Clickable Examples** — tap any word in an example sentence to look it up
+- **Synonyms & Antonyms** — AI-generated with intensity dots and comparative forms for adjectives
+- **Word Families** — etymological tree from any word (e.g. fahren → Fahrer, Fahrrad, Erfahrung)
+- **Text-to-Speech** — Google Cloud TTS with 5 German WaveNet voices, fallback to native iOS speech
+
+### Collections
+- **Thematic Lists** — manila folder design, organize vocabulary by topic
+- **AI Organization** — one tap to auto-sort unorganized words into thematic groups
+- **Batch Operations** — select multiple collections for deletion with full cascade
+
+### Review
+- **FSRS Algorithm** — Free Spaced Repetition Scheduler (same as Anki), 20-30% more efficient than SM-2
+- **Flashcard Sessions** — 4 response buttons (Again/Hard/Good/Easy), haptic feedback
+- **Review Forecast** — 7-day preview of upcoming reviews on the dashboard
+- **Statistics** — SVG charts: score trend, daily activity, mastery donut, per-type breakdown
+- **Streak Tracking** — consecutive study days with weekly activity chart
+
+### Exercises
+- **Fill-in-the-blank** — AI-generated sentences with vocabulary words
+- **Dictation** — listen and type German sentences
+- **Article & Case Quiz** — multiple choice for correct article/case
+- **Mix Mode** — interleaved exercise types for variety
+
+### Conversation
+- **AI Chat Partner** — streaming conversation with Gemini, inline grammar corrections
+- **Custom Scenarios** — create categories with icon, level (A1-C2), description
+- **Conversation History** — resume past conversations, swipe-to-delete
+- **Word Discovery** — new words highlighted and extractable from conversations
+
+### Immersion
+- **Graded Reading** — AI-generated texts (A1-C2) from your vocabulary, tap-to-translate
+- **Listening Comprehension** — TTS dialogue + multiple choice questions with transcript reveal
+
+### Smart Notifications
+- **Duolingo-style** — 18 German messages across 3 escalation levels
+- **Streak-aware** — escalates based on days without study
+- **Smart skip** — no notification if you already studied today
+
+### AI Usage Tracking
+- **Token & Cost Dashboard** — track Gemini API usage per feature
+- **Monthly Budget** — configurable with progress bar and over-budget warning
+- **Trend Charts** — daily cost over 7/30 days or all-time
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | Framework | Expo SDK 55, React Native 0.83 |
-| Navigation | expo-router with NativeTabs (native iOS tab bar) |
-| Database | expo-sqlite (local, on-device) |
+| Navigation | expo-router with NativeTabs + Stack.Toolbar |
+| Database | expo-sqlite (local, offline-first) |
 | AI | Vercel AI SDK v6 + Google Gemini 2.5 Flash Lite |
-| Dictionary | Wiktionary REST API (en.wiktionary.org) |
-| TTS | expo-speech (native AVSpeechSynthesizer) |
+| Spaced Repetition | ts-fsrs (FSRS algorithm) |
+| Dictionary | Wiktionary REST API |
+| TTS | Google Cloud TTS + expo-speech fallback |
+| Charts | react-native-svg |
 | Animations | react-native-reanimated |
+| Streaming | expo/fetch + TextEncoderStream polyfills |
 | Validation | Zod |
 
 ## Architecture
 
-Feature-based architecture under `src/features/`. Each feature is self-contained with its own components, hooks, services, and types.
+Feature-based architecture. Each feature is self-contained with components, hooks, services, and types.
 
 ```
 src/
-  app/                          # Expo Router routes
-    (search)/                   # Search tab
-    (vocabulary)/               # Vocabulary tab
-    (review)/                   # Review tab
-    (settings)/                 # Settings tab
-  components/                   # App-level components (tabs)
+  app/                              # Expo Router routes
+    (search)/                       # Search tab — word lookup
+    (vocabulary)/                   # Liste tab — collections
+    (review)/                       # Ripasso tab — review, exercises, chat, reading, listening
+    (settings)/                     # Settings tab — preferences, AI usage
   features/
-    dictionary/                 # Word lookup, cards, conjugation
-      components/
-      hooks/
-      services/
-      schemas/
-      types.ts
-    search/                     # Search screen, recent searches
-      components/
-      hooks/
-    vocabulary/                 # Vocabulary list, filters
-      components/
-      hooks/
-    review/                     # Spaced repetition, dashboard
-      components/
-      hooks/
-    settings/                   # App settings, persistence
-      components/
-      hooks/
-      services/
-      types.ts
-    shared/                     # Theme, database, utilities
-      theme/
-      db/
-      hooks/
-      components/
-      utils/
-      config/
-```
-
-## Data Flow
-
-1. **Search** — User types a word (German or Italian)
-2. **Cache check** — Look up in local SQLite database
-3. **Wiktionary** — Fetch structured data from `en.wiktionary.org/api/rest_v1/page/definition/` (multi-case: as-is, capitalized, lowercase)
-4. **AI enrichment** — Gemini generates contextual data: translations, examples with clickable words, usage context, conjugation for verbs
-5. **AI-only fallback** — If Wiktionary has no German data, Gemini generates everything including gender, plural
-6. **Save** — Word is persisted to SQLite with all enriched data
-7. **Review** — SM-2 algorithm schedules words for spaced repetition
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- iOS Simulator or physical iPhone
-- Xcode (for native builds)
-
-### Setup
-
-```bash
-# Install dependencies
-npm install
-
-# Create environment file
-cp .env.dist .env.local
-# Edit .env.local and add your Gemini API key
-
-# Start development
-npx expo start
-```
-
-### Environment Variables
-
-| Variable | Description |
-|----------|------------|
-| `EXPO_PUBLIC_GOOGLE_AI_KEY` | Google Gemini API key for AI enrichment |
-
-### Running on Device
-
-```bash
-# iOS Simulator
-npx expo run:ios
-
-# Physical iPhone (connected via USB)
-npx expo run:ios --device
+    dictionary/                     # Word cards, conjugation, declension, AI enrichment
+    search/                         # Search screen, recent searches
+    vocabulary/                     # Vocabulary export
+    collections/                    # Collection cards, grid, icon picker
+    review/                         # Spaced repetition, dashboard, stats, forecast
+    exercises/                      # Exercise generation, session, feedback
+    chat/                           # AI conversation, scenarios, streaming
+    immersion/                      # Word families, synonyms, reading, listening
+    settings/                       # Settings UI, AI usage tracking
+    shared/                         # Theme, database, TTS, AI tracker, components
 ```
 
 ## Design System
 
-Warm, editorial aesthetic inspired by Bauhaus minimalism.
+Warm editorial aesthetic with dark mode support.
 
-- **Fonts**: Outfit (display), IBM Plex Sans (body), Ubuntu Sans Mono (labels)
-- **Palette**: Cream background (`#F0EDE6`), warm ochre accent (`#C4943A`), muted earth tones
-- **Gender colors**: der = gold (`#C4A96A`), die = rose (`#D4AAA0`), das = sage (`#8DB58A`)
-- **Corners**: `borderCurve: "continuous"` everywhere (iOS squircles)
+| Element | Value |
+|---------|-------|
+| Display | Outfit |
+| Body | IBM Plex Sans |
+| Mono | Ubuntu Sans Mono |
+| Accent | Ochre `#C4943A` / `#D4A44A` |
+| Gender | der = gold, die = rose, das = sage |
+| Corners | `borderCurve: "continuous"` (iOS squircles) |
+| Icons | SF Symbols via expo-symbols |
+
+## Getting Started
+
+```bash
+# Install dependencies
+bun install
+
+# Create environment file
+cp .env.dist .env.local
+# Add your Google Gemini API key to .env.local
+
+# Start dev server
+npx expo start
+
+# iOS dev build (required for TTS, notifications, SVG charts)
+npx expo run:ios
+```
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `EXPO_PUBLIC_GOOGLE_AI_KEY` | Yes | Google Gemini API key |
 
 ## License
 
-Private project.
+MIT
