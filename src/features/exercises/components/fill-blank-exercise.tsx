@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
+import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import type { FillBlankExercise } from "@/features/exercises/types";
 
 interface FillBlankViewProps {
@@ -61,9 +62,17 @@ export function FillBlankView({
           {after}
         </Text>
 
-        <Text style={[textStyles.bodyLight, { color: colors.textMuted }]}>
-          {exercise.translation}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Text
+            style={[textStyles.bodyLight, { color: colors.textMuted, flex: 1 }]}
+          >
+            {exercise.translation}
+          </Text>
+          <SpeakerButton
+            text={exercise.sentence.replace("___", exercise.answer)}
+            size="sm"
+          />
+        </View>
       </View>
 
       {/* Input */}
