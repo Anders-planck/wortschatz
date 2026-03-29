@@ -6,24 +6,47 @@ interface ContextBoxProps {
   text: string;
 }
 
-function parseInline(line: string, boldColor: string, fontFamily: string) {
+function parseInline(
+  line: string,
+  primaryColor: string,
+  accentColor: string,
+  fontFamily: string,
+) {
   const parts: React.ReactNode[] = [];
-  const regex = /\*\*(.+?)\*\*/g;
+  // Match **bold**, 'single quoted', "double quoted"
+  const regex = /\*\*(.+?)\*\*|'([^']+?)'|"([^"]+?)"/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
+  let keyIdx = 0;
 
   while ((match = regex.exec(line)) !== null) {
     if (match.index > lastIndex) {
       parts.push(line.slice(lastIndex, match.index));
     }
-    parts.push(
-      <Text
-        key={match.index}
-        style={{ fontFamily, fontWeight: "600", color: boldColor }}
-      >
-        {match[1]}
-      </Text>,
-    );
+
+    if (match[1]) {
+      // **bold**
+      parts.push(
+        <Text
+          key={keyIdx++}
+          style={{ fontFamily, fontWeight: "600", color: primaryColor }}
+        >
+          {match[1]}
+        </Text>,
+      );
+    } else {
+      // 'quoted' or "quoted" — accent color, medium weight
+      const quoted = match[2] ?? match[3];
+      parts.push(
+        <Text
+          key={keyIdx++}
+          style={{ fontFamily, fontWeight: "500", color: accentColor }}
+        >
+          {quoted}
+        </Text>,
+      );
+    }
+
     lastIndex = regex.lastIndex;
   }
 
@@ -107,6 +130,7 @@ export function ContextBox({ text }: ContextBoxProps) {
             {parseInline(
               content,
               colors.textPrimary,
+              colors.accent,
               textStyles.body.fontFamily,
             )}
           </Text>
