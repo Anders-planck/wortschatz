@@ -24,12 +24,14 @@ import { getSetting } from "@/features/settings/services/settings-repository";
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
-  const { colors, resolvedScheme } = React.use(ThemeContext);
+  const { colors, resolvedScheme, mode } = React.use(ThemeContext);
   const router = useRouter();
-
   useEffect(() => {
-    Appearance.setColorScheme(resolvedScheme);
-  }, [resolvedScheme]);
+    // When "system", clear override so useColorScheme() follows device changes
+    Appearance.setColorScheme(
+      mode === "system" ? "unspecified" : resolvedScheme,
+    );
+  }, [mode, resolvedScheme]);
 
   // Reschedule smart notifications on every app open
   useEffect(() => {
