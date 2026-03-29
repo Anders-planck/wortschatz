@@ -63,9 +63,13 @@ export function ContextBox({ text }: ContextBoxProps) {
           <Text
             key={i}
             selectable
-            style={[textStyles.bodyLight, isBullet && { paddingLeft: 8 }]}
+            style={[
+              textStyles.bodyLight,
+              { textAlign: "left" },
+              isBullet && { paddingLeft: 12 },
+            ]}
           >
-            {isBullet ? "  •  " : ""}
+            {isBullet ? "•  " : ""}
             {parseInline(content, colors, textStyles.body.fontFamily)}
           </Text>
         );
