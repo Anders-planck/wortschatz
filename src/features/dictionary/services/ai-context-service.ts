@@ -52,7 +52,7 @@ Requirements:
 - "translationsIt": 2-4 Italian translations of the German word, most common first.
 - "examples": 2-3 real-world example sentences in practical everyday German (B1 level). Each sentence must have an Italian translation. For each sentence, provide word-by-word breakdown: every word with its Italian meaning (for clickable word exploration).
 - "usageContext": Brief explanation in Italian of when and how to use the German word, common mistakes, similar words.
-- "category": Semantic category (e.g., "Alltag", "Arbeit", "Reisen", "Essen", "Gefuhle", "Wohnung", etc.)
+- "category": MUST be one of: "Alltag", "Arbeit", "Reisen", "Essen", "Gesundheit", "Wohnung", "Bildung", "Natur", "Freizeit", "Kommunikation", "Einkaufen", "Verkehr", "Gefühle", "Familie", "Technik"
 - "conjugation": For verbs, provide full conjugation data. Include:
   - isIrregular: true if this is a strong/irregular verb
   - hilfsverb: "haben" or "sein" (auxiliary for Perfekt)
