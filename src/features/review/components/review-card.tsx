@@ -202,7 +202,10 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
         >
           <Text
             selectable
-            style={[textStyles.bodyLight, { fontSize: 12, textAlign: "left" }]}
+            style={[
+              textStyles.body,
+              { fontSize: 13, textAlign: "left", color: colors.textSecondary },
+            ]}
           >
             {word.usageContext}
           </Text>
