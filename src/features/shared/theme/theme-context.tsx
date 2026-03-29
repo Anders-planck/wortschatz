@@ -6,7 +6,7 @@ import React, {
   useState,
   type ReactNode,
 } from "react";
-import { useColorScheme } from "react-native";
+import { Appearance } from "react-native";
 import { lightColors, darkColors, type ThemeColors } from "./colors";
 import { getTextStyles } from "./typography";
 import {
@@ -38,9 +38,19 @@ const STORAGE_KEY = "themeMode";
 const VALID_MODES = new Set<ThemeMode>(["light", "dark", "system"]);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const systemScheme = useColorScheme();
   const [mode, setModeState] = useState<ThemeMode>("system");
+  const [systemScheme, setSystemScheme] = useState<"light" | "dark">(() =>
+    Appearance.getColorScheme() === "dark" ? "dark" : "light",
+  );
   const [loaded, setLoaded] = useState(false);
+
+  // Listen to system theme changes
+  useEffect(() => {
+    const sub = Appearance.addChangeListener(({ colorScheme }) => {
+      setSystemScheme(colorScheme === "dark" ? "dark" : "light");
+    });
+    return () => sub.remove();
+  }, []);
 
   useEffect(() => {
     getSetting(STORAGE_KEY).then((raw) => {
@@ -57,7 +67,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const resolvedScheme: "light" | "dark" =
-    mode === "system" ? (systemScheme === "dark" ? "dark" : "light") : mode;
+    mode === "system" ? systemScheme : mode;
 
   const colors = resolvedScheme === "dark" ? darkColors : lightColors;
   const textStyles = useMemo(() => getTextStyles(colors), [colors]);
