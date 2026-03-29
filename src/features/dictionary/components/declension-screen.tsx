@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { Stack } from "expo-router";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
@@ -357,6 +357,38 @@ export function DeclensionScreen({ term }: DeclensionScreenProps) {
       </ScrollView>
 
       <Stack.Screen options={{ title: `${term} — Deklination` }} />
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button
+          icon="info.circle"
+          onPress={() =>
+            Alert.alert(
+              "I casi tedeschi",
+              [
+                "NOM (Nominativ) — Il soggetto della frase.",
+                "Chi/cosa fa l'azione?",
+                "→ Der Hund schläft. (Il cane dorme.)\n",
+                "AKK (Akkusativ) — L'oggetto diretto.",
+                "Chi/cosa subisce l'azione?",
+                "→ Ich sehe den Hund. (Vedo il cane.)",
+                "Dopo: für, durch, gegen, ohne, um\n",
+                "DAT (Dativ) — L'oggetto indiretto.",
+                "A chi? Per chi?",
+                "→ Ich gebe dem Hund Wasser. (Do acqua al cane.)",
+                "Dopo: mit, nach, aus, bei, von, zu, seit\n",
+                "GEN (Genitiv) — Possesso.",
+                "Di chi? Di cosa?",
+                "→ Das Haus des Mannes. (La casa dell'uomo.)",
+                "Dopo: wegen, trotz, während, statt\n",
+                "Trucco: chiediti sempre:",
+                "1. Chi fa? → NOM",
+                "2. Chi/cosa subisce? → AKK",
+                "3. A chi va? → DAT",
+                "4. Di chi è? → GEN",
+              ].join("\n"),
+            )
+          }
+        />
+      </Stack.Toolbar>
     </>
   );
 }
