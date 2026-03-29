@@ -160,7 +160,24 @@ export async function createCollection(
 
 export async function deleteCollection(collectionId: number): Promise<void> {
   const db = await getDatabase();
+  await db.runAsync(`DELETE FROM collection_words WHERE collection_id = ?`, [
+    collectionId,
+  ]);
   await db.runAsync(`DELETE FROM collections WHERE id = ?`, [collectionId]);
+}
+
+export async function deleteCollections(ids: number[]): Promise<void> {
+  if (ids.length === 0) return;
+  const db = await getDatabase();
+  const placeholders = ids.map(() => "?").join(", ");
+  await db.runAsync(
+    `DELETE FROM collection_words WHERE collection_id IN (${placeholders})`,
+    ids,
+  );
+  await db.runAsync(
+    `DELETE FROM collections WHERE id IN (${placeholders})`,
+    ids,
+  );
 }
 
 export async function updateCollection(

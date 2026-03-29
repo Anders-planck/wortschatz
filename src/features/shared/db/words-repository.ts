@@ -18,6 +18,15 @@ export interface WordRow {
   next_review: string | null;
   category: string | null;
   created_at: string;
+  sr_due: string | null;
+  sr_stability: number;
+  sr_difficulty: number;
+  sr_elapsed_days: number;
+  sr_scheduled_days: number;
+  sr_reps: number;
+  sr_lapses: number;
+  sr_state: number;
+  sr_last_review: string | null;
 }
 
 function parseJsonSafe<T>(value: string | null, fallback: T): T {
@@ -50,6 +59,15 @@ export function rowToWord(row: WordRow): Word {
     nextReview: row.next_review,
     category: row.category,
     createdAt: row.created_at,
+    srDue: row.sr_due,
+    srStability: row.sr_stability ?? 0,
+    srDifficulty: row.sr_difficulty ?? 0,
+    srElapsedDays: row.sr_elapsed_days ?? 0,
+    srScheduledDays: row.sr_scheduled_days ?? 0,
+    srReps: row.sr_reps ?? 0,
+    srLapses: row.sr_lapses ?? 0,
+    srState: row.sr_state ?? 0,
+    srLastReview: row.sr_last_review,
   };
 }
 
@@ -143,8 +161,15 @@ export async function getWordsForReview(limit = 20): Promise<Word[]> {
   const now = new Date().toISOString();
   const rows = await db.getAllAsync<WordRow>(
     `SELECT * FROM words
-     WHERE next_review IS NULL OR next_review <= ?
-     ORDER BY review_score ASC, searched_at DESC
+     WHERE sr_due IS NULL OR sr_due <= ?
+     ORDER BY
+       CASE sr_state
+         WHEN 0 THEN 0
+         WHEN 1 THEN 1
+         WHEN 3 THEN 2
+         WHEN 2 THEN 3
+       END,
+       sr_due ASC
      LIMIT ?`,
     [now, limit],
   );
@@ -172,6 +197,42 @@ export async function updateReviewScore(
   await db.runAsync(
     `UPDATE words SET review_score = ?, next_review = ? WHERE term = ? COLLATE NOCASE`,
     [score, nextReview, term],
+  );
+}
+
+export async function updateFsrsCard(
+  term: string,
+  card: {
+    due: string;
+    stability: number;
+    difficulty: number;
+    elapsed_days: number;
+    scheduled_days: number;
+    reps: number;
+    lapses: number;
+    state: number;
+    last_review: string | null;
+  },
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    `UPDATE words SET
+       sr_due = ?, sr_stability = ?, sr_difficulty = ?,
+       sr_elapsed_days = ?, sr_scheduled_days = ?,
+       sr_reps = ?, sr_lapses = ?, sr_state = ?, sr_last_review = ?
+     WHERE term = ? COLLATE NOCASE`,
+    [
+      card.due,
+      card.stability,
+      card.difficulty,
+      card.elapsed_days,
+      card.scheduled_days,
+      card.reps,
+      card.lapses,
+      card.state,
+      card.last_review,
+      term,
+    ],
   );
 }
 

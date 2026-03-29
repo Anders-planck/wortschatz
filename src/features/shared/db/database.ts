@@ -24,9 +24,38 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
       review_score INTEGER NOT NULL DEFAULT 0,
       next_review TEXT,
       category TEXT,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      sr_due TEXT,
+      sr_stability REAL NOT NULL DEFAULT 0,
+      sr_difficulty REAL NOT NULL DEFAULT 0,
+      sr_elapsed_days INTEGER NOT NULL DEFAULT 0,
+      sr_scheduled_days INTEGER NOT NULL DEFAULT 0,
+      sr_reps INTEGER NOT NULL DEFAULT 0,
+      sr_lapses INTEGER NOT NULL DEFAULT 0,
+      sr_state INTEGER NOT NULL DEFAULT 0,
+      sr_last_review TEXT
     );
   `);
+
+  // Migrate existing DBs: add FSRS columns if missing
+  const srColumns = [
+    "sr_due TEXT",
+    "sr_stability REAL NOT NULL DEFAULT 0",
+    "sr_difficulty REAL NOT NULL DEFAULT 0",
+    "sr_elapsed_days INTEGER NOT NULL DEFAULT 0",
+    "sr_scheduled_days INTEGER NOT NULL DEFAULT 0",
+    "sr_reps INTEGER NOT NULL DEFAULT 0",
+    "sr_lapses INTEGER NOT NULL DEFAULT 0",
+    "sr_state INTEGER NOT NULL DEFAULT 0",
+    "sr_last_review TEXT",
+  ];
+  for (const col of srColumns) {
+    try {
+      await db.execAsync(`ALTER TABLE words ADD COLUMN ${col}`);
+    } catch {
+      // Column already exists
+    }
+  }
 
   await db.execAsync(`
     CREATE INDEX IF NOT EXISTS idx_words_term ON words (term COLLATE NOCASE);

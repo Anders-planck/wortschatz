@@ -32,6 +32,13 @@ export async function lookupFromWiktionary(term: string): Promise<Word | null> {
     nextReview: null,
     category: null,
     createdAt: now,
+    srStability: 0,
+    srDifficulty: 0,
+    srElapsedDays: 0,
+    srScheduledDays: 0,
+    srReps: 0,
+    srLapses: 0,
+    srState: 0,
   };
 
   const id = await insertWord(baseWord);
@@ -61,6 +68,13 @@ export async function lookupFromAI(term: string): Promise<Word> {
     nextReview: null,
     category: context.category,
     createdAt: now,
+    srStability: 0,
+    srDifficulty: 0,
+    srElapsedDays: 0,
+    srScheduledDays: 0,
+    srReps: 0,
+    srLapses: 0,
+    srState: 0,
   };
 
   const id = await insertWord(word);

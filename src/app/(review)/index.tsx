@@ -7,12 +7,19 @@ import { DashboardGreeting } from "@/features/review/components/dashboard-greeti
 import { TodaySessionCard } from "@/features/review/components/today-session-card";
 import { TrickyWordsList } from "@/features/review/components/tricky-words-list";
 import { WeeklyChart } from "@/features/review/components/weekly-chart";
+import { ReviewForecast } from "@/features/review/components/review-forecast";
 
 export default function ReviewScreen() {
   const { colors } = useAppTheme();
   const router = useRouter();
-  const { wordsToReview, trickyWords, totalCount, weeklyActivity, streak } =
-    useReviewDashboard();
+  const {
+    wordsToReview,
+    trickyWords,
+    totalCount,
+    weeklyActivity,
+    streak,
+    forecast,
+  } = useReviewDashboard();
 
   return (
     <>
@@ -23,6 +30,7 @@ export default function ReviewScreen() {
       >
         <DashboardGreeting streak={streak} totalCount={totalCount} />
         <WeeklyChart data={weeklyActivity} />
+        <ReviewForecast forecast={forecast} />
         <TodaySessionCard
           wordCount={wordsToReview.length}
           onStart={() => router.push("/(review)/session")}

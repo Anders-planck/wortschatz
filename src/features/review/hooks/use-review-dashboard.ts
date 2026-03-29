@@ -12,6 +12,10 @@ import {
   getWeeklyActivityFromLog,
   getActivityToday,
 } from "@/features/review/services/activity-repository";
+import {
+  getReviewForecast,
+  type ForecastDay,
+} from "@/features/review/services/forecast-repository";
 
 interface DashboardData {
   wordsToReview: Word[];
@@ -20,6 +24,7 @@ interface DashboardData {
   weeklyActivity: number[];
   streak: number;
   activitiesToday: number;
+  forecast: ForecastDay[];
   isLoading: boolean;
   refresh: () => Promise<void>;
 }
@@ -33,26 +38,36 @@ export function useReviewDashboard(): DashboardData {
   ]);
   const [streak, setStreak] = useState(0);
   const [activitiesToday, setActivitiesToday] = useState(0);
+  const [forecast, setForecast] = useState<ForecastDay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [reviewWords, tricky, count, weekly, currentStreak, todayCount] =
-        await Promise.all([
-          getWordsForReview(12),
-          getTrickyWords(8),
-          getWordCount(),
-          getWeeklyActivityFromLog(),
-          getStudyStreak(),
-          getActivityToday(),
-        ]);
+      const [
+        reviewWords,
+        tricky,
+        count,
+        weekly,
+        currentStreak,
+        todayCount,
+        forecastData,
+      ] = await Promise.all([
+        getWordsForReview(12),
+        getTrickyWords(8),
+        getWordCount(),
+        getWeeklyActivityFromLog(),
+        getStudyStreak(),
+        getActivityToday(),
+        getReviewForecast(),
+      ]);
       setWordsToReview(reviewWords);
       setTrickyWords(tricky);
       setTotalCount(count);
       setWeeklyActivity(weekly);
       setStreak(currentStreak);
       setActivitiesToday(todayCount);
+      setForecast(forecastData);
     } catch {
       // Silent failure — dashboard shows empty state
     } finally {
@@ -73,6 +88,7 @@ export function useReviewDashboard(): DashboardData {
     weeklyActivity,
     streak,
     activitiesToday,
+    forecast,
     isLoading,
     refresh,
   };
