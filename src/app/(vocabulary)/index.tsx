@@ -319,30 +319,55 @@ export default function ListeScreen() {
         icon="trash.circle.fill"
       />
 
-      <Stack.Screen.Title large>Liste</Stack.Screen.Title>
-
-      <Stack.Toolbar placement="right">
-        {isSelecting ? (
-          <Stack.Toolbar.Button icon="xmark" onPress={cancelSelection} />
-        ) : (
-          <>
-            {collections.length > 1 && (
-              <Stack.Toolbar.Button
-                icon="checkmark.circle"
-                onPress={() => setIsSelecting(true)}
-              />
-            )}
-            <Stack.Toolbar.Button
-              icon="sparkles"
-              onPress={() => router.push("/organize")}
-            />
-            <Stack.Toolbar.Button
-              icon="plus"
-              onPress={() => router.push("/create-collection")}
-            />
-          </>
-        )}
-      </Stack.Toolbar>
+      <Stack.Screen
+        options={{
+          title: "Liste",
+          headerLargeTitle: true,
+          headerRight: () =>
+            isSelecting ? (
+              <Pressable onPress={cancelSelection} hitSlop={8}>
+                <SymbolView
+                  name="xmark.circle.fill"
+                  size={24}
+                  tintColor={colors.textMuted}
+                  resizeMode="scaleAspectFit"
+                />
+              </Pressable>
+            ) : (
+              <View style={{ flexDirection: "row", gap: 16 }}>
+                {collections.length > 1 && (
+                  <Pressable onPress={() => setIsSelecting(true)} hitSlop={8}>
+                    <SymbolView
+                      name="checkmark.circle"
+                      size={22}
+                      tintColor={colors.textMuted}
+                      resizeMode="scaleAspectFit"
+                    />
+                  </Pressable>
+                )}
+                <Pressable onPress={() => router.push("/organize")} hitSlop={8}>
+                  <SymbolView
+                    name="sparkles"
+                    size={22}
+                    tintColor={colors.accent}
+                    resizeMode="scaleAspectFit"
+                  />
+                </Pressable>
+                <Pressable
+                  onPress={() => router.push("/create-collection")}
+                  hitSlop={8}
+                >
+                  <SymbolView
+                    name="plus.circle.fill"
+                    size={24}
+                    tintColor={colors.accent}
+                    resizeMode="scaleAspectFit"
+                  />
+                </Pressable>
+              </View>
+            ),
+        }}
+      />
     </>
   );
 }
