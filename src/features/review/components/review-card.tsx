@@ -193,18 +193,16 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
           style={{
             marginTop: 8,
             backgroundColor: colors.cream,
-            borderRadius: 6,
+            borderRadius: 8,
             borderCurve: "continuous",
             paddingHorizontal: 14,
             paddingVertical: 10,
+            alignSelf: "stretch",
           }}
         >
           <Text
             selectable
-            style={[
-              textStyles.mono,
-              { fontSize: 10, color: colors.textMuted, textAlign: "center" },
-            ]}
+            style={[textStyles.bodyLight, { fontSize: 12, textAlign: "left" }]}
           >
             {word.usageContext}
           </Text>
