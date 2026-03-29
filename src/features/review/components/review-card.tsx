@@ -6,6 +6,7 @@ import type { Word } from "@/features/dictionary/types";
 import { getSetting } from "@/features/settings/services/settings-repository";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import { Divider } from "@/features/shared/components/divider";
+import { ContextBox } from "@/features/dictionary/components/context-box";
 import { useSpeech } from "@/features/shared/hooks/use-speech";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { getGenderColors } from "@/features/shared/utils/word-colors";
@@ -189,26 +190,8 @@ export function ReviewCard({ word, isRevealed, onReveal }: ReviewCardProps) {
       )}
 
       {word.usageContext && (
-        <View
-          style={{
-            marginTop: 8,
-            backgroundColor: colors.cream,
-            borderRadius: 8,
-            borderCurve: "continuous",
-            paddingHorizontal: 14,
-            paddingVertical: 10,
-            alignSelf: "stretch",
-          }}
-        >
-          <Text
-            selectable
-            style={[
-              textStyles.body,
-              { fontSize: 13, textAlign: "left", color: colors.textSecondary },
-            ]}
-          >
-            {word.usageContext}
-          </Text>
+        <View style={{ marginTop: 8, alignSelf: "stretch" }}>
+          <ContextBox text={word.usageContext} />
         </View>
       )}
     </Animated.View>
