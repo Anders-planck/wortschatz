@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text } from "react-native";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
@@ -5,11 +6,7 @@ interface ContextBoxProps {
   text: string;
 }
 
-function parseInline(
-  line: string,
-  colors: { textPrimary: string },
-  fontFamily: string,
-) {
+function parseInline(line: string, boldColor: string, fontFamily: string) {
   const parts: React.ReactNode[] = [];
   const regex = /\*\*(.+?)\*\*/g;
   let lastIndex = 0;
@@ -22,7 +19,7 @@ function parseInline(
     parts.push(
       <Text
         key={match.index}
-        style={{ fontFamily, fontWeight: "600", color: colors.textPrimary }}
+        style={{ fontFamily, fontWeight: "600", color: boldColor }}
       >
         {match[1]}
       </Text>,
@@ -37,6 +34,16 @@ function parseInline(
   return parts.length > 0 ? parts : [line];
 }
 
+function isHeading(line: string): boolean {
+  const trimmed = line.trim();
+  return (
+    trimmed.endsWith(":") &&
+    !trimmed.startsWith("-") &&
+    !trimmed.startsWith("*") &&
+    trimmed.length < 40
+  );
+}
+
 export function ContextBox({ text }: ContextBoxProps) {
   const { colors, textStyles } = useAppTheme();
 
@@ -46,33 +53,62 @@ export function ContextBox({ text }: ContextBoxProps) {
     <View
       style={{
         backgroundColor: colors.cream,
-        borderRadius: 6,
+        borderRadius: 10,
         borderCurve: "continuous",
-        padding: 14,
-        gap: 4,
+        padding: 16,
+        gap: 2,
         alignSelf: "stretch",
-        alignItems: "flex-start",
       }}
     >
       {lines.map((line, i) => {
         const trimmed = line.trim();
-        if (!trimmed) return null;
+        if (!trimmed) {
+          return <View key={i} style={{ height: 8 }} />;
+        }
 
         const isBullet = trimmed.startsWith("* ") || trimmed.startsWith("- ");
+        const heading = isHeading(trimmed);
         const content = isBullet ? trimmed.slice(2) : trimmed;
+
+        if (heading) {
+          return (
+            <Text
+              key={i}
+              style={[
+                textStyles.heading,
+                {
+                  fontSize: 13,
+                  color: colors.textPrimary,
+                  marginTop: i > 0 ? 6 : 0,
+                },
+              ]}
+            >
+              {content}
+            </Text>
+          );
+        }
 
         return (
           <Text
             key={i}
             selectable
             style={[
-              textStyles.bodyLight,
-              { textAlign: "left" },
-              isBullet && { paddingLeft: 12 },
+              textStyles.body,
+              {
+                fontSize: 13,
+                color: colors.textSecondary,
+                textAlign: "left",
+                lineHeight: 20,
+              },
+              isBullet && { paddingLeft: 8 },
             ]}
           >
             {isBullet ? "•  " : ""}
-            {parseInline(content, colors, textStyles.body.fontFamily)}
+            {parseInline(
+              content,
+              colors.textPrimary,
+              textStyles.body.fontFamily,
+            )}
           </Text>
         );
       })}
