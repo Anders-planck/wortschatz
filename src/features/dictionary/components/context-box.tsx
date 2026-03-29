@@ -50,6 +50,8 @@ export function ContextBox({ text }: ContextBoxProps) {
         borderCurve: "continuous",
         padding: 14,
         gap: 4,
+        alignSelf: "stretch",
+        alignItems: "flex-start",
       }}
     >
       {lines.map((line, i) => {
