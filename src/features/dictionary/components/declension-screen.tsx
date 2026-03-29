@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack } from "expo-router";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import { SymbolView } from "expo-symbols";
+import Animated, {
+  FadeInUp,
+  FadeInDown,
+  FadeOut,
+} from "react-native-reanimated";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
@@ -143,10 +148,306 @@ function ArticleCard({
   );
 }
 
+const CASE_INFO = [
+  {
+    key: "NOM",
+    name: "Nominativ",
+    question: "Chi? / Cosa?",
+    role: "Il soggetto della frase — chi compie l'azione.",
+    example: "Der Hund schläft.",
+    translation: "Il cane dorme.",
+    prepositions: null,
+    tip: "Il nominativo è la forma base. È quella che trovi nel dizionario.",
+  },
+  {
+    key: "AKK",
+    name: "Akkusativ",
+    question: "Chi? / Cosa? (subisce)",
+    role: "L'oggetto diretto — chi o cosa subisce l'azione.",
+    example: "Ich sehe den Hund.",
+    translation: "Vedo il cane.",
+    prepositions: "für, durch, gegen, ohne, um, bis, entlang",
+    tip: "Solo il maschile cambia: der → den, ein → einen. Femminile, neutro e plurale restano uguali al NOM.",
+  },
+  {
+    key: "DAT",
+    name: "Dativ",
+    question: "A chi? / Per chi?",
+    role: "L'oggetto indiretto — a chi è destinata l'azione.",
+    example: "Ich gebe dem Hund Wasser.",
+    translation: "Do acqua al cane.",
+    prepositions: "mit, nach, aus, bei, von, zu, seit, gegenüber",
+    tip: "Tutti i generi cambiano: der → dem, die → der, das → dem. Al plurale: den + -n al nome.",
+  },
+  {
+    key: "GEN",
+    name: "Genitiv",
+    question: "Di chi? / Di cosa?",
+    role: "Possesso e appartenenza.",
+    example: "Das Haus des Mannes.",
+    translation: "La casa dell'uomo.",
+    prepositions: "wegen, trotz, während, statt, außerhalb, innerhalb",
+    tip: "Maschile e neutro aggiungono -s o -es al nome. Nella lingua parlata si usa spesso 'von + Dativ' al posto del genitivo.",
+  },
+];
+
+function CaseInfoSheet({ onClose }: { onClose: () => void }) {
+  const { colors, textStyles } = useAppTheme();
+  const caseColors: Record<string, { bg: string; text: string }> = {
+    NOM: { bg: colors.nomBg, text: colors.nomText },
+    AKK: { bg: colors.akkBg, text: colors.akkText },
+    DAT: { bg: colors.datBg, text: colors.datText },
+    GEN: { bg: colors.genBg, text: colors.genText },
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {/* Header */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: 20,
+          paddingTop: 16,
+        }}
+      >
+        <Text style={[textStyles.heading, { fontSize: 20 }]}>
+          I casi tedeschi
+        </Text>
+        <Pressable onPress={onClose} hitSlop={12}>
+          <SymbolView
+            name="xmark.circle.fill"
+            size={28}
+            tintColor={colors.textGhost}
+            resizeMode="scaleAspectFit"
+          />
+        </Pressable>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{ padding: 20, paddingTop: 0, gap: 16 }}
+      >
+        {CASE_INFO.map((c, i) => {
+          const caseColor = caseColors[c.key] ?? {
+            bg: colors.cream,
+            text: colors.textMuted,
+          };
+          return (
+            <Animated.View
+              key={c.key}
+              entering={FadeInDown.delay(i * 80).duration(300)}
+              style={{
+                backgroundColor: colors.card,
+                borderRadius: 16,
+                borderCurve: "continuous",
+                overflow: "hidden",
+              }}
+            >
+              {/* Case header */}
+              <View
+                style={{
+                  backgroundColor: caseColor.bg,
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "baseline",
+                    gap: 8,
+                  }}
+                >
+                  <Text
+                    style={[
+                      textStyles.mono,
+                      {
+                        fontSize: 12,
+                        fontWeight: "700",
+                        color: caseColor.text,
+                        letterSpacing: 1,
+                      },
+                    ]}
+                  >
+                    {c.key}
+                  </Text>
+                  <Text
+                    style={[
+                      textStyles.heading,
+                      { fontSize: 16, color: caseColor.text },
+                    ]}
+                  >
+                    {c.name}
+                  </Text>
+                </View>
+                <Text
+                  style={[
+                    textStyles.bodyLight,
+                    { fontSize: 13, color: caseColor.text },
+                  ]}
+                >
+                  {c.question}
+                </Text>
+              </View>
+
+              {/* Body */}
+              <View style={{ padding: 16, gap: 12 }}>
+                <Text
+                  style={[
+                    textStyles.body,
+                    { fontSize: 14, color: colors.textSecondary },
+                  ]}
+                >
+                  {c.role}
+                </Text>
+
+                {/* Example */}
+                <View
+                  style={{
+                    backgroundColor: colors.cream,
+                    borderRadius: 10,
+                    borderCurve: "continuous",
+                    padding: 12,
+                    gap: 4,
+                  }}
+                >
+                  <Text
+                    style={[
+                      textStyles.heading,
+                      { fontSize: 15, color: colors.textPrimary },
+                    ]}
+                  >
+                    {c.example}
+                  </Text>
+                  <Text
+                    style={[
+                      textStyles.bodyLight,
+                      { fontSize: 13, color: colors.textMuted },
+                    ]}
+                  >
+                    {c.translation}
+                  </Text>
+                </View>
+
+                {/* Prepositions */}
+                {c.prepositions && (
+                  <View style={{ gap: 4 }}>
+                    <Text
+                      style={[
+                        textStyles.mono,
+                        {
+                          fontSize: 10,
+                          color: colors.textGhost,
+                          letterSpacing: 1,
+                        },
+                      ]}
+                    >
+                      PREPOSIZIONI
+                    </Text>
+                    <Text
+                      style={[
+                        textStyles.body,
+                        {
+                          fontSize: 13,
+                          color: caseColor.text,
+                          fontWeight: "600",
+                        },
+                      ]}
+                    >
+                      {c.prepositions}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Tip */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 8,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <SymbolView
+                    name="lightbulb.fill"
+                    size={14}
+                    tintColor={colors.accent}
+                    resizeMode="scaleAspectFit"
+                    style={{ marginTop: 2 }}
+                  />
+                  <Text
+                    style={[
+                      textStyles.bodyLight,
+                      { fontSize: 13, color: colors.textSecondary, flex: 1 },
+                    ]}
+                  >
+                    {c.tip}
+                  </Text>
+                </View>
+              </View>
+            </Animated.View>
+          );
+        })}
+
+        {/* Quick reference */}
+        <Animated.View
+          entering={FadeInDown.delay(350).duration(300)}
+          style={{
+            backgroundColor: colors.accentLight,
+            borderRadius: 14,
+            borderCurve: "continuous",
+            padding: 16,
+            gap: 8,
+            marginBottom: 40,
+          }}
+        >
+          <Text
+            style={[
+              textStyles.mono,
+              { fontSize: 10, color: colors.textGhost, letterSpacing: 1 },
+            ]}
+          >
+            TRUCCO RAPIDO
+          </Text>
+          {[
+            { q: "Chi fa?", a: "→ NOM" },
+            { q: "Chi/cosa subisce?", a: "→ AKK" },
+            { q: "A chi va?", a: "→ DAT" },
+            { q: "Di chi è?", a: "→ GEN" },
+          ].map((item) => (
+            <View key={item.a} style={{ flexDirection: "row", gap: 8 }}>
+              <Text
+                style={[
+                  textStyles.body,
+                  { fontSize: 14, color: colors.textPrimary },
+                ]}
+              >
+                {item.q}
+              </Text>
+              <Text
+                style={[
+                  textStyles.heading,
+                  { fontSize: 14, color: colors.accent },
+                ]}
+              >
+                {item.a}
+              </Text>
+            </View>
+          ))}
+        </Animated.View>
+      </ScrollView>
+    </View>
+  );
+}
+
 export function DeclensionScreen({ term }: DeclensionScreenProps) {
   const { colors, textStyles } = useAppTheme();
   const [word, setWord] = useState<Word | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
   const [showPlural, setShowPlural] = useState(false);
 
   useEffect(() => {
@@ -357,6 +658,21 @@ export function DeclensionScreen({ term }: DeclensionScreenProps) {
       </ScrollView>
 
       <Stack.Screen options={{ title: `${term} — Deklination` }} />
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button
+          icon="info.circle"
+          onPress={() => setShowInfo(true)}
+        />
+      </Stack.Toolbar>
+
+      <Modal
+        visible={showInfo}
+        animationType="slide"
+        presentationStyle="formSheet"
+        onRequestClose={() => setShowInfo(false)}
+      >
+        <CaseInfoSheet onClose={() => setShowInfo(false)} />
+      </Modal>
     </>
   );
 }

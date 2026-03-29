@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { hapticMedium } from "@/features/shared/hooks/use-haptics";
 
@@ -6,8 +7,8 @@ type Response = 0 | 1 | 2 | 3;
 
 interface ButtonConfig {
   label: string;
-  borderColor: string;
-  textColor: string;
+  icon: string;
+  color: string;
 }
 
 interface ResponseButtonsProps {
@@ -18,21 +19,33 @@ export function ResponseButtons({ onRespond }: ResponseButtonsProps) {
   const { colors, textStyles } = useAppTheme();
 
   const BUTTONS: Record<Response, ButtonConfig> = {
-    0: { label: "Again", borderColor: colors.die, textColor: colors.againText },
+    0: {
+      label: "Again",
+      icon: "arrow.counterclockwise",
+      color: colors.danger,
+    },
     1: {
       label: "Hard",
-      borderColor: colors.border,
-      textColor: colors.textTertiary,
+      icon: "tortoise",
+      color: colors.textTertiary,
     },
-    2: { label: "Good", borderColor: colors.der, textColor: colors.akkText },
-    3: { label: "Easy", borderColor: colors.das, textColor: colors.datText },
+    2: {
+      label: "Good",
+      icon: "checkmark",
+      color: colors.accent,
+    },
+    3: {
+      label: "Easy",
+      icon: "bolt",
+      color: colors.success,
+    },
   };
 
   return (
     <View
       style={{
         flexDirection: "row",
-        gap: 8,
+        gap: 10,
         paddingHorizontal: 20,
         paddingBottom: 20,
       }}
@@ -48,20 +61,26 @@ export function ResponseButtons({ onRespond }: ResponseButtonsProps) {
             }}
             style={({ pressed }) => ({
               flex: 1,
-              borderWidth: 1.5,
-              borderColor: config.borderColor,
-              borderRadius: 4,
-              borderCurve: "continuous",
-              paddingVertical: 12,
               alignItems: "center",
-              opacity: pressed ? 0.7 : 1,
+              gap: 6,
+              paddingVertical: 12,
+              opacity: pressed ? 0.6 : 1,
             })}
           >
+            <SymbolView
+              name={config.icon as SFSymbol}
+              size={22}
+              tintColor={config.color}
+              resizeMode="scaleAspectFit"
+            />
             <Text
-              style={[
-                textStyles.body,
-                { fontSize: 12, fontWeight: "500", color: config.textColor },
-              ]}
+              style={{
+                fontFamily: textStyles.mono.fontFamily,
+                fontSize: 10,
+                fontWeight: "600",
+                color: config.color,
+                letterSpacing: 0.5,
+              }}
             >
               {config.label}
             </Text>
