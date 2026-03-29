@@ -55,11 +55,15 @@ async function generateFillBlank(words: Word[]): Promise<FillBlankExercise[]> {
       output: Output.object({ schema: FillBlankSchema }),
       prompt: `Sei un insegnante di tedesco per studenti italiani di livello B1.
 
-Crea esercizi "fill in the blank" per queste parole tedesche: ${wordList}
+PAROLE DELL'UTENTE (usa SOLO queste): ${wordList}
 
-Per ogni parola, crea una frase tedesca di livello B1 con ___ al posto della parola da inserire.
-Fornisci la traduzione italiana della frase completa e un suggerimento grammaticale in italiano.
-Genera un esercizio per ogni parola fornita.`,
+REGOLE OBBLIGATORIE:
+- Crea UN esercizio per OGNI parola della lista sopra.
+- Ogni frase DEVE contenere esattamente una delle parole fornite, sostituita con ___.
+- Il campo "wordTerm" DEVE essere ESATTAMENTE una delle parole della lista (copia-incolla esatto).
+- NON inventare parole nuove. NON usare parole che non sono nella lista.
+- La frase deve essere di livello B1, naturale e utile nella vita quotidiana.
+- Fornisci la traduzione italiana della frase completa e un suggerimento grammaticale in italiano.`,
     }),
   );
 
@@ -67,14 +71,17 @@ Genera un esercizio per ogni parola fornita.`,
     throw new Error("AI failed to generate fill-blank exercises");
   }
 
-  return result.output.exercises.map((ex) => ({
-    type: "fill" as const,
-    sentence: ex.sentence,
-    answer: ex.answer,
-    translation: ex.translation,
-    hint: ex.hint,
-    wordTerm: ex.wordTerm,
-  }));
+  const validTerms = new Set(words.map((w) => w.term.toLowerCase()));
+  return result.output.exercises
+    .filter((ex) => validTerms.has(ex.wordTerm.toLowerCase()))
+    .map((ex) => ({
+      type: "fill" as const,
+      sentence: ex.sentence,
+      answer: ex.answer,
+      translation: ex.translation,
+      hint: ex.hint,
+      wordTerm: ex.wordTerm,
+    }));
 }
 
 function generateDictation(words: Word[]): DictationExercise[] {
@@ -106,12 +113,16 @@ async function generateCaseQuiz(words: Word[]): Promise<CaseQuizExercise[]> {
       output: Output.object({ schema: CaseQuizSchema }),
       prompt: `Sei un insegnante di tedesco per studenti italiani di livello B1.
 
-Crea esercizi sugli articoli e i casi grammaticali tedeschi per questi sostantivi: ${wordList}
+SOSTANTIVI DELL'UTENTE (usa SOLO questi): ${wordList}
 
-Per ogni sostantivo, crea una frase tedesca con ___ dove va l'articolo declinato.
-Fornisci 4 opzioni di articolo (solo una corretta), il caso grammaticale usato,
-la traduzione italiana della frase e una spiegazione in italiano del perché si usa quel caso.
-Genera un esercizio per ogni sostantivo fornito.`,
+REGOLE OBBLIGATORIE:
+- Crea UN esercizio per OGNI sostantivo della lista sopra.
+- Ogni frase DEVE contenere esattamente uno dei sostantivi forniti.
+- Il campo "wordTerm" DEVE essere ESATTAMENTE uno dei sostantivi della lista (copia-incolla esatto, senza articolo).
+- NON inventare sostantivi nuovi. NON usare parole che non sono nella lista.
+- Nella frase, metti ___ dove va l'articolo declinato.
+- Fornisci 4 opzioni di articolo (solo una corretta), il caso grammaticale usato.
+- Fornisci la traduzione italiana della frase e una spiegazione in italiano del perché si usa quel caso.`,
     }),
   );
 
@@ -119,16 +130,19 @@ Genera un esercizio per ogni sostantivo fornito.`,
     throw new Error("AI failed to generate case quiz exercises");
   }
 
-  return result.output.exercises.map((ex) => ({
-    type: "cases" as const,
-    sentence: ex.sentence,
-    correctArticle: ex.correctArticle,
-    options: ex.options,
-    caseType: ex.caseType,
-    translation: ex.translation,
-    explanation: ex.explanation,
-    wordTerm: ex.wordTerm,
-  }));
+  const validTerms = new Set(nouns.map((w) => w.term.toLowerCase()));
+  return result.output.exercises
+    .filter((ex) => validTerms.has(ex.wordTerm.toLowerCase()))
+    .map((ex) => ({
+      type: "cases" as const,
+      sentence: ex.sentence,
+      correctArticle: ex.correctArticle,
+      options: ex.options,
+      caseType: ex.caseType,
+      translation: ex.translation,
+      explanation: ex.explanation,
+      wordTerm: ex.wordTerm,
+    }));
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
