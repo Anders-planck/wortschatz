@@ -47,3 +47,8 @@ app-example
 .superpowers/
 docs/mockups/*.html
 preview-*.html
+
+# Claude/agent local config
+.agents/
+.claude/skills/
+.vscode/
