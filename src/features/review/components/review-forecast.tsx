@@ -9,6 +9,10 @@ interface ReviewForecastProps {
 
 const DAY_LABELS = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
 
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function getColor(
   count: number,
   colors: {
@@ -39,7 +43,7 @@ export function ReviewForecast({ forecast }: ReviewForecastProps) {
   for (let i = 0; i < 7; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() + i);
-    const dateStr = d.toISOString().slice(0, 10);
+    const dateStr = localDateStr(d);
     const dayOfWeek = d.getDay();
     const found = forecast.find((f) => f.date === dateStr);
     days.push({

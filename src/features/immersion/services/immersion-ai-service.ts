@@ -23,16 +23,18 @@ export async function generateWordFamily(
     generateText({
       model: google(AI_MODEL),
       output: Output.object({ schema: WordFamilySchema }),
-      prompt: `You are a German etymology expert helping an Italian-speaking learner.
+      prompt: `You are a German etymology expert helping an Italian-speaking B1 learner.
 
 Given the German word "${term}" (${type}), generate its word family (Wortfamilie).
 
-Find the root/stem and list 6-10 related words derived from the same root.
-For each word provide: term, type (noun/verb/adjective/adverb/preposition), gender (der/die/das for nouns, null otherwise), Italian translation, prefix (if it has a separable/inseparable prefix, null otherwise).
+RULES:
+- Find the root/stem and list 6-10 REAL German words derived from the same root.
+- Only include words that ACTUALLY EXIST in German. Do NOT invent words.
+- For each word: term, type (noun/verb/adjective/adverb/preposition), gender (der/die/das for nouns ONLY, null for all other types), translation IN ITALIAN, prefix (separable/inseparable prefix if applicable, null otherwise).
+- Order from most common to least common. Focus on B1-level vocabulary.
+- If the word has no obvious family (e.g. simple root words), return fewer words rather than inventing connections.
 
-Example: "fahren" → Fahrer, Fahrrad, Erfahrung, Abfahrt, erfahren, Einfahrt, mitfahren, Führerschein.
-
-Include common, useful words a B1 learner would encounter. Order from most common to least common.`,
+Example: "fahren" → Fahrer, Fahrrad, Erfahrung, Abfahrt, erfahren, Einfahrt, mitfahren.`,
     }),
   );
 
@@ -54,13 +56,11 @@ export async function generateSynonymsAntonyms(
 
 For the German word "${term}" (${type}):
 
-1. Synonyms: 3-5 German synonyms with Italian translation and intensity (how similar: "high" = almost identical, "medium" = similar meaning, "low" = loosely related). Order by intensity descending.
-
-2. Antonyms: 2-3 German antonyms with Italian translation.
-
-3. Comparative: ONLY for adjectives — provide Komparativ and Superlativ forms. For non-adjectives, return null.
-
-All translations must be in Italian. Only include real, commonly used words.`,
+RULES:
+- synonyms: 3-5 REAL German synonyms. Each with ITALIAN translation and intensity ("high" = nearly identical meaning, "medium" = similar concept, "low" = loosely related). Order by intensity descending. Only include words that ACTUALLY EXIST and are commonly used.
+- antonyms: 2-3 REAL German antonyms with ITALIAN translation. If no natural antonym exists for this word, return an empty array.
+- comparative: ONLY for adjectives — provide Komparativ and Superlativ forms (e.g. schnell → schneller → am schnellsten). For ALL other word types, return null.
+- Do NOT invent German words. Every synonym and antonym must be a real, verifiable German word.`,
     }),
   );
 
@@ -81,15 +81,18 @@ export async function generateReading(
       output: Output.object({ schema: ReadingSchema }),
       prompt: `You are a German language teacher creating graded reading material for an Italian-speaking student.
 
-Create a short story (100-200 words) at ${level} level using these vocabulary words naturally: ${wordList}.
+VOCABULARY WORDS TO USE: ${wordList}
 
-Requirements:
-- Title in German
-- Level: "${level}"
-- Content: A coherent, engaging short text (100-200 words). Use the vocabulary words naturally — don't force them.
-- wordTranslations: A map of EVERY unique German word in the text → its Italian translation. Include articles, prepositions, verbs in their conjugated form mapped to the infinitive meaning. This is for tap-to-translate.
-
-Make the story interesting and relatable — daily life in Germany, a small adventure, a conversation.`,
+RULES:
+- Write a short story (100-200 words) at ${level} level.
+- Use AT LEAST 5 of the vocabulary words above naturally in the text. Do NOT force them into unnatural sentences.
+- Title: IN GERMAN.
+- Content: coherent, engaging text about daily life in Germany. Keep grammar and vocabulary within ${level} scope.
+- wordTranslations: a map of EVERY unique German word in the text → its ITALIAN translation.
+  - Include articles (der→il, die→la, ein→un), prepositions, pronouns.
+  - Map conjugated verbs to their INFINITIVE meaning (e.g. "isst" → "mangiare").
+  - Map declined nouns/adjectives to their base meaning.
+  - This map is used for tap-to-translate, so completeness is critical. Do NOT skip common words.`,
     }),
   );
 
@@ -110,16 +113,18 @@ export async function generateListeningExercises(
       output: Output.object({ schema: ListeningSetSchema }),
       prompt: `You are a German listening comprehension teacher for an Italian-speaking ${level} student.
 
-Create 3 listening comprehension exercises using these vocabulary words: ${wordList}.
+VOCABULARY WORDS TO USE: ${wordList}
 
-Each exercise has:
-- dialogue: A short German dialogue or paragraph (2-4 sentences) that would be read aloud via TTS
-- question: A comprehension question in German about the dialogue
-- options: Exactly 3 answer options in German
-- correctIndex: The index (0, 1, or 2) of the correct answer
-- explanation: Why the correct answer is right, explained in Italian
-
-Make dialogues realistic — ordering at a restaurant, asking for directions, a phone call, at the doctor, etc. Vary the scenarios.`,
+RULES:
+- Create exactly 3 listening comprehension exercises.
+- Each exercise MUST use at least 1-2 of the vocabulary words above in the dialogue.
+- dialogue: 2-4 SHORT sentences IN GERMAN. Keep it simple and clear for TTS (no abbreviations, no numbers as digits, no special characters). Stay within ${level} grammar and vocabulary.
+- question: comprehension question IN GERMAN about the dialogue.
+- options: exactly 3 answer options IN GERMAN. One correct, two plausible but wrong distractors.
+- correctIndex: 0, 1, or 2.
+- explanation: why the correct answer is right, IN ITALIAN.
+- Vary scenarios: restaurant, directions, phone call, doctor, shopping, etc.
+- Do NOT reuse the same scenario twice.`,
     }),
   );
 

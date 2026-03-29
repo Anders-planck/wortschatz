@@ -53,3 +53,7 @@ preview-*.html
 .claude/skills/
 .vscode/
 skills-lock.json
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

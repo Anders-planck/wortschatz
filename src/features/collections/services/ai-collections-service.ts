@@ -37,17 +37,16 @@ export async function triageWords(words: Word[]): Promise<TriageGroup[]> {
       }),
       prompt: `You are a German vocabulary organizer for an Italian-speaking student.
 
-Given these German words: ${terms}
+WORDS TO ORGANIZE (use ONLY these, do NOT invent new words): ${terms}
 
-Organize them into 3-5 thematic groups.
-
-For each group provide:
-- "name": a short thematic name in German (e.g. "Essen & Trinken", "Reise", "Alltag")
-- "icon": one icon from this list that best fits the theme: ${iconList}
-- "words": array of the German terms that belong to this group
-- "reason": a brief explanation in Italian of why these words are grouped together
-
-Every word must appear in exactly one group. Do not skip any word.`,
+RULES:
+- Organize into 3-5 thematic groups.
+- Every word from the list MUST appear in exactly one group. Do NOT skip any word.
+- Do NOT add words that are not in the list above.
+- "name": short thematic name IN GERMAN (e.g. "Essen & Trinken", "Reise", "Alltag").
+- "icon": MUST be one of these: ${iconList}. Pick the closest match.
+- "words": array of German terms from the list above. Copy-paste exactly as written.
+- "reason": brief explanation IN ITALIAN of why these words are grouped together.`,
     }),
   );
 
@@ -76,9 +75,14 @@ export async function autoPopulateCollection(
 
 The user has a collection named "${collectionName}".
 
-From the following German words, select ONLY the ones that thematically fit this collection: ${terms}
+AVAILABLE WORDS (select ONLY from this list): ${terms}
 
-Return only the matching terms as an array. If no words fit, return an empty array.`,
+RULES:
+- Return ONLY words from the list above that thematically fit the collection "${collectionName}".
+- Do NOT invent or add words that are not in the list.
+- Copy-paste the terms EXACTLY as written (preserve capitalization).
+- If no words fit, return an empty array.
+- Be strict: only include words with a clear thematic connection.`,
     }),
   );
 

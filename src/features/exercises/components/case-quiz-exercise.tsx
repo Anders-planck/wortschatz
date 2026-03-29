@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
+import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import type { CaseQuizExercise } from "@/features/exercises/types";
 
 interface CaseQuizViewProps {
@@ -86,9 +87,21 @@ export function CaseQuizView({
           {after}
         </Text>
 
-        <Text style={[textStyles.bodyLight, { color: colors.textMuted }]}>
-          {exercise.translation}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Text
+            style={[textStyles.bodyLight, { color: colors.textMuted, flex: 1 }]}
+          >
+            {exercise.translation}
+          </Text>
+          <SpeakerButton
+            text={
+              disabled
+                ? exercise.sentence.replace("___", exercise.correctArticle)
+                : exercise.sentence.replace("___", "Lücke")
+            }
+            size="sm"
+          />
+        </View>
       </View>
 
       {/* Option pills */}
