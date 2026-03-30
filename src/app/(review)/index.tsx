@@ -34,6 +34,8 @@ export default function ReviewScreen() {
         <ReviewForecast forecast={forecast} breakdown={breakdown} />
         <TodaySessionCard
           wordCount={wordsToReview.length}
+          readyCount={breakdown.ready}
+          newCount={breakdown.newCount}
           onStart={() => router.push("/(review)/session")}
         />
         <TrickyWordsList words={trickyWords} />
