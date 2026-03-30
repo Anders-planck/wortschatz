@@ -1,4 +1,5 @@
 import { getDatabase } from "@/features/shared/db/database";
+import { toLocalDateStr } from "@/features/shared/utils/date";
 
 export interface UsageDayPoint {
   date: string;
@@ -18,13 +19,13 @@ export interface FeatureUsage {
   calls: number;
 }
 
-function daysAgoISO(days: number): string {
+function daysAgoLocal(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() - days);
-  return d.toISOString().slice(0, 10);
+  return toLocalDateStr(d);
 }
 
-function monthStartISO(): string {
+function monthStartLocal(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
 }
@@ -34,7 +35,7 @@ export async function getUsageByPeriod(
 ): Promise<UsageDayPoint[]> {
   const db = await getDatabase();
   const where =
-    days != null ? `WHERE date(created_at) >= '${daysAgoISO(days)}'` : "";
+    days != null ? `WHERE date(created_at) >= '${daysAgoLocal(days)}'` : "";
 
   const rows = await db.getAllAsync<{ day: string; cost: number }>(
     `SELECT date(created_at) as day, SUM(cost_usd) as cost
@@ -50,7 +51,7 @@ export async function getUsageSummary(
 ): Promise<UsageSummary> {
   const db = await getDatabase();
   const where =
-    days != null ? `WHERE date(created_at) >= '${daysAgoISO(days)}'` : "";
+    days != null ? `WHERE date(created_at) >= '${daysAgoLocal(days)}'` : "";
 
   const row = await db.getFirstAsync<{
     total_cost: number;
@@ -76,7 +77,7 @@ export async function getUsageByFeature(
 ): Promise<FeatureUsage[]> {
   const db = await getDatabase();
   const where =
-    days != null ? `WHERE date(created_at) >= '${daysAgoISO(days)}'` : "";
+    days != null ? `WHERE date(created_at) >= '${daysAgoLocal(days)}'` : "";
 
   const rows = await db.getAllAsync<{
     feature: string;
@@ -101,7 +102,7 @@ export async function getCurrentMonthCost(): Promise<number> {
   const row = await db.getFirstAsync<{ cost: number }>(
     `SELECT COALESCE(SUM(cost_usd), 0) as cost
      FROM ai_usage_log
-     WHERE date(created_at) >= '${monthStartISO()}'`,
+     WHERE date(created_at) >= '${monthStartLocal()}'`,
   );
   return row?.cost ?? 0;
 }
