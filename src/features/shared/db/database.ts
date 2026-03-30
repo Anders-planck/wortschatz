@@ -154,20 +154,23 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
     );
   `);
 
-  // Seed default scenarios once
-  const scenarioCount = await db.getFirstAsync<{ count: number }>(
-    "SELECT COUNT(*) as count FROM chat_scenarios WHERE is_default = 1",
+  // Seed default scenarios once (use a flag so deleted defaults don't respawn)
+  const seeded = await db.getFirstAsync<{ value: string }>(
+    "SELECT value FROM settings WHERE key = 'scenarios_seeded'",
   );
-  if (scenarioCount?.count === 0) {
+  if (!seeded) {
     const now = new Date().toISOString();
     await db.execAsync(`
-      INSERT INTO chat_scenarios (id, title, description, icon, level, is_default, created_at) VALUES
+      INSERT OR IGNORE INTO chat_scenarios (id, title, description, icon, level, is_default, created_at) VALUES
         ('free', 'Conversazione libera', 'Parla di qualsiasi argomento', 'text.bubble', 'Adaptive', 1, '${now}'),
         ('supermarket', 'Al supermercato', 'Fare la spesa, prezzi, prodotti', 'cart', 'A2', 1, '${now}'),
         ('job-interview', 'Colloquio di lavoro', 'Competenze, esperienza, domande', 'building.2', 'B1', 1, '${now}'),
         ('apartment', 'Cercare un appartamento', 'Affitto, stanze, quartiere', 'house', 'A2-B1', 1, '${now}'),
         ('doctor', 'Dal dottore', 'Sintomi, ricette, visite', 'cross.case', 'B1', 1, '${now}');
     `);
+    await db.runAsync(
+      "INSERT INTO settings (key, value) VALUES ('scenarios_seeded', '1')",
+    );
   }
 
   await db.execAsync(`
