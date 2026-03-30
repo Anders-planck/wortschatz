@@ -96,30 +96,29 @@ export async function getWeeklyActivityFromLog(): Promise<number[]> {
   const db = await getDatabase();
 
   const now = new Date();
-  const dayOfWeek = (now.getDay() + 6) % 7; // Monday=0, Sunday=6
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - dayOfWeek);
-  monday.setHours(0, 0, 0, 0);
-  const mondayStr = toLocalDateStr(monday);
+  const start = new Date(now);
+  start.setDate(now.getDate() - 6);
+  start.setHours(0, 0, 0, 0);
+  const startStr = toLocalDateStr(start);
 
   const rows = await db.getAllAsync<{ day: string; count: number }>(
     `SELECT DATE(created_at, 'localtime') as day, COUNT(*) as count
      FROM activity_log
      WHERE DATE(created_at, 'localtime') >= ?
      GROUP BY day`,
-    [mondayStr],
+    [startStr],
   );
 
   const countByDay = new Map(rows.map((r) => [r.day, r.count]));
   const result: number[] = [];
 
   for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
     result.push(countByDay.get(toLocalDateStr(d)) ?? 0);
   }
 
-  return result; // [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
+  return result; // last 7 days ending today
 }
 
 export async function getExerciseStats(): Promise<
