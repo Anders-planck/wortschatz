@@ -70,12 +70,7 @@ const EXERCISE_COLORS: Record<string, string> = {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatDateKey(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${dd}`;
-}
+import { toLocalDateStr, rollingWeekDays } from "@/features/shared/utils/date";
 
 interface CalendarDay {
   day: string;
@@ -93,7 +88,7 @@ function buildCalendarDays(
   for (let i = 29; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(now.getDate() - i);
-    const key = formatDateKey(d);
+    const key = toLocalDateStr(d);
     days.push({ day: key, count: countByDay.get(key) ?? 0, isFuture: false });
   }
 
@@ -104,7 +99,7 @@ function buildCalendarDays(
   ).getDate();
   for (let d = now.getDate() + 1; d <= lastDayOfMonth; d++) {
     const date = new Date(now.getFullYear(), now.getMonth(), d);
-    days.push({ day: formatDateKey(date), count: 0, isFuture: true });
+    days.push({ day: toLocalDateStr(date), count: 0, isFuture: true });
   }
 
   return days;
@@ -185,7 +180,7 @@ function SectionBadge({
 export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
   const { colors, textStyles } = useAppTheme();
 
-  const todayKey = useMemo(() => formatDateKey(new Date()), []);
+  const todayKey = useMemo(() => toLocalDateStr(new Date()), []);
 
   // ── 1. Hero Row data
   const heroCards = [
@@ -260,7 +255,7 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
     for (let i = 29; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(now.getDate() - i);
-      const key = formatDateKey(d);
+      const key = toLocalDateStr(d);
       days.push({ day: key, count: countByDay.get(key) ?? 0 });
     }
     return days;
@@ -323,23 +318,11 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
     const countByDay = new Map(
       stats.monthlyActivity.map((a) => [a.day, a.count]),
     );
-    const days: { label: string; day: string; count: number }[] = [];
-    const labels = ["L", "M", "M", "G", "V", "S", "D"];
-    const now = new Date();
-    // last 7 days ending today
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(now.getDate() - i);
-      const key = formatDateKey(d);
-      const dow = d.getDay(); // 0=Sun
-      const labelIdx = dow === 0 ? 6 : dow - 1;
-      days.push({
-        label: labels[labelIdx],
-        day: key,
-        count: countByDay.get(key) ?? 0,
-      });
-    }
-    return days;
+    return rollingWeekDays().map(({ label, dateStr }) => ({
+      label,
+      day: dateStr,
+      count: countByDay.get(dateStr) ?? 0,
+    }));
   }, [stats.monthlyActivity]);
 
   const maxWeekCount = useMemo(

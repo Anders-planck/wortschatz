@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
+import { toLocalDateStr } from "@/features/shared/utils/date";
 import type { ForecastDay } from "../services/forecast-repository";
 
 interface ReviewForecastProps {
@@ -8,10 +9,6 @@ interface ReviewForecastProps {
 }
 
 const DAY_LABELS = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
-
-function localDateStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
 
 function getColor(
   count: number,
@@ -43,7 +40,7 @@ export function ReviewForecast({ forecast }: ReviewForecastProps) {
   for (let i = 0; i < 7; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() + i);
-    const dateStr = localDateStr(d);
+    const dateStr = toLocalDateStr(d);
     const dayOfWeek = d.getDay();
     const found = forecast.find((f) => f.date === dateStr);
     days.push({

@@ -1,19 +1,16 @@
 import { getDatabase } from "@/features/shared/db/database";
+import { toLocalDateStr } from "@/features/shared/utils/date";
 
 export interface ForecastDay {
   date: string;
   count: number;
 }
 
-function localDateStr(d: Date = new Date()): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
 export async function getReviewForecast(
   days: number = 7,
 ): Promise<ForecastDay[]> {
   const db = await getDatabase();
-  const today = localDateStr();
+  const today = toLocalDateStr(new Date());
 
   // Words with sr_due set and due within range
   const scheduled = await db.getAllAsync<{ day: string; count: number }>(
