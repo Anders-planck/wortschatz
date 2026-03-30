@@ -1,4 +1,5 @@
 import { getDatabase } from "@/features/shared/db/database";
+import { toLocalDateStr } from "@/features/shared/utils/date";
 
 export interface ActivityEntry {
   wordId: number;
@@ -10,18 +11,12 @@ export interface ActivityEntry {
   scoreAfter: number;
 }
 
-function toLocalDateStr(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
 export async function logActivity(entry: ActivityEntry): Promise<void> {
   const db = await getDatabase();
+  const now = new Date();
   await db.runAsync(
-    `INSERT INTO activity_log (word_id, activity_type, exercise_type, response, is_correct, score_before, score_after, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO activity_log (word_id, activity_type, exercise_type, response, is_correct, score_before, score_after, date_local, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       entry.wordId,
       entry.activityType,
@@ -30,16 +25,18 @@ export async function logActivity(entry: ActivityEntry): Promise<void> {
       entry.isCorrect ? 1 : 0,
       entry.scoreBefore,
       entry.scoreAfter,
-      new Date().toISOString(),
+      toLocalDateStr(now),
+      now.toISOString(),
     ],
   );
 }
 
 export async function getActivityToday(): Promise<number> {
   const db = await getDatabase();
+  const today = toLocalDateStr(new Date());
   const result = await db.getFirstAsync<{ count: number }>(
-    `SELECT COUNT(*) as count FROM activity_log
-     WHERE DATE(created_at, 'localtime') = DATE('now', 'localtime')`,
+    `SELECT COUNT(*) as count FROM activity_log WHERE date_local = ?`,
+    [today],
   );
   return result?.count ?? 0;
 }
@@ -53,11 +50,11 @@ export async function getActivityByDay(
   const cutoffStr = toLocalDateStr(cutoff);
 
   const rows = await db.getAllAsync<{ day: string; count: number }>(
-    `SELECT DATE(created_at, 'localtime') as day, COUNT(*) as count
+    `SELECT date_local as day, COUNT(*) as count
      FROM activity_log
-     WHERE DATE(created_at, 'localtime') >= ?
-     GROUP BY day
-     ORDER BY day ASC`,
+     WHERE date_local >= ?
+     GROUP BY date_local
+     ORDER BY date_local ASC`,
     [cutoffStr],
   );
   return rows;
@@ -66,9 +63,11 @@ export async function getActivityByDay(
 export async function getStudyStreak(): Promise<number> {
   const db = await getDatabase();
   const rows = await db.getAllAsync<{ day: string }>(
-    `SELECT DISTINCT DATE(created_at, 'localtime') as day
+    `SELECT DISTINCT date_local as day
      FROM activity_log
-     ORDER BY day DESC`,
+     WHERE date_local != ''
+     ORDER BY date_local DESC
+     LIMIT 365`,
   );
 
   if (rows.length === 0) return 0;
@@ -102,10 +101,10 @@ export async function getWeeklyActivityFromLog(): Promise<number[]> {
   const startStr = toLocalDateStr(start);
 
   const rows = await db.getAllAsync<{ day: string; count: number }>(
-    `SELECT DATE(created_at, 'localtime') as day, COUNT(*) as count
+    `SELECT date_local as day, COUNT(*) as count
      FROM activity_log
-     WHERE DATE(created_at, 'localtime') >= ?
-     GROUP BY day`,
+     WHERE date_local >= ?
+     GROUP BY date_local`,
     [startStr],
   );
 
@@ -217,12 +216,12 @@ export async function getScoreTrend(
   const startStr = toLocalDateStr(startDate);
 
   const rows = await db.getAllAsync<{ day: string; avg_score: number }>(
-    `SELECT DATE(created_at, 'localtime') as day,
+    `SELECT date_local as day,
             AVG(score_after) as avg_score
      FROM activity_log
-     WHERE DATE(created_at, 'localtime') >= ?
-     GROUP BY day
-     ORDER BY day ASC`,
+     WHERE date_local >= ?
+     GROUP BY date_local
+     ORDER BY date_local ASC`,
     [startStr],
   );
 
