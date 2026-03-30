@@ -84,7 +84,6 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
 
     CREATE INDEX IF NOT EXISTS idx_activity_created ON activity_log(created_at);
     CREATE INDEX IF NOT EXISTS idx_activity_word ON activity_log(word_id);
-    CREATE INDEX IF NOT EXISTS idx_activity_date_local ON activity_log(date_local);
 
     CREATE TABLE IF NOT EXISTS ai_usage_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -159,6 +158,9 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   } catch {
     // Column already exists
   }
+  await db.execAsync(
+    "CREATE INDEX IF NOT EXISTS idx_activity_date_local ON activity_log(date_local)",
+  );
   // Backfill empty date_local from created_at
   await db.runAsync(
     `UPDATE activity_log SET date_local = DATE(created_at, 'localtime') WHERE date_local = ''`,
