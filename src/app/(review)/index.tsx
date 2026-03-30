@@ -19,6 +19,7 @@ export default function ReviewScreen() {
     weeklyActivity,
     streak,
     forecast,
+    breakdown,
   } = useReviewDashboard();
 
   return (
@@ -30,7 +31,7 @@ export default function ReviewScreen() {
       >
         <DashboardGreeting streak={streak} totalCount={totalCount} />
         <WeeklyChart data={weeklyActivity} />
-        <ReviewForecast forecast={forecast} />
+        <ReviewForecast forecast={forecast} breakdown={breakdown} />
         <TodaySessionCard
           wordCount={wordsToReview.length}
           onStart={() => router.push("/(review)/session")}
