@@ -21,6 +21,7 @@ export default function SessionScreen() {
     isRevealed,
     isComplete,
     responses,
+    intervals,
     total,
     startSession,
     reveal,
@@ -68,7 +69,9 @@ export default function SessionScreen() {
             onReveal={reveal}
           />
         )}
-        {isRevealed && <ResponseButtons onRespond={respond} />}
+        {isRevealed && (
+          <ResponseButtons onRespond={respond} intervals={intervals} />
+        )}
       </View>
       <Stack.Screen.Title>Sessione</Stack.Screen.Title>
     </>
