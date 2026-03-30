@@ -117,3 +117,25 @@ export async function submitReview(
 
   return { newScore, nextReview };
 }
+
+export function formatInterval(due: Date, now: Date): string {
+  const diffMs = due.getTime() - now.getTime();
+  const mins = Math.round(diffMs / 60_000);
+  if (mins < 1) return "<1m";
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.round(hours / 24);
+  if (days > 30) return `${Math.round(days / 30)}M`;
+  return `${days}g`;
+}
+
+export function previewIntervals(word?: Word): string[] {
+  const now = new Date();
+  const card = word ? wordToFsrsCardInput(word) : createEmptyCard(now);
+  const scheduling = f.repeat(card, now);
+
+  return ([Rating.Again, Rating.Hard, Rating.Good, Rating.Easy] as Grade[]).map(
+    (grade) => formatInterval(scheduling[grade].card.due, now),
+  );
+}
