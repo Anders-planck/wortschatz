@@ -2,13 +2,23 @@ import { Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { toLocalDateStr } from "@/features/shared/utils/date";
-import type { ForecastDay } from "../services/forecast-repository";
+import type {
+  ForecastDay,
+  ForecastBreakdown,
+} from "../services/forecast-repository";
 
 interface ReviewForecastProps {
   forecast: ForecastDay[];
+  breakdown: ForecastBreakdown;
 }
 
 const DAY_LABELS = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+
+const STATE_COLORS = {
+  ready: { bg: "#EDF5ED", text: "#4A9A4A" },
+  learning: { bg: "#FDF3E6", text: "#D4944A" },
+  new: { bg: "#E8F0F8", text: "#7A9EC0" },
+};
 
 function getColor(
   count: number,
@@ -25,10 +35,18 @@ function getColor(
   return colors.danger;
 }
 
-export function ReviewForecast({ forecast }: ReviewForecastProps) {
+function formatTimeUntil(isoDate: string): string {
+  const diffMs = new Date(isoDate).getTime() - Date.now();
+  if (diffMs < 60_000) return "<1 min";
+  const mins = Math.round(diffMs / 60_000);
+  if (mins < 60) return `${mins} min`;
+  const hours = Math.round(mins / 60);
+  return `${hours}h`;
+}
+
+export function ReviewForecast({ forecast, breakdown }: ReviewForecastProps) {
   const { colors, textStyles } = useAppTheme();
 
-  // Build 7-day array starting from today
   const today = new Date();
   const days: {
     label: string;
@@ -52,6 +70,16 @@ export function ReviewForecast({ forecast }: ReviewForecastProps) {
   }
 
   const totalUpcoming = days.reduce((sum, d) => sum + d.count, 0);
+
+  const chips = [
+    { count: breakdown.ready, label: "pronte", color: STATE_COLORS.ready },
+    {
+      count: breakdown.learning,
+      label: "in corso",
+      color: STATE_COLORS.learning,
+    },
+    { count: breakdown.newCount, label: "nuove", color: STATE_COLORS.new },
+  ].filter((c) => c.count > 0);
 
   return (
     <Animated.View entering={FadeInUp.delay(60).duration(300)}>
@@ -88,6 +116,47 @@ export function ReviewForecast({ forecast }: ReviewForecastProps) {
           </Text>
         </View>
 
+        {/* State breakdown chips */}
+        {chips.length > 0 && (
+          <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
+            {chips.map((chip) => (
+              <View
+                key={chip.label}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 5,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  borderRadius: 8,
+                  borderCurve: "continuous",
+                  backgroundColor: chip.color.bg,
+                }}
+              >
+                <View
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 4,
+                    backgroundColor: chip.color.text,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontFamily: textStyles.mono.fontFamily,
+                    fontSize: 11,
+                    fontWeight: "600",
+                    color: chip.color.text,
+                  }}
+                >
+                  {chip.count} {chip.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* 7-day forecast grid */}
         <View style={{ flexDirection: "row", gap: 6 }}>
           {days.map((day) => {
             const color = getColor(day.count, colors);
@@ -133,6 +202,45 @@ export function ReviewForecast({ forecast }: ReviewForecastProps) {
             );
           })}
         </View>
+
+        {/* Next session hint */}
+        {breakdown.learning > 0 && breakdown.nextLearningDue && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              padding: 8,
+              paddingHorizontal: 12,
+              borderRadius: 8,
+              borderCurve: "continuous",
+              backgroundColor: STATE_COLORS.learning.bg,
+            }}
+          >
+            <View
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: STATE_COLORS.learning.text,
+                opacity: 0.7,
+              }}
+            />
+            <Text
+              style={{
+                fontFamily: textStyles.mono.fontFamily,
+                fontSize: 10,
+                fontWeight: "500",
+                color: STATE_COLORS.learning.text,
+                flex: 1,
+              }}
+            >
+              Prossima sessione tra {formatTimeUntil(breakdown.nextLearningDue)}{" "}
+              — {breakdown.learning}{" "}
+              {breakdown.learning === 1 ? "parola" : "parole"} in apprendimento
+            </Text>
+          </View>
+        )}
       </View>
     </Animated.View>
   );

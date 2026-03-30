@@ -3,7 +3,11 @@ import { useState, useCallback } from "react";
 import type { Word } from "@/features/dictionary/types";
 import { getWordsForReview } from "@/features/shared/db/words-repository";
 import { getWordsForReviewByCollection } from "@/features/shared/db/collections-repository";
-import { submitReview, type ActivityContext } from "./use-spaced-repetition";
+import {
+  submitReview,
+  previewIntervals,
+  type ActivityContext,
+} from "./use-spaced-repetition";
 import {
   hapticMedium,
   hapticSuccess,
@@ -18,6 +22,7 @@ interface ReviewSession {
   isRevealed: boolean;
   isComplete: boolean;
   responses: Response[];
+  intervals: string[];
   total: number;
   isLoading: boolean;
   startSession: () => Promise<void>;
@@ -90,6 +95,10 @@ export function useReviewSession(collectionId?: number): ReviewSession {
     [currentIndex, words, responses],
   );
 
+  const intervals = words[currentIndex]
+    ? previewIntervals(words[currentIndex])
+    : [];
+
   return {
     words,
     currentIndex,
@@ -97,6 +106,7 @@ export function useReviewSession(collectionId?: number): ReviewSession {
     isRevealed,
     isComplete,
     responses,
+    intervals,
     total: words.length,
     isLoading,
     startSession,

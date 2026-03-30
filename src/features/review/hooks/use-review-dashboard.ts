@@ -14,7 +14,9 @@ import {
 } from "@/features/review/services/activity-repository";
 import {
   getReviewForecast,
+  getReviewForecastBreakdown,
   type ForecastDay,
+  type ForecastBreakdown,
 } from "@/features/review/services/forecast-repository";
 
 interface DashboardData {
@@ -25,6 +27,7 @@ interface DashboardData {
   streak: number;
   activitiesToday: number;
   forecast: ForecastDay[];
+  breakdown: ForecastBreakdown;
   isLoading: boolean;
   refresh: () => Promise<void>;
 }
@@ -39,6 +42,12 @@ export function useReviewDashboard(): DashboardData {
   const [streak, setStreak] = useState(0);
   const [activitiesToday, setActivitiesToday] = useState(0);
   const [forecast, setForecast] = useState<ForecastDay[]>([]);
+  const [breakdown, setBreakdown] = useState<ForecastBreakdown>({
+    ready: 0,
+    learning: 0,
+    newCount: 0,
+    nextLearningDue: null,
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -52,6 +61,7 @@ export function useReviewDashboard(): DashboardData {
         currentStreak,
         todayCount,
         forecastData,
+        breakdownData,
       ] = await Promise.all([
         getWordsForReview(12),
         getTrickyWords(8),
@@ -60,6 +70,7 @@ export function useReviewDashboard(): DashboardData {
         getStudyStreak(),
         getActivityToday(),
         getReviewForecast(),
+        getReviewForecastBreakdown(),
       ]);
       setWordsToReview(reviewWords);
       setTrickyWords(tricky);
@@ -68,6 +79,7 @@ export function useReviewDashboard(): DashboardData {
       setStreak(currentStreak);
       setActivitiesToday(todayCount);
       setForecast(forecastData);
+      setBreakdown(breakdownData);
     } catch {
       // Silent failure — dashboard shows empty state
     } finally {
@@ -89,6 +101,7 @@ export function useReviewDashboard(): DashboardData {
     streak,
     activitiesToday,
     forecast,
+    breakdown,
     isLoading,
     refresh,
   };

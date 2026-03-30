@@ -13,9 +13,13 @@ interface ButtonConfig {
 
 interface ResponseButtonsProps {
   onRespond: (response: Response) => void;
+  intervals?: string[];
 }
 
-export function ResponseButtons({ onRespond }: ResponseButtonsProps) {
+export function ResponseButtons({
+  onRespond,
+  intervals = [],
+}: ResponseButtonsProps) {
   const { colors, textStyles } = useAppTheme();
 
   const BUTTONS: Record<Response, ButtonConfig> = {
@@ -52,6 +56,7 @@ export function ResponseButtons({ onRespond }: ResponseButtonsProps) {
     >
       {([0, 1, 2, 3] as Response[]).map((response) => {
         const config = BUTTONS[response];
+        const interval = intervals[response];
         return (
           <Pressable
             key={response}
@@ -84,6 +89,19 @@ export function ResponseButtons({ onRespond }: ResponseButtonsProps) {
             >
               {config.label}
             </Text>
+            {interval && (
+              <Text
+                style={{
+                  fontFamily: textStyles.mono.fontFamily,
+                  fontSize: 11,
+                  fontWeight: "700",
+                  color: config.color,
+                  opacity: 0.7,
+                }}
+              >
+                {interval}
+              </Text>
+            )}
           </Pressable>
         );
       })}

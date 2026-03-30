@@ -39,3 +39,44 @@ export async function getReviewForecast(
 
   return result;
 }
+
+export interface ForecastBreakdown {
+  ready: number;
+  learning: number;
+  newCount: number;
+  nextLearningDue: string | null;
+}
+
+export async function getReviewForecastBreakdown(): Promise<ForecastBreakdown> {
+  const db = await getDatabase();
+  const now = new Date().toISOString();
+
+  const [readyRow, learningRow, newRow, nextDueRow] = await Promise.all([
+    db.getFirstAsync<{ count: number }>(
+      `SELECT COUNT(*) as count FROM words
+       WHERE sr_due IS NOT NULL AND sr_due <= ? AND sr_state IN (2, 3)`,
+      [now],
+    ),
+    db.getFirstAsync<{ count: number }>(
+      `SELECT COUNT(*) as count FROM words
+       WHERE sr_state = 1 AND sr_due > ?`,
+      [now],
+    ),
+    db.getFirstAsync<{ count: number }>(
+      `SELECT COUNT(*) as count FROM words WHERE sr_due IS NULL`,
+    ),
+    db.getFirstAsync<{ due: string }>(
+      `SELECT sr_due as due FROM words
+       WHERE sr_state = 1 AND sr_due > ?
+       ORDER BY sr_due ASC LIMIT 1`,
+      [now],
+    ),
+  ]);
+
+  return {
+    ready: readyRow?.count ?? 0,
+    learning: learningRow?.count ?? 0,
+    newCount: newRow?.count ?? 0,
+    nextLearningDue: nextDueRow?.due ?? null,
+  };
+}
