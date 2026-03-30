@@ -2,7 +2,7 @@ import { Text, View } from "react-native";
 import { SectionTitle } from "@/features/shared/components/section-title";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
-const DAY_LABELS = ["L", "M", "M", "G", "V", "S", "D"];
+const ALL_LABELS = ["D", "L", "M", "M", "G", "V", "S"];
 
 interface WeeklyChartProps {
   data: number[];
@@ -11,7 +11,15 @@ interface WeeklyChartProps {
 export function WeeklyChart({ data }: WeeklyChartProps) {
   const { colors, textStyles } = useAppTheme();
   const maxValue = Math.max(...data, 1);
-  const todayIndex = (new Date().getDay() + 6) % 7; // Monday = 0
+  const todayIndex = 6; // last item is always today
+
+  // Build labels for last 7 days ending today
+  const now = new Date();
+  const labels = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(now.getDate() - 6 + i);
+    return ALL_LABELS[d.getDay()];
+  });
 
   return (
     <View style={{ gap: 8 }}>
@@ -63,7 +71,7 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
                   },
                 ]}
               >
-                {DAY_LABELS[i]}
+                {labels[i]}
               </Text>
             </View>
           );
