@@ -303,7 +303,12 @@ export default function ListeScreen() {
             onReview={(id) =>
               router.push({
                 pathname: "/(review)/session",
-                params: { collectionId: String(id) },
+                params: {
+                  collectionId: String(id),
+                  collectionName:
+                    collections.find((collection) => collection.id === id)?.name ??
+                    "Ripasso",
+                },
               })
             }
             onRename={handleRename}

@@ -1,8 +1,5 @@
 import { File, Directory, Paths } from "expo-file-system";
-import {
-  getAudioUrl,
-  updateAudioUrl,
-} from "@/features/shared/db/words-repository";
+import { updateAudioUrl } from "@/features/shared/db/words-repository";
 import {
   GOOGLE_API_KEY,
   TTS_API_URL,

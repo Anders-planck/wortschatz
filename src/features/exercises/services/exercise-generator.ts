@@ -2,6 +2,10 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { google } from "@/features/shared/config/ai-provider";
 import { trackAiCall } from "@/features/shared/services/ai-usage-tracker";
+import {
+  PrerequisiteError,
+  isPrerequisiteError,
+} from "@/features/shared/types/prerequisites";
 import type { Word } from "@/features/dictionary/types";
 import type {
   Exercise,
@@ -45,6 +49,10 @@ const CaseQuizSchema = z.object({
 });
 
 async function generateFillBlank(words: Word[]): Promise<FillBlankExercise[]> {
+  if (words.length === 0) {
+    throw new PrerequisiteError("needs_vocabulary");
+  }
+
   const wordList = words
     .map((w) => `${w.term} (${w.translations[0] ?? ""})`)
     .join(", ");
@@ -72,7 +80,7 @@ REGOLE OBBLIGATORIE:
   }
 
   const validTerms = new Set(words.map((w) => w.term.toLowerCase()));
-  return result.output.exercises
+  const exercises = result.output.exercises
     .filter((ex) => validTerms.has(ex.wordTerm.toLowerCase()))
     .map((ex) => ({
       type: "fill" as const,
@@ -82,10 +90,19 @@ REGOLE OBBLIGATORIE:
       hint: ex.hint,
       wordTerm: ex.wordTerm,
     }));
+
+  if (exercises.length === 0) {
+    throw new PrerequisiteError("generation_failed");
+  }
+
+  return exercises;
 }
 
 function generateDictation(words: Word[]): DictationExercise[] {
   const wordsWithExamples = getWordsWithExamples(words);
+  if (wordsWithExamples.length === 0) {
+    throw new PrerequisiteError("needs_example_words");
+  }
 
   return wordsWithExamples.slice(0, 10).map((word) => {
     const example = word.examples![0];
@@ -101,7 +118,9 @@ function generateDictation(words: Word[]): DictationExercise[] {
 async function generateCaseQuiz(words: Word[]): Promise<CaseQuizExercise[]> {
   const nouns = getNounsWithGender(words);
 
-  if (nouns.length === 0) return [];
+  if (nouns.length === 0) {
+    throw new PrerequisiteError("needs_gendered_nouns");
+  }
 
   const wordList = nouns
     .map((w) => `${w.gender} ${w.term} (${w.translations[0] ?? ""})`)
@@ -131,7 +150,7 @@ REGOLE OBBLIGATORIE:
   }
 
   const validTerms = new Set(nouns.map((w) => w.term.toLowerCase()));
-  return result.output.exercises
+  const exercises = result.output.exercises
     .filter((ex) => validTerms.has(ex.wordTerm.toLowerCase()))
     .map((ex) => ({
       type: "cases" as const,
@@ -143,6 +162,12 @@ REGOLE OBBLIGATORIE:
       explanation: ex.explanation,
       wordTerm: ex.wordTerm,
     }));
+
+  if (exercises.length === 0) {
+    throw new PrerequisiteError("generation_failed");
+  }
+
+  return exercises;
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -158,6 +183,9 @@ export async function generateExercises(
   exerciseType: ExerciseType,
 ): Promise<Exercise[]> {
   const words = await getExerciseWords(10);
+  if ((exerciseType === "fill" || exerciseType === "mix") && words.length === 0) {
+    throw new PrerequisiteError("needs_vocabulary");
+  }
 
   if (exerciseType === "fill") {
     return generateFillBlank(words);
@@ -172,10 +200,24 @@ export async function generateExercises(
   }
 
   // "mix": run all 3 in parallel and interleave
+  const safeDictationPromise = Promise.resolve()
+    .then(() => generateDictation(words))
+    .catch((error: unknown) => {
+      if (isPrerequisiteError(error) && error.reason === "needs_example_words") {
+        return [];
+      }
+      throw error;
+    });
+  const safeCasePromise = generateCaseQuiz(words).catch((error: unknown) => {
+    if (isPrerequisiteError(error) && error.reason === "needs_gendered_nouns") {
+      return [];
+    }
+    throw error;
+  });
   const [fillExercises, dictationExercises, caseExercises] = await Promise.all([
     generateFillBlank(words.slice(0, 4)),
-    Promise.resolve(generateDictation(words)),
-    generateCaseQuiz(words),
+    safeDictationPromise,
+    safeCasePromise,
   ]);
 
   const interleaved: Exercise[] = [];
@@ -189,6 +231,10 @@ export async function generateExercises(
     if (i < fillExercises.length) interleaved.push(fillExercises[i]);
     if (i < dictationExercises.length) interleaved.push(dictationExercises[i]);
     if (i < caseExercises.length) interleaved.push(caseExercises[i]);
+  }
+
+  if (interleaved.length === 0) {
+    throw new PrerequisiteError("generation_failed");
   }
 
   return shuffleArray(interleaved);

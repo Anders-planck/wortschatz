@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { Stack, useRouter } from "expo-router";
 import { ScrollView } from "react-native";
 
 import { useThemeColors } from "@/features/shared/theme/theme-context";
+import { markWordSearched } from "@/features/shared/db/words-repository";
 import { useWordDetail } from "@/features/dictionary/hooks/use-word-detail";
 import { WordCard } from "@/features/dictionary/components/word-card";
 import { WordLoading } from "@/features/dictionary/components/word-loading";
@@ -12,6 +14,11 @@ export default function WordDetailScreen() {
   const router = useRouter();
   const { term, word, isLoading, isAILoading, error, handleWordPress } =
     useWordDetail();
+
+  useEffect(() => {
+    if (!word?.term) return;
+    markWordSearched(word.term).catch(() => {});
+  }, [word?.term]);
 
   const isNoun = word?.type === "noun";
 

@@ -3,10 +3,10 @@ import { useState, useCallback } from "react";
 import type { Word } from "@/features/dictionary/types";
 import { getWordsForReview } from "@/features/shared/db/words-repository";
 import { getWordsForReviewByCollection } from "@/features/shared/db/collections-repository";
+import { logStudySession } from "@/features/review/services/study-sessions-repository";
 import {
   submitReview,
   previewIntervals,
-  type ActivityContext,
 } from "./use-spaced-repetition";
 import {
   hapticMedium,
@@ -25,18 +25,23 @@ interface ReviewSession {
   intervals: string[];
   total: number;
   isLoading: boolean;
+  startTime: number | null;
   startSession: () => Promise<void>;
   reveal: () => void;
   respond: (response: Response) => Promise<void>;
 }
 
-export function useReviewSession(collectionId?: number): ReviewSession {
+export function useReviewSession(
+  collectionId?: number,
+  sessionLabel: string = "Ripasso",
+): ReviewSession {
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [responses, setResponses] = useState<Response[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
 
   const startSession = useCallback(async () => {
     try {
@@ -49,8 +54,10 @@ export function useReviewSession(collectionId?: number): ReviewSession {
       setIsRevealed(false);
       setIsComplete(false);
       setResponses([]);
+      setStartTime(reviewWords.length > 0 ? Date.now() : null);
     } catch {
       setWords([]);
+      setStartTime(null);
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +92,19 @@ export function useReviewSession(collectionId?: number): ReviewSession {
       setResponses(newResponses);
 
       if (currentIndex + 1 >= words.length) {
+        try {
+          await logStudySession({
+            activityType: "review",
+            label: sessionLabel,
+            itemCount: newResponses.length,
+            correctCount: newResponses.filter((value) => value >= 2).length,
+            durationSeconds: startTime
+              ? Math.round((Date.now() - startTime) / 1000)
+              : 0,
+          });
+        } catch {
+          // Session completion should not fail on study logging
+        }
         setIsComplete(true);
         hapticSuccess();
       } else {
@@ -92,7 +112,7 @@ export function useReviewSession(collectionId?: number): ReviewSession {
         setIsRevealed(false);
       }
     },
-    [currentIndex, words, responses],
+    [currentIndex, responses, sessionLabel, startTime, words],
   );
 
   const intervals = words[currentIndex]
@@ -109,6 +129,7 @@ export function useReviewSession(collectionId?: number): ReviewSession {
     intervals,
     total: words.length,
     isLoading,
+    startTime,
     startSession,
     reveal,
     respond,

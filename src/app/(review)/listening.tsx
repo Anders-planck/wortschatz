@@ -9,6 +9,7 @@ import {
 import { Stack, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { PrerequisiteState } from "@/features/shared/components/prerequisite-state";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import { useListening } from "@/features/immersion/hooks/use-listening";
@@ -100,6 +101,60 @@ export default function ListeningScreen() {
           </Pressable>
         </ScrollView>
         <Stack.Screen options={{ title: "Risultati" }} />
+      </>
+    );
+  }
+
+  if (listening.phase === "blocked") {
+    return (
+      <>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{ flex: 1, backgroundColor: colors.bg }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <PrerequisiteState
+            icon="ear"
+            title="Servono almeno 3 parole salvate"
+            description="Aggiungi un po' di vocabolario prima di iniziare un esercizio di ascolto."
+            primaryLabel="Cerca parole"
+            onPrimaryPress={() => router.replace("/(search)")}
+            secondaryLabel="Torna indietro"
+            onSecondaryPress={() => router.back()}
+          />
+        </ScrollView>
+        <Stack.Screen options={{ title: "Ascolto" }} />
+      </>
+    );
+  }
+
+  if (listening.phase === "error") {
+    return (
+      <>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{ flex: 1, backgroundColor: colors.bg }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <PrerequisiteState
+            icon="exclamationmark.triangle"
+            title="Impossibile preparare l'ascolto"
+            description="La generazione degli esercizi non e andata a buon fine. Riprova tra un attimo."
+            primaryLabel="Riprova"
+            onPrimaryPress={() => void listening.retry()}
+            secondaryLabel="Cerca parole"
+            onSecondaryPress={() => router.replace("/(search)")}
+          />
+        </ScrollView>
+        <Stack.Screen options={{ title: "Ascolto" }} />
       </>
     );
   }
@@ -299,7 +354,7 @@ export default function ListeningScreen() {
             </View>
 
             <Pressable
-              onPress={listening.next}
+              onPress={() => void listening.next()}
               style={({ pressed }) => ({
                 backgroundColor: colors.accent,
                 borderRadius: 14,

@@ -35,6 +35,14 @@
           "imageWidth": 120
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Consenti a WortSchatz di leggere le immagini per tradurre e spiegare il testo.",
+          "cameraPermission": "Consenti a WortSchatz di usare la fotocamera per scansionare il testo.",
+          "microphonePermission": false
+        }
+      ],
       "expo-audio",
       "./plugins/with-local-notifications-only",
       "@react-native-community/datetimepicker"

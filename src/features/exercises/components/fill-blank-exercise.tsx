@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Pressable,
   Text,
@@ -6,7 +6,6 @@ import {
   View,
   type TextInput as TextInputType,
 } from "react-native";
-import { useState } from "react";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import type { FillBlankExercise } from "@/features/exercises/types";

@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import { generateSynonymsAntonyms } from "../services/immersion-ai-service";
+import {
+  getSynonymsCache,
+  setSynonymsCache,
+} from "@/features/shared/db/words-repository";
 import type { SynonymsAntonyms } from "../types";
 
 export function useSynonyms(
@@ -10,21 +14,38 @@ export function useSynonyms(
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!term || !type) return;
+    if (!term || !type) {
+      setData(null);
+      setIsLoading(false);
+      return;
+    }
 
     let cancelled = false;
+    setData(null);
     setIsLoading(true);
 
-    generateSynonymsAntonyms(term, type)
-      .then((result) => {
-        if (!cancelled) setData(result);
-      })
-      .catch(() => {
+    (async () => {
+      try {
+        const cached = await getSynonymsCache(term);
+        if (cached) {
+          if (!cancelled) {
+            setData(cached);
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        const result = await generateSynonymsAntonyms(term, type);
+        await setSynonymsCache(term, result).catch(() => {});
+        if (!cancelled) {
+          setData(result);
+        }
+      } catch {
         // Silently fail — synonyms are supplementary
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setIsLoading(false);
-      });
+      }
+    })();
 
     return () => {
       cancelled = true;

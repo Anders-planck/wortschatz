@@ -1,5 +1,10 @@
 import * as Notifications from "expo-notifications";
 import { getDatabase } from "@/features/shared/db/database";
+import { toLocalDateStr } from "@/features/shared/utils/date";
+import {
+  getLastStudyDate,
+  getStudyStreak,
+} from "./study-sessions-repository";
 import { getEscalationLevel, pickMessage } from "./notification-messages";
 
 const REVIEW_CHANNEL_ID = "review-reminder";
@@ -44,44 +49,20 @@ async function getNotificationContext(): Promise<{
   );
   const dueCount = dueRow?.count ?? 0;
 
-  // Last study date from activity_log
-  const lastRow = await db.getFirstAsync<{ last_date: string }>(
-    `SELECT DATE(created_at, 'localtime') as last_date
-     FROM activity_log ORDER BY created_at DESC LIMIT 1`,
-  );
-
-  const today = new Date().toISOString().slice(0, 10);
+  const [lastStudyDate, streak] = await Promise.all([
+    getLastStudyDate(),
+    getStudyStreak(),
+  ]);
+  const today = toLocalDateStr(new Date());
   let daysMissed = 0;
-  if (lastRow?.last_date) {
-    const lastDate = new Date(lastRow.last_date);
-    const todayDate = new Date(today);
+  if (lastStudyDate) {
+    const lastDate = new Date(`${lastStudyDate}T00:00:00`);
+    const todayDate = new Date(`${today}T00:00:00`);
     daysMissed = Math.floor(
       (todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24),
     );
   } else {
     daysMissed = 1;
-  }
-
-  // Streak
-  let streak = 0;
-  const rows = await db.getAllAsync<{ day: string }>(
-    `SELECT DISTINCT DATE(created_at, 'localtime') as day
-     FROM activity_log ORDER BY day DESC LIMIT 30`,
-  );
-  if (rows.length > 0) {
-    const d = new Date(today);
-    // If studied today, start from today; otherwise from yesterday
-    if (rows[0].day !== today) {
-      d.setDate(d.getDate() - 1);
-    }
-    for (const row of rows) {
-      if (row.day === d.toISOString().slice(0, 10)) {
-        streak++;
-        d.setDate(d.getDate() - 1);
-      } else {
-        break;
-      }
-    }
   }
 
   // Last notification message

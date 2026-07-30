@@ -10,14 +10,36 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { useChatSession } from "@/features/chat/hooks/use-chat-session";
-import { getChatSessionMessages } from "@/features/chat/services/chat-repository";
+import { saveDiscoveredWords } from "@/features/chat/services/discovered-words-service";
+import { getChatSession } from "@/features/chat/services/chat-repository";
 import { getScenarioById } from "@/features/chat/services/scenario-repository";
-import type { Scenario } from "@/features/chat/types";
+import type { ChatMessage, Scenario } from "@/features/chat/types";
 import { ChatBubble } from "@/features/chat/components/chat-bubble";
 import { TypingIndicator } from "@/features/chat/components/typing-indicator";
 import { QuickReplyChips } from "@/features/chat/components/quick-reply-chips";
 import { ChatInputBar } from "@/features/chat/components/chat-input-bar";
 import { ChatSummary } from "@/features/chat/components/chat-summary";
+import { Toast } from "@/features/shared/components/toast";
+
+function normalizeWord(word: string): string {
+  return word.trim().toLowerCase();
+}
+
+function buildSaveMessage(result: {
+  savedCount: number;
+  skippedCount: number;
+  failedTerms: string[];
+}): string {
+  const parts: string[] = [];
+  if (result.savedCount > 0) parts.push(`${result.savedCount} salvate`);
+  if (result.skippedCount > 0) {
+    parts.push(`${result.skippedCount} gia presenti`);
+  }
+  if (result.failedTerms.length > 0) {
+    parts.push(`${result.failedTerms.length} non salvate`);
+  }
+  return parts.join(" · ");
+}
 
 export default function ChatSessionScreen() {
   const { colors } = useAppTheme();
@@ -32,6 +54,11 @@ export default function ChatSessionScreen() {
     durationSeconds: number;
   } | null>(null);
   const [scenario, setScenario] = useState<Scenario | null>(null);
+  const [isSavingWords, setIsSavingWords] = useState(false);
+  const [handledWords, setHandledWords] = useState<Set<string>>(new Set());
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastIcon, setToastIcon] = useState("checkmark.circle.fill");
 
   const session = useChatSession();
 
@@ -41,9 +68,13 @@ export default function ChatSessionScreen() {
       if (!s) return;
       setScenario(s);
       if (sessionId) {
-        getChatSessionMessages(Number(sessionId))
-          .then((messages) => {
-            session.resume(s, messages);
+        getChatSession(Number(sessionId))
+          .then((savedSession) => {
+            if (!savedSession) {
+              session.start(s);
+              return;
+            }
+            session.resume(s, savedSession);
           })
           .catch(() => {
             session.start(s);
@@ -68,6 +99,43 @@ export default function ChatSessionScreen() {
     session.sendMessage(text);
   };
 
+  const remainingWords = useMemo(
+    () =>
+      session.discoveredWords.filter(
+        (word) => !handledWords.has(normalizeWord(word)),
+      ),
+    [handledWords, session.discoveredWords],
+  );
+
+  const handleSaveWords = useCallback(async () => {
+    if (remainingWords.length === 0 || isSavingWords) return;
+
+    setIsSavingWords(true);
+    try {
+      const result = await saveDiscoveredWords(remainingWords);
+      setHandledWords((prev) => {
+        const next = new Set(prev);
+        for (const word of [...result.savedTerms, ...result.skippedTerms]) {
+          next.add(normalizeWord(word));
+        }
+        return next;
+      });
+      setToastIcon(
+        result.failedTerms.length > 0
+          ? "exclamationmark.circle.fill"
+          : "checkmark.circle.fill",
+      );
+      setToastMessage(buildSaveMessage(result));
+      setToastVisible(true);
+    } catch {
+      setToastIcon("exclamationmark.circle.fill");
+      setToastMessage("Impossibile salvare le parole");
+      setToastVisible(true);
+    } finally {
+      setIsSavingWords(false);
+    }
+  }, [isSavingWords, remainingWords]);
+
   const handleWordTap = useCallback((_word: string) => {
     // Could navigate to dictionary or show word details
   }, []);
@@ -78,13 +146,13 @@ export default function ChatSessionScreen() {
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: (typeof session.messages)[number] }) => {
+    ({ item }: { item: ChatMessage }) => {
       const parsed = session.parsedMap.get(item.id);
       return (
         <ChatBubble
           message={item}
-          corrections={parsed?.corrections ?? []}
-          markedWords={parsed?.markedWords ?? []}
+          corrections={parsed?.corrections ?? item.corrections ?? []}
+          markedWords={parsed?.markedWords ?? item.markedWords ?? []}
           onWordTap={handleWordTap}
         />
       );
@@ -104,11 +172,24 @@ export default function ChatSessionScreen() {
               summaryStats?.durationSeconds ??
               Math.round((Date.now() - session.startTime) / 1000)
             }
-            onSaveWords={() => {
-              // TODO: save discovered words to dictionary
-            }}
+            onSaveWords={() => void handleSaveWords()}
+            isSavingWords={isSavingWords}
+            saveDisabled={remainingWords.length === 0}
+            saveLabel={
+              remainingWords.length === 0
+                ? "Gia salvate"
+                : handledWords.size > 0
+                  ? "Riprova"
+                  : "Salva tutto"
+            }
           />
         </View>
+        <Toast
+          message={toastMessage}
+          icon={toastIcon}
+          visible={toastVisible}
+          onDismiss={() => setToastVisible(false)}
+        />
         <Stack.Screen
           options={{
             title: "Riepilogo",

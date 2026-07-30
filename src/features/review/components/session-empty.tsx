@@ -1,20 +1,30 @@
-import { View, Text } from "react-native";
-
+import { View } from "react-native";
+import { PrerequisiteState } from "@/features/shared/components/prerequisite-state";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 
-export function SessionEmpty() {
-  const { colors, textStyles } = useAppTheme();
+interface SessionEmptyProps {
+  onBrowse: () => void;
+}
+
+export function SessionEmpty({ onBrowse }: SessionEmptyProps) {
+  const { colors } = useAppTheme();
 
   return (
     <View
       style={{
         flex: 1,
         justifyContent: "center",
-        alignItems: "center",
         backgroundColor: colors.bg,
+        paddingHorizontal: 24,
       }}
     >
-      <Text style={textStyles.mono}>No words to review</Text>
+      <PrerequisiteState
+        icon="magnifyingglass"
+        title="Nessuna parola da ripassare"
+        description="Aggiungi qualche parola al vocabolario per iniziare una sessione di ripasso."
+        primaryLabel="Cerca parole"
+        onPrimaryPress={onBrowse}
+      />
     </View>
   );
 }

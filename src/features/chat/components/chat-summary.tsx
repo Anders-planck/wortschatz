@@ -11,6 +11,9 @@ interface ChatSummaryProps {
   messageCount: number;
   durationSeconds: number;
   onSaveWords: () => void;
+  isSavingWords?: boolean;
+  saveDisabled?: boolean;
+  saveLabel?: string;
 }
 
 export function ChatSummary({
@@ -19,6 +22,9 @@ export function ChatSummary({
   messageCount,
   durationSeconds,
   onSaveWords,
+  isSavingWords = false,
+  saveDisabled = false,
+  saveLabel = "Salva tutto",
 }: ChatSummaryProps) {
   const { colors, textStyles } = useAppTheme();
 
@@ -289,8 +295,9 @@ export function ChatSummary({
             </Text>
             <Pressable
               onPress={onSaveWords}
+              disabled={saveDisabled || isSavingWords}
               style={({ pressed }) => ({
-                opacity: pressed ? 0.7 : 1,
+                opacity: saveDisabled ? 0.45 : pressed ? 0.7 : 1,
               })}
             >
               <Text
@@ -299,7 +306,7 @@ export function ChatSummary({
                   { color: colors.accent, fontWeight: "600", fontSize: 13 },
                 ]}
               >
-                Salva tutto
+                {isSavingWords ? "Salvataggio..." : saveLabel}
               </Text>
             </Pressable>
           </View>

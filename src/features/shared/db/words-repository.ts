@@ -1,4 +1,5 @@
 import type { Word } from "@/features/dictionary/types";
+import type { SynonymsAntonyms, WordFamily } from "@/features/immersion/types";
 import { getDatabase } from "./database";
 
 export interface WordRow {
@@ -14,6 +15,9 @@ export interface WordRow {
   audio_url: string | null;
   raw_wiktionary: string | null;
   searched_at: string;
+  origin?: string | null;
+  synonyms_data?: string | null;
+  word_family_data?: string | null;
   review_score: number;
   next_review: string | null;
   category: string | null;
@@ -80,14 +84,17 @@ export async function getWordByTerm(term: string): Promise<Word | null> {
   return row ? rowToWord(row) : null;
 }
 
-export async function insertWord(word: Omit<Word, "id">): Promise<number> {
+export async function insertWord(
+  word: Omit<Word, "id">,
+  options?: { origin?: "search" | "chat" },
+): Promise<{ id: number; inserted: boolean }> {
   const db = await getDatabase();
   const result = await db.runAsync(
-    `INSERT OR REPLACE INTO words (
+    `INSERT OR IGNORE INTO words (
       term, type, gender, plural, translations, forms, examples,
-      usage_context, audio_url, raw_wiktionary, searched_at,
+      usage_context, audio_url, raw_wiktionary, searched_at, origin,
       review_score, next_review, category, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       word.term,
       word.type,
@@ -100,13 +107,26 @@ export async function insertWord(word: Omit<Word, "id">): Promise<number> {
       word.audioUrl,
       word.rawWiktionary ? JSON.stringify(word.rawWiktionary) : null,
       word.searchedAt,
+      options?.origin ?? "search",
       word.reviewScore ?? 0,
       word.nextReview,
       word.category,
       word.createdAt,
     ],
   );
-  return result.lastInsertRowId;
+  if (result.changes > 0) {
+    return { id: result.lastInsertRowId, inserted: true };
+  }
+
+  const existing = await db.getFirstAsync<{ id: number }>(
+    "SELECT id FROM words WHERE term = ? COLLATE NOCASE",
+    [word.term],
+  );
+  if (!existing) {
+    throw new Error(`Failed to insert or locate word: ${word.term}`);
+  }
+
+  return { id: existing.id, inserted: false };
 }
 
 export async function updateWordAIContent(
@@ -252,10 +272,24 @@ export async function deleteWord(term: string): Promise<void> {
 export async function getRecentWords(limit = 10): Promise<Word[]> {
   const db = await getDatabase();
   const rows = await db.getAllAsync<WordRow>(
-    "SELECT * FROM words ORDER BY searched_at DESC LIMIT ?",
+    `SELECT *
+     FROM words
+     WHERE origin = 'search'
+     ORDER BY searched_at DESC
+     LIMIT ?`,
     [limit],
   );
   return rows.map(rowToWord);
+}
+
+export async function markWordSearched(term: string): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    `UPDATE words
+     SET searched_at = ?, origin = 'search'
+     WHERE term = ? COLLATE NOCASE`,
+    [new Date().toISOString(), term],
+  );
 }
 
 export async function updateAudioUrl(
@@ -276,4 +310,50 @@ export async function getAudioUrl(term: string): Promise<string | null> {
     [term],
   );
   return row?.audio_url ?? null;
+}
+
+export async function getSynonymsCache(
+  term: string,
+): Promise<SynonymsAntonyms | null> {
+  const db = await getDatabase();
+  const row = await db.getFirstAsync<{ synonyms_data: string | null }>(
+    "SELECT synonyms_data FROM words WHERE term = ? COLLATE NOCASE",
+    [term],
+  );
+  return parseJsonSafe<SynonymsAntonyms | null>(row?.synonyms_data ?? null, null);
+}
+
+export async function setSynonymsCache(
+  term: string,
+  data: SynonymsAntonyms,
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    `UPDATE words
+     SET synonyms_data = ?
+     WHERE term = ? COLLATE NOCASE`,
+    [JSON.stringify(data), term],
+  );
+}
+
+export async function getWordFamilyCache(term: string): Promise<WordFamily | null> {
+  const db = await getDatabase();
+  const row = await db.getFirstAsync<{ word_family_data: string | null }>(
+    "SELECT word_family_data FROM words WHERE term = ? COLLATE NOCASE",
+    [term],
+  );
+  return parseJsonSafe<WordFamily | null>(row?.word_family_data ?? null, null);
+}
+
+export async function setWordFamilyCache(
+  term: string,
+  data: WordFamily,
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    `UPDATE words
+     SET word_family_data = ?
+     WHERE term = ? COLLATE NOCASE`,
+    [JSON.stringify(data), term],
+  );
 }

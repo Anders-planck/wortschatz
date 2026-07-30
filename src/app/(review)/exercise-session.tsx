@@ -2,22 +2,19 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, Text } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
+import { PrerequisiteState } from "@/features/shared/components/prerequisite-state";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { useExerciseSession } from "@/features/exercises/hooks/use-exercise-session";
-import type { ExerciseType } from "@/features/exercises/types";
+import {
+  EXERCISE_TYPE_LABELS,
+  type ExerciseType,
+} from "@/features/exercises/types";
 import { ExerciseProgress } from "@/features/exercises/components/exercise-progress";
 import { ExerciseFeedback } from "@/features/exercises/components/exercise-feedback";
 import { ExerciseSummary } from "@/features/exercises/components/exercise-summary";
 import { FillBlankView } from "@/features/exercises/components/fill-blank-exercise";
 import { DictationView } from "@/features/exercises/components/dictation-exercise";
 import { CaseQuizView } from "@/features/exercises/components/case-quiz-exercise";
-
-const TITLE_MAP: Record<ExerciseType, string> = {
-  fill: "Completa",
-  dictation: "Dettato",
-  cases: "Articoli & Casi",
-  mix: "Mix intelligente",
-};
 
 export default function ExerciseSessionScreen() {
   const { colors, textStyles } = useAppTheme();
@@ -42,7 +39,7 @@ export default function ExerciseSessionScreen() {
 
   const handleContinue = () => {
     setShowFeedback(false);
-    session.advance();
+    void session.advance();
   };
 
   const handleSkip = async () => {
@@ -50,7 +47,26 @@ export default function ExerciseSessionScreen() {
     await session.skip();
   };
 
-  const title = TITLE_MAP[type] ?? "Esercizi";
+  const title = EXERCISE_TYPE_LABELS[type] ?? "Esercizi";
+  const blockedContent: Record<string, { title: string; description: string }> = {
+    needs_vocabulary: {
+      title: "Aggiungi un po' di vocabolario",
+      description:
+        type === "mix"
+          ? "Salva qualche parola prima di iniziare il mix di esercizi."
+          : "Salva almeno una parola nel vocabolario per iniziare questo esercizio.",
+    },
+    needs_example_words: {
+      title: "Servono parole con esempi",
+      description:
+        "Il dettato usa parole che hanno gia una frase di esempio. Cerca e salva altre parole con contesto.",
+    },
+    needs_gendered_nouns: {
+      title: "Servono sostantivi con articolo",
+      description:
+        "Questo quiz richiede almeno un sostantivo con genere salvato nel vocabolario.",
+    },
+  };
 
   if (session.phase === "loading") {
     return (
@@ -90,6 +106,61 @@ export default function ExerciseSessionScreen() {
             durationSeconds={session.durationSeconds}
             onRetryErrors={session.retryErrors}
             onClose={() => router.back()}
+          />
+        </ScrollView>
+        <Stack.Screen options={{ title }} />
+      </>
+    );
+  }
+
+  if (session.phase === "blocked" && session.prerequisiteReason) {
+    const content = blockedContent[session.prerequisiteReason];
+    return (
+      <>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{ flex: 1, backgroundColor: colors.bg }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <PrerequisiteState
+            icon="book.closed"
+            title={content.title}
+            description={content.description}
+            primaryLabel="Cerca parole"
+            onPrimaryPress={() => router.replace("/(search)")}
+            secondaryLabel="Torna indietro"
+            onSecondaryPress={() => router.back()}
+          />
+        </ScrollView>
+        <Stack.Screen options={{ title }} />
+      </>
+    );
+  }
+
+  if (session.phase === "error") {
+    return (
+      <>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{ flex: 1, backgroundColor: colors.bg }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <PrerequisiteState
+            icon="exclamationmark.triangle"
+            title="Impossibile preparare gli esercizi"
+            description="La generazione non e andata a buon fine. Riprova tra un attimo."
+            primaryLabel="Riprova"
+            onPrimaryPress={() => void session.retry()}
+            secondaryLabel="Torna indietro"
+            onSecondaryPress={() => router.back()}
           />
         </ScrollView>
         <Stack.Screen options={{ title }} />

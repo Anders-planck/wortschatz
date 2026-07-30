@@ -8,16 +8,16 @@ import {
   getWordCount,
 } from "@/features/shared/db/words-repository";
 import {
-  getStudyStreak,
-  getWeeklyActivityFromLog,
-  getActivityToday,
-} from "@/features/review/services/activity-repository";
-import {
   getReviewForecast,
   getReviewForecastBreakdown,
   type ForecastDay,
   type ForecastBreakdown,
 } from "@/features/review/services/forecast-repository";
+import {
+  getStudyActivityToday,
+  getStudyStreak,
+  getWeeklyStudyActivity,
+} from "@/features/review/services/study-sessions-repository";
 
 interface DashboardData {
   wordsToReview: Word[];
@@ -66,9 +66,9 @@ export function useReviewDashboard(): DashboardData {
         getWordsForReview(12),
         getTrickyWords(8),
         getWordCount(),
-        getWeeklyActivityFromLog(),
+        getWeeklyStudyActivity(),
         getStudyStreak(),
-        getActivityToday(),
+        getStudyActivityToday(),
         getReviewForecast(),
         getReviewForecastBreakdown(),
       ]);

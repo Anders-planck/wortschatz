@@ -5,13 +5,18 @@ import type {
   ExerciseType,
   SessionPhase,
 } from "../types";
+import { EXERCISE_TYPE_LABELS } from "../types";
 import { generateExercises } from "../services/exercise-generator";
 import {
   submitReview,
-  type ActivityContext,
 } from "@/features/review/hooks/use-spaced-repetition";
 import { getAllWords } from "@/features/shared/db/words-repository";
 import type { Word } from "@/features/dictionary/types";
+import { logStudySession } from "@/features/review/services/study-sessions-repository";
+import {
+  type PrerequisiteReason,
+  isPrerequisiteError,
+} from "@/features/shared/types/prerequisites";
 import {
   hapticMedium,
   hapticSuccess,
@@ -28,11 +33,13 @@ interface ExerciseSession {
   correctCount: number;
   errorCount: number;
   durationSeconds: number;
+  prerequisiteReason: PrerequisiteReason | null;
   start: (type: ExerciseType) => Promise<void>;
   submit: (userAnswer: string) => Promise<void>;
-  advance: () => void;
+  advance: () => Promise<void>;
   skip: () => Promise<void>;
   retryErrors: () => void;
+  retry: () => Promise<void>;
 }
 
 export function useExerciseSession(): ExerciseSession {
@@ -43,12 +50,20 @@ export function useExerciseSession(): ExerciseSession {
   const [allWords, setAllWords] = useState<Word[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
+  const [lastType, setLastType] = useState<ExerciseType>("mix");
+  const [prerequisiteReason, setPrerequisiteReason] =
+    useState<PrerequisiteReason | null>(null);
 
   const start = useCallback(async (type: ExerciseType) => {
+    setLastType(type);
     setPhase("loading");
     setCurrentIndex(0);
     setResults([]);
+    setExercises([]);
+    setAllWords([]);
+    setStartTime(null);
     setEndTime(null);
+    setPrerequisiteReason(null);
 
     try {
       const [generated, words] = await Promise.all([
@@ -59,10 +74,37 @@ export function useExerciseSession(): ExerciseSession {
       setAllWords(words);
       setStartTime(Date.now());
       setPhase("active");
-    } catch {
-      setPhase("summary");
+    } catch (error: unknown) {
+      if (isPrerequisiteError(error) && error.reason !== "generation_failed") {
+        setPrerequisiteReason(error.reason);
+        setPhase("blocked");
+      } else {
+        setPrerequisiteReason("generation_failed");
+        setPhase("error");
+      }
     }
   }, []);
+
+  const finishSession = useCallback(
+    async (finalResults: ExerciseResult[]) => {
+      if (finalResults.length === 0) return;
+
+      try {
+        await logStudySession({
+          activityType: "exercise",
+          label: EXERCISE_TYPE_LABELS[lastType],
+          itemCount: finalResults.length,
+          correctCount: finalResults.filter((result) => result.isCorrect).length,
+          durationSeconds: startTime
+            ? Math.round((Date.now() - startTime) / 1000)
+            : 0,
+        });
+      } catch {
+        // Keep summary UX responsive even if session logging fails
+      }
+    },
+    [lastType, startTime],
+  );
 
   const findWordForExercise = useCallback(
     (exercise: Exercise, words: Word[]): Word | undefined => {
@@ -126,16 +168,17 @@ export function useExerciseSession(): ExerciseSession {
     [exercises, currentIndex, allWords, findWordForExercise],
   );
 
-  const advance = useCallback(() => {
+  const advance = useCallback(async () => {
     const nextIndex = currentIndex + 1;
     if (nextIndex >= exercises.length) {
       setEndTime(Date.now());
+      await finishSession(results);
       setPhase("summary");
       hapticSuccess();
     } else {
       setCurrentIndex(nextIndex);
     }
-  }, [currentIndex, exercises.length]);
+  }, [currentIndex, exercises.length, finishSession, results]);
 
   const skip = useCallback(async () => {
     const exercise = exercises[currentIndex];
@@ -147,7 +190,8 @@ export function useExerciseSession(): ExerciseSession {
       isCorrect: false,
     };
 
-    setResults((prev) => [...prev, result]);
+    const newResults = [...results, result];
+    setResults(newResults);
 
     const word = findWordForExercise(exercise, allWords);
     if (word) {
@@ -173,11 +217,19 @@ export function useExerciseSession(): ExerciseSession {
     const nextIndex = currentIndex + 1;
     if (nextIndex >= exercises.length) {
       setEndTime(Date.now());
+      await finishSession(newResults);
       setPhase("summary");
     } else {
       setCurrentIndex(nextIndex);
     }
-  }, [exercises, currentIndex, allWords, findWordForExercise]);
+  }, [
+    allWords,
+    currentIndex,
+    exercises,
+    findWordForExercise,
+    finishSession,
+    results,
+  ]);
 
   const retryErrors = useCallback(() => {
     const failed = results.filter((r) => !r.isCorrect).map((r) => r.exercise);
@@ -191,6 +243,10 @@ export function useExerciseSession(): ExerciseSession {
     setEndTime(null);
     setPhase("active");
   }, [results]);
+
+  const retry = useCallback(async () => {
+    await start(lastType);
+  }, [lastType, start]);
 
   const correctCount = results.filter((r) => r.isCorrect).length;
   const errorCount = results.filter((r) => !r.isCorrect).length;
@@ -210,10 +266,12 @@ export function useExerciseSession(): ExerciseSession {
     correctCount,
     errorCount,
     durationSeconds,
+    prerequisiteReason,
     start,
     submit,
     advance,
     skip,
     retryErrors,
+    retry,
   };
 }

@@ -11,7 +11,10 @@ export async function lookupFromCache(term: string): Promise<Word | null> {
   return getWordByTerm(term);
 }
 
-export async function lookupFromWiktionary(term: string): Promise<Word | null> {
+export async function lookupFromWiktionary(
+  term: string,
+  origin: "search" | "chat" = "search",
+): Promise<Word | null> {
   const data = await fetchFromWiktionary(term);
   if (!data) return null;
 
@@ -41,11 +44,18 @@ export async function lookupFromWiktionary(term: string): Promise<Word | null> {
     srState: 0,
   };
 
-  const id = await insertWord(baseWord);
-  return { ...baseWord, id };
+  const result = await insertWord(baseWord, { origin });
+  if (!result.inserted) {
+    return getWordByTerm(baseWord.term);
+  }
+
+  return { ...baseWord, id: result.id };
 }
 
-export async function lookupFromAI(term: string): Promise<Word> {
+export async function lookupFromAI(
+  term: string,
+  origin: "search" | "chat" = "search",
+): Promise<Word> {
   const context = await generateWordContext({ term });
   const germanTerm = context.germanTerm || term;
 
@@ -77,8 +87,13 @@ export async function lookupFromAI(term: string): Promise<Word> {
     srState: 0,
   };
 
-  const id = await insertWord(word);
-  return { ...word, id };
+  const result = await insertWord(word, { origin });
+  if (!result.inserted) {
+    const existing = await getWordByTerm(germanTerm);
+    if (existing) return existing;
+  }
+
+  return { ...word, id: result.id };
 }
 
 export async function enrichWithAI(word: Word): Promise<Word> {

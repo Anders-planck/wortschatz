@@ -1,13 +1,16 @@
 import { getDatabase } from "@/features/shared/db/database";
 import { getWordCount } from "@/features/shared/db/words-repository";
 import {
-  getActivityToday,
-  getActivityByDay,
   getExerciseStats,
   getTotalStudyStats,
-  getRecentActivity,
   getScoreTrend,
 } from "./activity-repository";
+import {
+  getRecentStudySessions,
+  getStudyActivityByDay,
+  getStudyActivityToday,
+  type StudySessionType,
+} from "./study-sessions-repository";
 
 const MASTERY_LEVELS = [
   "Padroneggiato",
@@ -36,10 +39,10 @@ export interface WordStats {
     accuracy: number;
   }[];
   recentActivity: {
-    term: string;
-    activityType: string;
-    exerciseType: string | null;
-    isCorrect: boolean;
+    label: string;
+    activityType: StudySessionType;
+    itemCount: number;
+    correctCount: number | null;
     createdAt: string;
   }[];
   scoreTrend: { day: string; avgScore: number }[];
@@ -53,12 +56,11 @@ export async function getDetailedStats(): Promise<WordStats> {
     byTypeRows,
     avgRow,
     masteryRows,
-    activitiesTodayFromLog,
-    todayFallbackRow,
+    activitiesToday,
     monthlyActivity,
     exerciseBreakdown,
     studyStats,
-    recentActivity,
+    recentSessions,
     scoreTrend,
   ] = await Promise.all([
     getWordCount(),
@@ -84,23 +86,13 @@ export async function getDetailedStats(): Promise<WordStats> {
       FROM words
       GROUP BY level`,
     ),
-    getActivityToday(),
-    db.getFirstAsync<{ count: number }>(
-      `SELECT COUNT(*) as count FROM words
-       WHERE DATE(searched_at, 'localtime') = DATE('now', 'localtime')`,
-    ),
-    getActivityByDay(30),
+    getStudyActivityToday(),
+    getStudyActivityByDay(30),
     getExerciseStats(),
     getTotalStudyStats(),
-    getRecentActivity(10),
+    getRecentStudySessions(10),
     getScoreTrend(30),
   ]);
-
-  // Backward compat: if activity_log is empty (first launch after update), fall back to searched_at count
-  const activitiesToday =
-    activitiesTodayFromLog > 0
-      ? activitiesTodayFromLog
-      : (todayFallbackRow?.count ?? 0);
 
   const masteryMap = new Map(masteryRows.map((r) => [r.level, r.count]));
   const masteryDistribution = MASTERY_LEVELS.map((level) => ({
@@ -119,7 +111,13 @@ export async function getDetailedStats(): Promise<WordStats> {
     overallAccuracy: studyStats.overallAccuracy,
     monthlyActivity,
     exerciseBreakdown,
-    recentActivity,
+    recentActivity: recentSessions.map((session) => ({
+      label: session.label,
+      activityType: session.activityType,
+      itemCount: session.itemCount,
+      correctCount: session.correctCount,
+      createdAt: session.createdAt,
+    })),
     scoreTrend,
   };
 }

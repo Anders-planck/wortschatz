@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -10,6 +10,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { getReadingById } from "@/features/immersion/services/readings-repository";
 import { getAllWords } from "@/features/shared/db/words-repository";
+import { logStudySession } from "@/features/review/services/study-sessions-repository";
 import { WordPopup } from "@/features/immersion/components/word-popup";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";
 import type { SavedReading } from "@/features/immersion/types";
@@ -24,6 +25,9 @@ export default function ReadingDetailScreen() {
     Map<string, string>
   >(new Map());
   const [isLoading, setIsLoading] = useState(true);
+  const [isMarkedRead, setIsMarkedRead] = useState(false);
+  const [isMarkingRead, setIsMarkingRead] = useState(false);
+  const openedAtRef = useRef(Date.now());
 
   useEffect(() => {
     if (!id) return;
@@ -105,6 +109,23 @@ export default function ReadingDetailScreen() {
 
   const totalWords = words.length;
   const knownCount = words.filter((w) => isKnown(w)).length;
+
+  const handleMarkRead = async () => {
+    if (isMarkedRead || isMarkingRead) return;
+
+    setIsMarkingRead(true);
+    try {
+      await logStudySession({
+        activityType: "reading",
+        label: reading.title,
+        itemCount: reading.wordCount,
+        durationSeconds: Math.round((Date.now() - openedAtRef.current) / 1000),
+      });
+      setIsMarkedRead(true);
+    } finally {
+      setIsMarkingRead(false);
+    }
+  };
 
   return (
     <>
@@ -197,6 +218,35 @@ export default function ReadingDetailScreen() {
         >
           Tocca una parola per la traduzione
         </Text>
+
+        <Pressable
+          onPress={() => void handleMarkRead()}
+          disabled={isMarkedRead || isMarkingRead}
+          style={({ pressed }) => ({
+            marginTop: 8,
+            backgroundColor: isMarkedRead ? colors.successBg : colors.accent,
+            borderRadius: 14,
+            borderCurve: "continuous",
+            paddingVertical: 16,
+            alignItems: "center",
+            opacity: isMarkedRead ? 1 : pressed || isMarkingRead ? 0.85 : 1,
+          })}
+        >
+          <Text
+            style={{
+              fontFamily: textStyles.heading.fontFamily,
+              fontSize: 15,
+              fontWeight: "600",
+              color: isMarkedRead ? colors.success : colors.onAccent,
+            }}
+          >
+            {isMarkedRead
+              ? "Segnato come letto"
+              : isMarkingRead
+                ? "Salvataggio..."
+                : "Segna come letto"}
+          </Text>
+        </Pressable>
       </ScrollView>
 
       {tappedWord && (

@@ -32,10 +32,26 @@ export function useSearchScreen() {
       const normalized = term.trim();
       if (normalized.length < 2 || hasNavigated.current) return;
       hasNavigated.current = true;
+      if (/\s/.test(normalized)) {
+        router.push({
+          pathname: "/translate",
+          params: { text: normalized },
+        });
+        return;
+      }
+
       router.push(`/word/${encodeURIComponent(normalized)}`);
     },
     [router],
   );
+
+  const openTranslate = useCallback(() => {
+    router.push("/translate");
+  }, [router]);
+
+  const openScan = useCallback(() => {
+    router.push("/scan-translate");
+  }, [router]);
 
   return {
     query,
@@ -43,5 +59,7 @@ export function useSearchScreen() {
     recentWords,
     refreshRecent: loadRecent,
     submitSearch,
+    openTranslate,
+    openScan,
   };
 }

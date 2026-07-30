@@ -8,7 +8,9 @@ export type AiFeature =
   | "enrichment"
   | "synonyms"
   | "word_family"
-  | "collections";
+  | "collections"
+  | "translation"
+  | "ocr_translation";
 
 const PRICING: Record<string, { input: number; output: number }> = {
   "gemini-2.5-flash-lite": {

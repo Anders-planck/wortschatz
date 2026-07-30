@@ -1,9 +1,6 @@
 import { generateText, Output } from "ai";
 import { google } from "@/features/shared/config/ai-provider";
 import { trackAiCall } from "@/features/shared/services/ai-usage-tracker";
-
-const AI_MODEL = "gemini-2.5-flash-lite";
-
 import {
   WordFamilySchema,
   SynonymsAntonymsSchema,
@@ -14,6 +11,8 @@ import {
   type Reading,
   type ListeningExercise,
 } from "../types";
+
+const AI_MODEL = "gemini-2.5-flash-lite";
 
 export async function generateWordFamily(
   term: string,

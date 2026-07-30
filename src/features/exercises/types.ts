@@ -1,6 +1,17 @@
-import type { Word } from "@/features/dictionary/types";
-
 export type ExerciseType = "fill" | "dictation" | "cases" | "mix";
+export type SessionPhase =
+  | "loading"
+  | "active"
+  | "summary"
+  | "blocked"
+  | "error";
+
+export const EXERCISE_TYPE_LABELS: Record<ExerciseType, string> = {
+  fill: "Completa",
+  dictation: "Dettato",
+  cases: "Articoli & Casi",
+  mix: "Mix intelligente",
+};
 
 export interface FillBlankExercise {
   type: "fill";
@@ -36,5 +47,3 @@ export interface ExerciseResult {
   userAnswer: string;
   isCorrect: boolean;
 }
-
-export type SessionPhase = "loading" | "active" | "summary";

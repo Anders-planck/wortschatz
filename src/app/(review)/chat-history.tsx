@@ -390,7 +390,7 @@ export default function ChatHistoryScreen() {
                             color: colors.textSecondary,
                           }}
                         >
-                          {formatDate(session.createdAt)}
+                          {formatDate(session.updatedAt)}
                         </Text>
                         <Text
                           style={{
@@ -458,14 +458,14 @@ export default function ChatHistoryScreen() {
                         />
                         <View style={{ flex: 1, gap: 2 }}>
                           <Text
-                            style={{
-                              fontFamily: textStyles.mono.fontFamily,
-                              fontSize: 12,
-                              color: colors.textSecondary,
-                            }}
-                          >
-                            {formatDate(session.createdAt)}
-                          </Text>
+                          style={{
+                            fontFamily: textStyles.mono.fontFamily,
+                            fontSize: 12,
+                            color: colors.textSecondary,
+                          }}
+                        >
+                          {formatDate(session.updatedAt)}
+                        </Text>
                           <Text
                             style={{
                               fontFamily: textStyles.mono.fontFamily,

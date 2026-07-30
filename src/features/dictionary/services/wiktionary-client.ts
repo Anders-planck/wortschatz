@@ -5,7 +5,7 @@ const BASE_URL = "https://en.wiktionary.org/api/rest_v1";
 interface WiktionaryDefinition {
   definition: string;
   examples?: string[];
-  parsedExamples?: Array<{ example: string; translation?: string }>;
+  parsedExamples?: { example: string; translation?: string }[];
 }
 
 interface WiktionaryEntry {

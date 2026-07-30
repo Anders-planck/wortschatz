@@ -5,7 +5,7 @@ import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 interface ExerciseProgressProps {
   total: number;
   current: number;
-  results: Array<{ isCorrect: boolean }>;
+  results: { isCorrect: boolean }[];
   startTime: number | null;
 }
 

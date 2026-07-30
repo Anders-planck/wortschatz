@@ -1,30 +1,15 @@
 import { useMemo } from "react";
 import { Text, View } from "react-native";
 import { SymbolView } from "expo-symbols";
-import Svg, {
-  Path,
-  Circle,
-  Line,
-  Defs,
-  LinearGradient,
-  Stop,
-  Text as SvgText,
-} from "react-native-svg";
+import Svg, { Path, Circle, Line, Defs, LinearGradient, Stop } from "react-native-svg";
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import type {
   MasteryLevel,
   WordStats,
 } from "@/features/review/services/stats-repository";
+import { toLocalDateStr, rollingWeekDays } from "@/features/shared/utils/date";
 
 // ─── Label/Color Maps ────────────────────────────────────────────────────────
-
-const TYPE_LABELS: Record<string, string> = {
-  noun: "Nomi",
-  verb: "Verbi",
-  adjective: "Aggettivi",
-  adverb: "Avverbi",
-  preposition: "Preposizioni",
-};
 
 const TYPE_SHORT: Record<string, string> = {
   noun: "Nomi",
@@ -50,12 +35,6 @@ const MASTERY_COLORS: Record<MasteryLevel, string> = {
   Difficile: "#C07060",
 };
 
-const EXERCISE_LABELS: Record<string, string> = {
-  fill: "Completa",
-  dictation: "Dettato",
-  cases: "Articoli & Casi",
-};
-
 const EXERCISE_SHORT: Record<string, string> = {
   fill: "Completa",
   dictation: "Dettato",
@@ -68,42 +47,24 @@ const EXERCISE_COLORS: Record<string, string> = {
   cases: "#8DB58A",
 };
 
+const ACTIVITY_BADGES: Record<string, string> = {
+  review: "Ripasso",
+  exercise: "Esercizio",
+  chat: "Chat",
+  reading: "Lettura",
+  listening: "Ascolto",
+};
+
+const SCORE_MIN = -5;
+const SCORE_MAX = 10;
+const DONUT_SIZE = 90;
+const DONUT_R = 33;
+const DONUT_CX = DONUT_SIZE / 2;
+const DONUT_CY = DONUT_SIZE / 2;
+const STROKE_W = 10;
+const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_R;
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-import { toLocalDateStr, rollingWeekDays } from "@/features/shared/utils/date";
-
-interface CalendarDay {
-  day: string;
-  count: number;
-  isFuture: boolean;
-}
-
-function buildCalendarDays(
-  activity: { day: string; count: number }[],
-): CalendarDay[] {
-  const countByDay = new Map(activity.map((a) => [a.day, a.count]));
-  const days: CalendarDay[] = [];
-  const now = new Date();
-
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
-    const key = toLocalDateStr(d);
-    days.push({ day: key, count: countByDay.get(key) ?? 0, isFuture: false });
-  }
-
-  const lastDayOfMonth = new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    0,
-  ).getDate();
-  for (let d = now.getDate() + 1; d <= lastDayOfMonth; d++) {
-    const date = new Date(now.getFullYear(), now.getMonth(), d);
-    days.push({ day: toLocalDateStr(date), count: 0, isFuture: true });
-  }
-
-  return days;
-}
 
 function relativeTime(isoDate: string): string {
   const now = Date.now();
@@ -199,8 +160,6 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
   const chartHeight = 90;
   const chartPadX = 8;
   const chartPadY = 8;
-  const scoreMin = -5;
-  const scoreMax = 10;
 
   const trendPoints = useMemo(() => {
     if (stats.scoreTrend.length === 0) return [];
@@ -208,13 +167,13 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
     return stats.scoreTrend.map((pt, i) => {
       const x =
         chartPadX + (i / Math.max(n - 1, 1)) * (chartWidth - chartPadX * 2);
-      const norm = (pt.avgScore - scoreMin) / (scoreMax - scoreMin);
+      const norm = (pt.avgScore - SCORE_MIN) / (SCORE_MAX - SCORE_MIN);
       const y =
         chartPadY +
         (1 - Math.max(0, Math.min(1, norm))) * (chartHeight - chartPadY * 2);
       return { x, y };
     });
-  }, [stats.scoreTrend]);
+  }, [chartHeight, chartPadX, chartPadY, chartWidth, stats.scoreTrend]);
 
   const linePath = useMemo(() => smoothPath(trendPoints), [trendPoints]);
   const areaPath = useMemo(() => {
@@ -283,13 +242,6 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
         )
       : 0;
 
-  const DONUT_SIZE = 90;
-  const DONUT_R = 33;
-  const DONUT_CX = DONUT_SIZE / 2;
-  const DONUT_CY = DONUT_SIZE / 2;
-  const STROKE_W = 10;
-  const CIRCUMFERENCE = 2 * Math.PI * DONUT_R;
-
   const donutSegments = useMemo(() => {
     const total = totalMastery === 0 ? 1 : totalMastery;
     let offset = 0;
@@ -297,9 +249,9 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
     return stats.masteryDistribution
       .filter((m) => m.count > 0)
       .map((m) => {
-        const dashLen = (m.count / total) * CIRCUMFERENCE - gap;
+        const dashLen = (m.count / total) * DONUT_CIRCUMFERENCE - gap;
         const seg = { ...m, dashLen: Math.max(dashLen, 0), offset };
-        offset += (m.count / total) * CIRCUMFERENCE;
+        offset += (m.count / total) * DONUT_CIRCUMFERENCE;
         return seg;
       });
   }, [stats.masteryDistribution, totalMastery]);
@@ -685,7 +637,7 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
                   fill="none"
                   stroke={MASTERY_COLORS[seg.level]}
                   strokeWidth={STROKE_W}
-                  strokeDasharray={`${seg.dashLen} ${CIRCUMFERENCE}`}
+                  strokeDasharray={`${seg.dashLen} ${DONUT_CIRCUMFERENCE}`}
                   strokeDashoffset={-seg.offset}
                   strokeLinecap="butt"
                   rotation={-90}
@@ -1150,12 +1102,24 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
           </Text>
         ) : (
           stats.recentActivity.map((item, idx) => {
-            const badgeLabel =
-              item.activityType === "review"
-                ? "Ripasso"
-                : (EXERCISE_LABELS[item.exerciseType ?? ""] ??
-                  item.exerciseType ??
-                  "Esercizio");
+            const badgeLabel = ACTIVITY_BADGES[item.activityType] ?? item.activityType;
+            const hasAccuracy =
+              item.correctCount !== null && item.itemCount > 0;
+            const accuracy = hasAccuracy
+              ? item.correctCount! / item.itemCount
+              : null;
+            const iconName =
+              item.activityType === "reading" || !hasAccuracy
+                ? "checkmark.seal.fill"
+                : accuracy! >= 0.7
+                  ? "checkmark.circle.fill"
+                  : "xmark.circle.fill";
+            const iconColor =
+              item.activityType === "reading" || !hasAccuracy
+                ? colors.accent
+                : accuracy! >= 0.7
+                  ? "#6AAF6A"
+                  : "#C07060";
 
             return (
               <View
@@ -1167,13 +1131,9 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
                 }}
               >
                 <SymbolView
-                  name={
-                    item.isCorrect
-                      ? "checkmark.circle.fill"
-                      : "xmark.circle.fill"
-                  }
+                  name={iconName as import("expo-symbols").SFSymbol}
                   size={18}
-                  tintColor={item.isCorrect ? "#6AAF6A" : "#C07060"}
+                  tintColor={iconColor}
                   resizeMode="scaleAspectFit"
                 />
                 <Text
@@ -1187,8 +1147,22 @@ export function StatsCard({ stats, dailyGoal, streak }: StatsCardProps) {
                   ]}
                   numberOfLines={1}
                 >
-                  {item.term}
+                  {item.label}
                 </Text>
+                {hasAccuracy && (
+                  <Text
+                    style={[
+                      textStyles.mono,
+                      {
+                        fontSize: 10,
+                        color: colors.textMuted,
+                        fontVariant: ["tabular-nums"],
+                      },
+                    ]}
+                  >
+                    {item.correctCount}/{item.itemCount}
+                  </Text>
+                )}
                 <View
                   style={{
                     backgroundColor: `${colors.accent}20`,

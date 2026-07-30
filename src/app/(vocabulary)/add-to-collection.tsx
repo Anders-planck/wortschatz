@@ -1,7 +1,11 @@
 import { useState, useCallback } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useFocusEffect } from "expo-router";
+import {
+  Stack,
+  useFocusEffect,
+  useLocalSearchParams,
+  useRouter,
+} from "expo-router";
 import { SymbolView, type SFSymbol } from "expo-symbols";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";

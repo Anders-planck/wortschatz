@@ -33,6 +33,16 @@ const FEATURE_CONFIG: Record<string, FeatureConfigEntry> = {
   },
   word_family: { label: "Wortfamilie", icon: "leaf", colorKey: "verb" },
   collections: { label: "Collezioni", icon: "folder", colorKey: "die" },
+  translation: {
+    label: "Traduzione",
+    icon: "character.bubble",
+    colorKey: "accent",
+  },
+  ocr_translation: {
+    label: "Foto & OCR",
+    icon: "camera.viewfinder",
+    colorKey: "prep",
+  },
 };
 
 interface AiUsageBreakdownProps {

@@ -11,6 +11,9 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  corrections?: Correction[];
+  markedWords?: string[];
+  suggestions?: string[];
 }
 
 export interface Correction {

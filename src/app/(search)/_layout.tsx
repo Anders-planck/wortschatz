@@ -7,6 +7,8 @@ export default function SearchLayout() {
   return (
     <Stack screenOptions={screenOptions}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="translate" />
+      <Stack.Screen name="scan-translate" />
       <Stack.Screen name="word/[term]" />
       <Stack.Screen name="word-family/[term]" />
       <Stack.Screen

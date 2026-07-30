@@ -5,7 +5,6 @@ import Constants from "expo-constants";
 import { useSpeech } from "@/features/shared/hooks/use-speech";
 import { useThemeColors } from "@/features/shared/theme/theme-context";
 import { useSettings } from "@/features/settings/hooks/use-settings";
-import { fonts } from "@/features/shared/theme/typography";
 import {
   SPEECH_RATE_MIN,
   SPEECH_RATE_MAX,

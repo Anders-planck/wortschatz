@@ -6,11 +6,16 @@ export function SearchHint() {
   const { colors, textStyles } = useAppTheme();
 
   return (
-    <View style={{ paddingTop: 32, alignItems: "center" }}>
+    <View style={{ gap: 8 }}>
+      <Text style={textStyles.monoLabel}>Input incompleto</Text>
       <Text
-        style={[textStyles.bodyLight, { fontSize: 14, color: colors.textHint }]}
+        style={[
+          textStyles.body,
+          { fontSize: 14, color: colors.textSecondary, lineHeight: 21 },
+        ]}
       >
-        Continua a scrivere...
+        Scrivi almeno due caratteri. Una parola apre il dizionario, una frase
+        intera entra nel flusso di traduzione dettagliata.
       </Text>
     </View>
   );

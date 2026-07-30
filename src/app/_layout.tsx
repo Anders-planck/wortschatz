@@ -7,8 +7,7 @@ import {
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useMemo } from "react";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { Appearance } from "react-native";
 import { useRouter } from "expo-router";
 

@@ -2,11 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import Animated, {
-  FadeInUp,
-  FadeInDown,
-  FadeOut,
-} from "react-native-reanimated";
+import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { SpeakerButton } from "@/features/shared/components/speaker-button";

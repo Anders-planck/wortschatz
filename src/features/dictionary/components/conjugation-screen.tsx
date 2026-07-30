@@ -47,14 +47,18 @@ function TenseTable({
   isIrregular: boolean;
   highlightEnding: boolean;
 }) {
-  const { colors, textStyles } = useAppTheme();
+  const { colors } = useAppTheme();
   const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
   const referenceForm = data.wir;
 
   const forms = useMemo(() => buildSpokenForms(data), [data]);
 
   const handleSpeakAll = useCallback(() => {
-    isSpeaking ? stop() : speakAll(forms);
+    if (isSpeaking) {
+      stop();
+      return;
+    }
+    speakAll(forms);
   }, [isSpeaking, stop, speakAll, forms]);
 
   const renderForm = useCallback(
@@ -136,13 +140,17 @@ function PerfektTable({
   data: ConjugationTenseData;
   partizipII: string;
 }) {
-  const { colors, textStyles } = useAppTheme();
+  const { colors } = useAppTheme();
   const { speakAll, stop, isSpeaking, currentSpeakingIndex } = useSpeech();
 
   const forms = useMemo(() => buildSpokenForms(data), [data]);
 
   const handleSpeakAll = useCallback(() => {
-    isSpeaking ? stop() : speakAll(forms);
+    if (isSpeaking) {
+      stop();
+      return;
+    }
+    speakAll(forms);
   }, [isSpeaking, stop, speakAll, forms]);
 
   const renderForm = useCallback(

@@ -8,9 +8,11 @@ export interface SavedChatSession {
   correctionsCount: number;
   durationSeconds: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export async function saveChatSession(data: {
+  id?: number;
   scenario: string;
   messages: ChatMessage[];
   correctionsCount: number;
@@ -19,9 +21,44 @@ export async function saveChatSession(data: {
   durationSeconds: number;
 }): Promise<number> {
   const db = await getDatabase();
+  const now = new Date().toISOString();
+
+  if (data.id != null) {
+    await db.runAsync(
+      `UPDATE chat_sessions
+       SET scenario = ?,
+           messages = ?,
+           corrections_count = ?,
+           correct_count = ?,
+           new_words = ?,
+           duration_seconds = ?,
+           updated_at = ?
+       WHERE id = ?`,
+      [
+        data.scenario,
+        JSON.stringify(data.messages),
+        data.correctionsCount,
+        data.correctCount,
+        JSON.stringify(data.newWords),
+        data.durationSeconds,
+        now,
+        data.id,
+      ],
+    );
+    return data.id;
+  }
+
   const result = await db.runAsync(
-    `INSERT INTO chat_sessions (scenario, messages, corrections_count, correct_count, new_words, duration_seconds, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO chat_sessions (
+       scenario,
+       messages,
+       corrections_count,
+       correct_count,
+       new_words,
+       duration_seconds,
+       created_at,
+       updated_at
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       data.scenario,
       JSON.stringify(data.messages),
@@ -29,10 +66,30 @@ export async function saveChatSession(data: {
       data.correctCount,
       JSON.stringify(data.newWords),
       data.durationSeconds,
-      new Date().toISOString(),
+      now,
+      now,
     ],
   );
   return result.lastInsertRowId;
+}
+
+function parseMessages(raw: string): ChatMessage[] {
+  try {
+    return JSON.parse(raw) as ChatMessage[];
+  } catch {
+    return [];
+  }
+}
+
+function parseStringArray(raw: string): string[] {
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === "string")
+      : [];
+  } catch {
+    return [];
+  }
 }
 
 export async function getRecentChatSessions(
@@ -46,10 +103,18 @@ export async function getRecentChatSessions(
     corrections_count: number;
     duration_seconds: number;
     created_at: string;
+    updated_at: string;
   }>(
-    `SELECT id, scenario, json_array_length(messages) as messages_count, corrections_count, duration_seconds, created_at
+    `SELECT
+       id,
+       scenario,
+       json_array_length(messages) as messages_count,
+       corrections_count,
+       duration_seconds,
+       created_at,
+       updated_at
      FROM chat_sessions
-     ORDER BY created_at DESC
+     ORDER BY updated_at DESC, created_at DESC
      LIMIT ?`,
     [limit],
   );
@@ -61,6 +126,7 @@ export async function getRecentChatSessions(
     correctionsCount: r.corrections_count,
     durationSeconds: r.duration_seconds,
     createdAt: r.created_at,
+    updatedAt: r.updated_at,
   }));
 }
 
@@ -75,11 +141,19 @@ export async function getChatSessionsByScenario(
     corrections_count: number;
     duration_seconds: number;
     created_at: string;
+    updated_at: string;
   }>(
-    `SELECT id, scenario, json_array_length(messages) as messages_count, corrections_count, duration_seconds, created_at
+    `SELECT
+       id,
+       scenario,
+       json_array_length(messages) as messages_count,
+       corrections_count,
+       duration_seconds,
+       created_at,
+       updated_at
      FROM chat_sessions
      WHERE scenario = ?
-     ORDER BY created_at DESC`,
+     ORDER BY updated_at DESC, created_at DESC`,
     [scenarioId],
   );
 
@@ -90,23 +164,60 @@ export async function getChatSessionsByScenario(
     correctionsCount: r.corrections_count,
     durationSeconds: r.duration_seconds,
     createdAt: r.created_at,
+    updatedAt: r.updated_at,
   }));
 }
 
-export async function getChatSessionMessages(
-  id: number,
-): Promise<ChatMessage[]> {
+export async function getChatSession(id: number): Promise<{
+  id: number;
+  scenario: string;
+  messages: ChatMessage[];
+  correctionsCount: number;
+  correctCount: number;
+  newWords: string[];
+  durationSeconds: number;
+  createdAt: string;
+  updatedAt: string;
+} | null> {
   const db = await getDatabase();
-  const row = await db.getFirstAsync<{ messages: string }>(
-    "SELECT messages FROM chat_sessions WHERE id = ?",
+  const row = await db.getFirstAsync<{
+    id: number;
+    scenario: string;
+    messages: string;
+    corrections_count: number;
+    correct_count: number;
+    new_words: string;
+    duration_seconds: number;
+    created_at: string;
+    updated_at: string;
+  }>(
+    `SELECT
+       id,
+       scenario,
+       messages,
+       corrections_count,
+       correct_count,
+       new_words,
+       duration_seconds,
+       created_at,
+       updated_at
+     FROM chat_sessions
+     WHERE id = ?`,
     [id],
   );
-  if (!row) return [];
-  try {
-    return JSON.parse(row.messages) as ChatMessage[];
-  } catch {
-    return [];
-  }
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    scenario: row.scenario,
+    messages: parseMessages(row.messages),
+    correctionsCount: row.corrections_count,
+    correctCount: row.correct_count,
+    newWords: parseStringArray(row.new_words),
+    durationSeconds: row.duration_seconds,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }
 
 export async function deleteChatSession(id: number): Promise<void> {

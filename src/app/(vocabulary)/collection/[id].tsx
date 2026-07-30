@@ -1,13 +1,17 @@
 import { useState, useCallback } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+  Stack,
+  useFocusEffect,
+  useLocalSearchParams,
+  useRouter,
+} from "expo-router";
 
 import { useAppTheme } from "@/features/shared/theme/use-app-theme";
 import { useCollections } from "@/features/collections/hooks/use-collections";
 import { getCollectionWords } from "@/features/shared/db/collections-repository";
 import { VocabularyItem } from "@/features/vocabulary/components/vocabulary-item";
 import type { Word } from "@/features/dictionary/types";
-import { useFocusEffect } from "expo-router";
 
 export default function CollectionDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -153,7 +157,10 @@ export default function CollectionDetailScreen() {
           onPress={() =>
             router.push({
               pathname: "/(review)/session",
-              params: { collectionId: String(id) },
+              params: {
+                collectionId: String(id),
+                collectionName: collection?.name ?? "Ripasso",
+              },
             })
           }
         />
