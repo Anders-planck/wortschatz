@@ -1,4 +1,4 @@
-import { generateText, Output } from "ai";
+import { generateText, NoObjectGeneratedError, Output } from "ai";
 import { google } from "@/features/shared/config/ai-provider";
 import { trackAiCall } from "@/features/shared/services/ai-usage-tracker";
 import { TranslationAnalysisSchema } from "../schemas/translation-schema";
@@ -9,6 +9,16 @@ import type {
 } from "../types";
 
 const AI_MODEL = "gemini-2.5-flash-lite";
+
+function toFriendlyError(error: unknown, fallback: string): Error {
+  if (NoObjectGeneratedError.isInstance(error)) {
+    return new Error(
+      "Il contenuto è troppo complesso da analizzare in un colpo solo. Prova con un'immagine più ravvicinata o meno testo.",
+    );
+  }
+  if (error instanceof Error) return error;
+  return new Error(fallback);
+}
 
 function buildTranslationPrompt({
   sourceLanguage,
@@ -56,6 +66,14 @@ Return a structured analysis with these goals:
 - Keep phrase explanation focused and compact, usually 2-4 sentences.
 - Keep grammarNotes short, concrete, and ready to be shown as bullets.
 - Keep token explanations short and precise, usually 1-2 sentences.
+
+Length and structure limits (respect them strictly to keep the response valid and compact):
+- usageNotes: between 2 and 6 items.
+- alternativeTranslations: at most 5 items (may be empty).
+- extractionNotes: at most 5 items (may be empty).
+- Each phrase in phraseBreakdown: 1 to 6 grammarNotes and at least 1 token.
+- phraseBreakdown: at most 12 phrases total.
+- If the input is a long list, table, or vocabulary set (e.g. a page of numbers or words), DO NOT create one phrase per line. Group related entries and cover only the most representative or instructive 8-12 phrases. Summarize the overall pattern in overallExplanation instead of exploding every item.
 `;
 }
 
@@ -69,37 +87,42 @@ export async function translateDetailedText(params: {
     throw new Error("Inserisci una frase da tradurre");
   }
 
-  const result = await trackAiCall("translation", () =>
-    generateText({
-      model: google(AI_MODEL),
-      output: Output.object({ schema: TranslationAnalysisSchema }),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: buildTranslationPrompt({
-                sourceLanguage: params.sourceLanguage,
-                targetLanguage: params.targetLanguage,
-                fromImage: false,
-              }),
-            },
-            {
-              type: "text",
-              text: `Text to analyze and translate:\n${trimmed}`,
-            },
-          ],
-        },
-      ],
-    }),
-  );
+  try {
+    const result = await trackAiCall("translation", () =>
+      generateText({
+        model: google(AI_MODEL),
+        output: Output.object({ schema: TranslationAnalysisSchema }),
+        maxOutputTokens: 8192,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: buildTranslationPrompt({
+                  sourceLanguage: params.sourceLanguage,
+                  targetLanguage: params.targetLanguage,
+                  fromImage: false,
+                }),
+              },
+              {
+                type: "text",
+                text: `Text to analyze and translate:\n${trimmed}`,
+              },
+            ],
+          },
+        ],
+      }),
+    );
 
-  if (!result.output) {
-    throw new Error("Traduzione non disponibile");
+    if (!result.output) {
+      throw new Error("Traduzione non disponibile");
+    }
+
+    return result.output;
+  } catch (error) {
+    throw toFriendlyError(error, "Traduzione non disponibile");
   }
-
-  return result.output;
 }
 
 export async function translateDetailedImage(params: {
@@ -108,36 +131,41 @@ export async function translateDetailedImage(params: {
   sourceLanguage: TranslationSourceLanguage;
   targetLanguage: TranslationLanguage;
 }): Promise<TranslationAnalysis> {
-  const result = await trackAiCall("ocr_translation", () =>
-    generateText({
-      model: google(AI_MODEL),
-      output: Output.object({ schema: TranslationAnalysisSchema }),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: buildTranslationPrompt({
-                sourceLanguage: params.sourceLanguage,
-                targetLanguage: params.targetLanguage,
-                fromImage: true,
-              }),
-            },
-            {
-              type: "image",
-              image: params.imageBytes,
-              mediaType: params.mediaType,
-            },
-          ],
-        },
-      ],
-    }),
-  );
+  try {
+    const result = await trackAiCall("ocr_translation", () =>
+      generateText({
+        model: google(AI_MODEL),
+        output: Output.object({ schema: TranslationAnalysisSchema }),
+        maxOutputTokens: 8192,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: buildTranslationPrompt({
+                  sourceLanguage: params.sourceLanguage,
+                  targetLanguage: params.targetLanguage,
+                  fromImage: true,
+                }),
+              },
+              {
+                type: "image",
+                image: params.imageBytes,
+                mediaType: params.mediaType,
+              },
+            ],
+          },
+        ],
+      }),
+    );
 
-  if (!result.output) {
-    throw new Error("Analisi immagine non disponibile");
+    if (!result.output) {
+      throw new Error("Analisi immagine non disponibile");
+    }
+
+    return result.output;
+  } catch (error) {
+    throw toFriendlyError(error, "Analisi immagine non disponibile");
   }
-
-  return result.output;
 }

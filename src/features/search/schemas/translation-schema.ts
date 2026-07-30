@@ -14,8 +14,8 @@ export const PhraseBreakdownSchema = z.object({
   translatedPhrase: z.string(),
   literalMeaning: z.string(),
   explanation: z.string(),
-  grammarNotes: z.array(z.string()).min(1).max(6),
-  tokens: z.array(PhraseTokenSchema).min(1),
+  grammarNotes: z.array(z.string()),
+  tokens: z.array(PhraseTokenSchema),
 });
 
 export const TranslationAnalysisSchema = z.object({
@@ -25,9 +25,9 @@ export const TranslationAnalysisSchema = z.object({
   translatedText: z.string(),
   naturalTranslation: z.string(),
   overallExplanation: z.string(),
-  usageNotes: z.array(z.string()).min(2).max(8),
-  alternativeTranslations: z.array(z.string()).max(5),
-  phraseBreakdown: z.array(PhraseBreakdownSchema).min(1),
+  usageNotes: z.array(z.string()),
+  alternativeTranslations: z.array(z.string()),
+  phraseBreakdown: z.array(PhraseBreakdownSchema),
   extractedText: z.string().nullable(),
-  extractionNotes: z.array(z.string()).max(5),
+  extractionNotes: z.array(z.string()),
 });
